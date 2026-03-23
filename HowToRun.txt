@@ -1,0 +1,37 @@
+Pour l’exécuter en local sous Windows/PowerShell, le plus simple est :
+
+cd D:\education\pfe\pfe_ai
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+Pour profiter du mode NLP complet avec spaCy, installe aussi les modèles :
+
+python -m spacy download en_core_web_sm
+python -m spacy download fr_core_news_sm
+Ensuite tu as 4 façons de lancer le projet.
+
+1. Générer le dataset
+
+python data/datasets/generate_dataset.py
+2. Lancer l’API FastAPI
+
+uvicorn src.api.main:app --reload
+Puis ouvre http://localhost:8000/api/v1/docs
+
+3. Lancer le dashboard Streamlit
+Dans un autre terminal :
+
+cd D:\education\pfe\pfe_ai
+.venv\Scripts\Activate.ps1
+streamlit run frontend/app.py
+Puis ouvre http://localhost:8501
+
+4. Lancer l’évaluation scientifique
+
+python -c "from src.evaluation.evaluator import EvaluationSuite; EvaluationSuite().run_full_evaluation('data/datasets/cv_job_dataset.csv')"
+Tests
+
+pytest -q
+Option Docker
+
+docker compose up --build

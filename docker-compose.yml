@@ -1,0 +1,27 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
+      - model_cache:/app/models
+    command: uvicorn src.api.main:app --host 0.0.0.0 --port 8000
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./:/app
+    command: streamlit run frontend/app.py --server.address 0.0.0.0 --server.port 8501
+    depends_on:
+      - api
+
+volumes:
+  model_cache:
+
