@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Briefcase, Clock, Download, FileText, Lightbulb, RotateCcw, Target,
-  TrendingUp, Upload, Code2, Brain,
+  TrendingUp, Upload, Code2, Brain, Share2, List,
 } from "lucide-react";
 import { api } from "@/lib/api/client";
 import type { EvaluatePayload, JobOffer, ModelKey } from "@/lib/api/types";
@@ -18,6 +18,7 @@ import { RadarChart } from "@/components/ui/RadarChart";
 import { ScoreReveal } from "@/components/score/ScoreReveal";
 import { ScoreBreakdown } from "@/components/score/ScoreBreakdown";
 import { SkillChipGroup } from "@/components/skills/SkillChips";
+import { SkillConstellation } from "@/components/skills/SkillConstellation";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { MODEL_OPTIONS } from "@/lib/constants";
 import { staggerContainer, fadeUp } from "@/lib/motion";
@@ -232,6 +233,7 @@ function ResultView({ result, name, jobTitle, onReset, toast }: {
   const sa = ex.skill_analysis;
   const sem = ex.semantic_analysis;
   const [tab, setTab] = useState<"skills" | "gaps" | "actions" | "raw">("skills");
+  const [skillView, setSkillView] = useState<"map" | "list">("map");
   const [pdfLoading, setPdfLoading] = useState(false);
   const displayName = name || "Candidate";
 
@@ -337,12 +339,42 @@ function ResultView({ result, name, jobTitle, onReset, toast }: {
         <CardBody>
           {tab === "skills" && (
             <div className="flex flex-col gap-5">
-              <div className="grid gap-5 sm:grid-cols-2">
-                <SkillChipGroup group="matched" skills={sa.matching_skills} />
-                <SkillChipGroup group="priority" skills={sa.critical_missing} />
-                <SkillChipGroup group="missing" skills={sa.missing_skills} />
-                <SkillChipGroup group="extra" skills={sa.extra_skills} />
+              <div className="flex items-center justify-between">
+                <span className="text-caption text-ink-secondary">Skill coverage · {sa.skill_coverage}</span>
+                <div className="flex gap-1 rounded-lg bg-surface-overlay p-0.5">
+                  <button
+                    onClick={() => setSkillView("map")}
+                    className={cn("flex items-center gap-1.5 rounded-md px-2.5 py-1 text-caption font-medium transition-colors",
+                      skillView === "map" ? "bg-surface text-ink shadow-e1" : "text-ink-muted hover:text-ink-secondary")}
+                  >
+                    <Share2 className="h-3.5 w-3.5" /> Constellation
+                  </button>
+                  <button
+                    onClick={() => setSkillView("list")}
+                    className={cn("flex items-center gap-1.5 rounded-md px-2.5 py-1 text-caption font-medium transition-colors",
+                      skillView === "list" ? "bg-surface text-ink shadow-e1" : "text-ink-muted hover:text-ink-secondary")}
+                  >
+                    <List className="h-3.5 w-3.5" /> List
+                  </button>
+                </div>
               </div>
+              {skillView === "map" ? (
+                <div className="grid place-items-center py-2">
+                  <SkillConstellation
+                    matched={sa.matching_skills}
+                    priority={sa.critical_missing}
+                    missing={sa.missing_skills}
+                    extra={sa.extra_skills}
+                  />
+                </div>
+              ) : (
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <SkillChipGroup group="matched" skills={sa.matching_skills} />
+                  <SkillChipGroup group="priority" skills={sa.critical_missing} />
+                  <SkillChipGroup group="missing" skills={sa.missing_skills} />
+                  <SkillChipGroup group="extra" skills={sa.extra_skills} />
+                </div>
+              )}
               <div className="grid grid-cols-3 gap-3 border-t border-subtle/10 pt-4">
                 <Metric icon={<Brain className="h-4 w-4" />} label="Semantic Match" value={`${sem.score.toFixed(1)}%`} />
                 <Metric label="Topic Overlap" value={`${(sem.theme_overlap * 100).toFixed(0)}%`} />
