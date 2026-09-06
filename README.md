@@ -44,6 +44,29 @@ Documentation Swagger: [http://localhost:8000/api/v1/docs](http://localhost:8000
 streamlit run frontend/app.py
 ```
 
+## Couche 2 — Analyse LLM locale (Ollama, optionnelle)
+
+NeuralHire ajoute une seconde couche de *raisonnement qualitatif* par LLM local,
+en plus du moteur statistique. Elle est **additive et optionnelle** : si Ollama
+n'est pas lancé, le score et la décision fonctionnent exactement comme avant.
+
+```bash
+# 1. Installer Ollama : https://ollama.com/download
+ollama serve                 # démarrer le serveur (souvent auto-démarré)
+ollama pull llama3.2:3b      # modèle par défaut (~2 Go, adapté CPU/8 Go RAM)
+curl http://localhost:11434/api/tags   # vérifier
+```
+
+Variables (facultatives, valeurs par défaut saines) : `OLLAMA_MODEL`,
+`OLLAMA_BASE_URL`, `OLLAMA_TIMEOUT`, `LLM_ENABLED`. Vérification bout-en-bout :
+
+```bash
+python scripts/verify_deep_analysis.py
+```
+
+Architecture détaillée, choix du modèle, prompt et méthodologie d'évaluation :
+voir [`LLM_LAYER.md`](LLM_LAYER.md).
+
 ## Evaluation
 
 ```bash
