@@ -50,6 +50,19 @@ class Settings(BaseSettings):
     # Scoring
     MATCH_THRESHOLD: float = float(os.environ.get("MATCH_THRESHOLD", "0.60"))
 
+    # ── LLM reasoning layer (Layer 2 — additive, optional) ────────────────────
+    # A local Ollama runtime powers the qualitative "deep analysis". It is fully
+    # optional: if Ollama is unreachable the core statistical evaluation is
+    # completely unaffected and the deep-analysis section degrades gracefully.
+    LLM_ENABLED: bool = os.environ.get("LLM_ENABLED", "true").strip().lower() not in {"0", "false", "no", "off"}
+    OLLAMA_BASE_URL: str = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
+    # Default sized for modest hardware (CPU-only, ~8GB RAM): a quantized 3B
+    # instruct model. Override with a larger model on capable machines.
+    OLLAMA_MODEL: str = os.environ.get("OLLAMA_MODEL", "llama3.2:3b")
+    # Local CPU inference is slow — generous timeouts, but bounded.
+    OLLAMA_TIMEOUT: float = float(os.environ.get("OLLAMA_TIMEOUT", "120"))
+    OLLAMA_CONNECT_TIMEOUT: float = float(os.environ.get("OLLAMA_CONNECT_TIMEOUT", "3"))
+
     # Logging
     LOG_LEVEL: str = os.environ.get("LOG_LEVEL", "INFO")
 
