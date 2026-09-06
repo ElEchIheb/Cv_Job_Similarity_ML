@@ -72,6 +72,7 @@
       "bulma",
       "chakra ui",
       "chart.js",
+      "css",
       "css modules",
       "d3.js",
       "echarts",
@@ -79,6 +80,7 @@
       "emotion",
       "framer motion",
       "gatsby",
+      "html",
       "jquery",
       "less",
       "lit",
@@ -97,6 +99,7 @@
       "recoil",
       "redux",
       "remix",
+      "responsive design",
       "rollup",
       "rxjs",
       "sass",
@@ -1294,6 +1297,9 @@
     "ad": "active directory",
     "adf": "azure data factory",
     "appsec": "application security",
+    "css3": "css",
+    "html5": "html",
+    "scss": "sass",
     "ar vr": "ar/vr",
     "aws ecs": "ecs",
     "aws eks": "eks",
@@ -1530,7 +1536,7 @@
   },
   "metadata": {
     "hard_skill_categories": 34,
-    "hard_skill_total": 1039,
+    "hard_skill_total": 1042,
     "soft_skill_total": 79,
     "certification_total": 99
   }
