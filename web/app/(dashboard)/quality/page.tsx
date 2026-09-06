@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { Award, BarChart3, Gauge, Info, Timer, TrendingUp } from "lucide-react";
 import { api } from "@/lib/api/client";
 import type { Quality, QualityFigure } from "@/lib/api/types";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/DataStates";
+import { usePrefersReducedMotion } from "@/lib/use-reduced-motion";
+import { staggerContainer, fadeUp } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 const MODEL_LABEL = (name: string): string => {
@@ -90,12 +93,12 @@ export default function QualityPage() {
       </Card>
 
       {/* Highlights */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <motion.div variants={staggerContainer(0.06)} initial="hidden" animate="show" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Highlight icon={<Gauge className="h-4 w-4" />} label="Best Accuracy" value={`${(bestAcc * 100).toFixed(1)}%`} desc="Highest classification accuracy" tone="success" />
         <Highlight icon={<Award className="h-4 w-4" />} label="Best F1 Score" value={`${(bestF1.val * 100).toFixed(1)}%`} desc={`Best balanced precision/recall — ${MODEL_LABEL(bestF1.name)}`} tone="accent" />
         <Highlight icon={<TrendingUp className="h-4 w-4" />} label="Best AUC-ROC" value={bestAuc.toFixed(3)} desc="Ranking quality (1.0 = perfect)" tone="cyan" />
         <Highlight icon={<Timer className="h-4 w-4" />} label="Fastest Method" value={`${fastest.toFixed(1)} ms`} desc="Offline inference latency per pair" tone="warning" />
-      </div>
+      </motion.div>
 
       {/* Figures */}
       {figures.length > 0 && (
@@ -174,11 +177,19 @@ export default function QualityPage() {
 }
 
 function MetricCell({ pct, highlight }: { pct: number; highlight?: boolean }) {
+  const reduced = usePrefersReducedMotion();
+  const w = `${Math.min(100, pct)}%`;
   return (
     <td className="px-3 py-3">
       <div className="flex items-center gap-2">
         <div className="h-1.5 w-14 overflow-hidden rounded-full bg-surface-overlay">
-          <div className={cn("h-full rounded-full", highlight ? "bg-gradient-to-r from-accent-400 to-cyan-400" : "bg-accent/60")} style={{ width: `${Math.min(100, pct)}%` }} />
+          <motion.div
+            className={cn("h-full rounded-full", highlight ? "bg-gradient-to-r from-accent-400 to-cyan-400" : "bg-accent/60")}
+            initial={{ width: reduced ? w : 0 }}
+            whileInView={{ width: w }}
+            viewport={{ once: true }}
+            transition={reduced ? { duration: 0 } : { duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          />
         </div>
         <span className={cn("tnum text-caption font-medium", highlight ? "text-accent-300" : "text-ink")}>{pct.toFixed(1)}%</span>
       </div>
@@ -189,12 +200,17 @@ function MetricCell({ pct, highlight }: { pct: number; highlight?: boolean }) {
 function Highlight({ icon, label, value, desc, tone }: { icon: React.ReactNode; label: string; value: string; desc: string; tone: string }) {
   const t: Record<string, string> = { accent: "text-accent-300 bg-accent/12", success: "text-success-fg bg-success-soft", warning: "text-warning-fg bg-warning-soft", cyan: "text-cyan-400 bg-cyan-500/12" };
   return (
-    <div className="rounded-xl border border-subtle/12 bg-surface p-5 shadow-e2">
+    <motion.div
+      variants={fadeUp}
+      whileHover={{ y: -4 }}
+      transition={{ type: "spring", stiffness: 300, damping: 24 }}
+      className="rounded-xl border border-subtle/12 bg-surface p-5 shadow-e2 transition-shadow hover:shadow-e4"
+    >
       <span className={cn("mb-2 inline-grid h-8 w-8 place-items-center rounded-lg", t[tone])}>{icon}</span>
       <div className="font-display text-h2 font-semibold text-ink">{value}</div>
       <div className="text-caption font-medium text-ink-secondary">{label}</div>
       <div className="mt-1 text-caption text-ink-muted">{desc}</div>
-    </div>
+    </motion.div>
   );
 }
 

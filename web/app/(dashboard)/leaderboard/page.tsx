@@ -14,6 +14,7 @@ import { Pill } from "@/components/ui/Pill";
 import { Select, Label } from "@/components/ui/Field";
 import { EmptyState } from "@/components/ui/DataStates";
 import { useToast } from "@/components/ui/Toast";
+import { staggerContainer, fadeUp } from "@/lib/motion";
 import { BAND_LABEL, DECISION_STATUS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -185,14 +186,14 @@ export default function LeaderboardPage() {
 
       {results && results.length > 0 && (
         <>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+          <motion.div variants={staggerContainer(0.05)} initial="hidden" animate="show" className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
             <MiniStat icon={<Users className="h-4 w-4" />} label="Candidates" value={results.length} tone="accent" />
             <MiniStat icon={<CheckCircle2 className="h-4 w-4" />} label="Strong Fit" value={nHire} tone="success" />
             <MiniStat icon={<MinusCircle className="h-4 w-4" />} label="Potential Fit" value={nCons} tone="warning" />
             <MiniStat icon={<XCircle className="h-4 w-4" />} label="Low Fit" value={nRej} tone="danger" />
             <MiniStat icon={<Award className="h-4 w-4" />} label="Avg Score" value={`${avg.toFixed(0)}%`} tone="accent" />
             <MiniStat icon={<Trophy className="h-4 w-4" />} label="Top Score" value={`${top.toFixed(0)}%`} tone="cyan" />
-          </div>
+          </motion.div>
 
           <Card elevation={2}>
             <CardHeader><CardTitle className="text-h4">Score distribution</CardTitle>
@@ -214,9 +215,13 @@ export default function LeaderboardPage() {
             </CardBody>
           </Card>
 
-          <div className="flex flex-col gap-3">
-            {results.map((r, i) => <LeaderCard key={i} rank={i + 1} r={r} />)}
-          </div>
+          <motion.div variants={staggerContainer(0.06)} initial="hidden" animate="show" className="flex flex-col gap-3">
+            {results.map((r, i) => (
+              <motion.div key={i} variants={fadeUp}>
+                <LeaderCard rank={i + 1} r={r} />
+              </motion.div>
+            ))}
+          </motion.div>
 
           {valid.length > 0 && (
             <Card elevation={2} className={cn("border-l-4",
@@ -238,11 +243,11 @@ export default function LeaderboardPage() {
 function MiniStat({ icon, label, value, tone }: { icon: React.ReactNode; label: string; value: number | string; tone: string }) {
   const t: Record<string, string> = { accent: "text-accent-300 bg-accent/12", success: "text-success-fg bg-success-soft", warning: "text-warning-fg bg-warning-soft", danger: "text-danger-fg bg-danger-soft", cyan: "text-cyan-400 bg-cyan-500/12" };
   return (
-    <div className="rounded-lg border border-subtle/12 bg-surface p-4 shadow-e1">
+    <motion.div variants={fadeUp} className="rounded-lg border border-subtle/12 bg-surface p-4 shadow-e1">
       <span className={cn("mb-2 inline-grid h-8 w-8 place-items-center rounded-lg", t[tone])}>{icon}</span>
       <div className="font-display text-h3 font-semibold text-ink tnum">{value}</div>
       <div className="text-caption text-ink-secondary">{label}</div>
-    </div>
+    </motion.div>
   );
 }
 

@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Brain, CheckCircle2, Cpu, Info, Layers, Search, SlidersHorizontal, Zap } from "lucide-react";
 import { api } from "@/lib/api/client";
+import { staggerContainer, fadeUp } from "@/lib/motion";
 import type { ModelKey, SystemInfo } from "@/lib/api/types";
 import { useDecisionConfig } from "@/lib/decision-config";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -79,19 +81,22 @@ export default function SettingsPage() {
 
           <Card elevation={2}>
             <CardHeader><CardTitle className="text-h4">Threshold preview</CardTitle></CardHeader>
-            <CardBody className="flex flex-col gap-3">
-              <PreviewRow band="Strong Fit" range={`≥ ${strong}%`} tone="success" tag="Recommended" />
-              <PreviewRow band="Potential Fit" range={`${potential}% – ${strong - 1}%`} tone="warning" tag="Consider" />
-              <PreviewRow band="Low Fit" range={`Below ${potential}%`} tone="danger" tag="Not Recommended" />
+            <CardBody className="flex flex-col gap-4">
+              <BandStrip potential={potential} strong={strong} />
+              <div className="flex flex-col gap-3">
+                <PreviewRow band="Strong Fit" range={`≥ ${strong}%`} tone="success" tag="Recommended" />
+                <PreviewRow band="Potential Fit" range={`${potential}% – ${strong - 1}%`} tone="warning" tag="Consider" />
+                <PreviewRow band="Low Fit" range={`Below ${potential}%`} tone="danger" tag="Not Recommended" />
+              </div>
             </CardBody>
           </Card>
         </div>
       )}
 
       {tab === "models" && (
-        <div className="grid gap-4 md:grid-cols-2">
+        <motion.div variants={staggerContainer(0.07)} initial="hidden" animate="show" className="grid gap-4 md:grid-cols-2">
           {(system?.models ?? []).map((m) => (
-            <Card key={m.key} elevation={2} className="border-l-4" style={{ borderLeftColor: MODEL_COLORS[m.key] }}>
+            <Card key={m.key} variants={fadeUp} elevation={2} interactive className="border-l-4" style={{ borderLeftColor: MODEL_COLORS[m.key] }}>
               <CardBody className="flex items-start gap-4">
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg" style={{ color: MODEL_COLORS[m.key], background: `${MODEL_COLORS[m.key]}1f` }}>{MODEL_ICON[m.key]}</span>
                 <div className="flex-1">
@@ -104,7 +109,7 @@ export default function SettingsPage() {
               </CardBody>
             </Card>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {tab === "system" && (
@@ -163,6 +168,38 @@ export default function SettingsPage() {
   );
 }
 
+/** Animated 0–100 band strip — segments spring to new widths as sliders move. */
+function BandStrip({ potential, strong }: { potential: number; strong: number }) {
+  const spring = { type: "spring", stiffness: 260, damping: 30 } as const;
+  const seg = (w: number, cls: string, label?: string) => (
+    <motion.div
+      className={cn("relative h-full", cls)}
+      animate={{ width: `${w}%` }}
+      transition={spring}
+      style={{ width: `${w}%` }}
+    >
+      {label && w > 12 && (
+        <span className="absolute inset-0 grid place-items-center text-[10px] font-semibold text-white/90">{label}</span>
+      )}
+    </motion.div>
+  );
+  return (
+    <div>
+      <div className="flex h-6 w-full overflow-hidden rounded-lg ring-1 ring-subtle/15">
+        {seg(potential, "bg-danger/80", "Low")}
+        {seg(strong - potential, "bg-warning/80", "Potential")}
+        {seg(100 - strong, "bg-success/80", "Strong")}
+      </div>
+      <div className="mt-1 flex justify-between text-[10px] tabular-nums text-ink-muted">
+        <span>0%</span>
+        <motion.span animate={{ x: 0 }}>{potential}%</motion.span>
+        <motion.span animate={{ x: 0 }}>{strong}%</motion.span>
+        <span>100%</span>
+      </div>
+    </div>
+  );
+}
+
 function PreviewRow({ band, range, tone, tag }: { band: string; range: string; tone: "success" | "warning" | "danger"; tag: string }) {
   const dot = tone === "success" ? "bg-success" : tone === "warning" ? "bg-warning" : "bg-danger";
   return (
@@ -171,7 +208,20 @@ function PreviewRow({ band, range, tone, tag }: { band: string; range: string; t
         <span className={cn("h-2.5 w-2.5 rounded-full", dot)} />
         <span className="font-medium text-ink">{band}</span>
       </div>
-      <span className="tnum text-caption text-ink-secondary">{range}</span>
+      <span className="relative overflow-hidden">
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.span
+            key={range}
+            initial={{ y: 8, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -8, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="tnum block text-caption text-ink-secondary"
+          >
+            {range}
+          </motion.span>
+        </AnimatePresence>
+      </span>
       <Badge status={tone}>{tag}</Badge>
     </div>
   );

@@ -32,7 +32,7 @@ export function Sidebar({ onSignOut }: { onSignOut?: () => void }) {
                       href={item.href}
                       icon={item.icon}
                       label={item.label}
-                      active={pathname === item.href || pathname.startsWith(item.href + "/")}
+                      active={pathname === item.href || (pathname?.startsWith(item.href + "/") ?? false)}
                     />
                     {!item.ready && (
                       <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-surface-overlay px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wide text-ink-muted">

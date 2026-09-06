@@ -14,7 +14,7 @@ export function TopBar({ userName }: { userName: string }) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [systemOk, setSystemOk] = useState(true);
 
-  const current = NAV.find((n) => pathname.startsWith(n.href));
+  const current = NAV.find((n) => pathname?.startsWith(n.href));
 
   useEffect(() => {
     api.system().then(() => setSystemOk(true)).catch(() => setSystemOk(false));

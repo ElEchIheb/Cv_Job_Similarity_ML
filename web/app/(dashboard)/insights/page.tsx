@@ -8,8 +8,10 @@ import type { CompareRow, ModelKey } from "@/lib/api/types";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { CountUp } from "@/components/ui/CountUp";
 import { Textarea, Label } from "@/components/ui/Field";
 import { useToast } from "@/components/ui/Toast";
+import { staggerContainer, fadeUp } from "@/lib/motion";
 import { MODEL_COLORS, MODEL_DESCRIPTIONS, MODEL_LABELS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -78,24 +80,28 @@ export default function InsightsPage() {
             </CardBody>
           </Card>
 
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {rows.map((r) => {
+          <motion.div variants={staggerContainer(0.1)} initial="hidden" animate="show" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {rows.map((r, i) => {
               const t = tier(r.percentage);
               return (
-                <motion.div key={r.model} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                  className="flex flex-col items-center rounded-xl border border-subtle/12 bg-surface p-5 text-center shadow-e2">
-                  <span className="mb-3 grid h-10 w-10 place-items-center rounded-lg" style={{ color: MODEL_COLORS[r.model], background: `${MODEL_COLORS[r.model]}1f` }}>{ICONS[r.model]}</span>
-                  <div className="text-caption font-semibold text-ink">{MODEL_LABELS[r.model]}</div>
-                  <div className="my-1 font-display text-h1 font-bold tnum" style={{ color: MODEL_COLORS[r.model] }}>{r.percentage.toFixed(0)}%</div>
-                  <div className={cn("mb-3 text-caption font-semibold", t.cls)}>{t.label}</div>
-                  <div className="flex w-full items-center justify-between border-t border-subtle/10 pt-3 text-micro text-ink-muted">
+                <motion.div key={r.model} variants={fadeUp} whileHover={{ y: -4 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 24 }}
+                  className="relative flex flex-col items-center overflow-hidden rounded-xl border border-subtle/12 bg-surface p-5 text-center shadow-e2 transition-shadow hover:shadow-e4">
+                  <div className="pointer-events-none absolute -top-8 left-1/2 h-20 w-20 -translate-x-1/2 rounded-full opacity-50 blur-2xl" style={{ background: MODEL_COLORS[r.model] }} />
+                  <span className="relative mb-3 grid h-10 w-10 place-items-center rounded-lg" style={{ color: MODEL_COLORS[r.model], background: `${MODEL_COLORS[r.model]}1f` }}>{ICONS[r.model]}</span>
+                  <div className="relative text-caption font-semibold text-ink">{MODEL_LABELS[r.model]}</div>
+                  <div className="relative my-1 font-display text-h1 font-bold tnum" style={{ color: MODEL_COLORS[r.model] }}>
+                    <CountUp to={r.percentage} decimals={0} duration={900} delay={i * 100} suffix="%" />
+                  </div>
+                  <div className={cn("relative mb-3 text-caption font-semibold", t.cls)}>{t.label}</div>
+                  <div className="relative flex w-full items-center justify-between border-t border-subtle/10 pt-3 text-micro text-ink-muted">
                     <span>Speed: {r.speed_ms != null ? `${r.speed_ms} ms` : "N/A"}</span>
                     <span>Conf: {r.confidence ? String(r.confidence) : "—"}</span>
                   </div>
                 </motion.div>
               );
             })}
-          </div>
+          </motion.div>
 
           <Card elevation={1}><CardHeader><CardTitle className="text-h4">Comparison table</CardTitle></CardHeader>
             <CardBody className="overflow-x-auto">
