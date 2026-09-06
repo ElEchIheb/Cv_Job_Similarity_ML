@@ -20,6 +20,7 @@ import { ScoreBreakdown } from "@/components/score/ScoreBreakdown";
 import { SkillChipGroup } from "@/components/skills/SkillChips";
 import { SkillConstellation } from "@/components/skills/SkillConstellation";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { DeepAnalysis } from "@/components/analysis/DeepAnalysis";
 import { MODEL_OPTIONS } from "@/lib/constants";
 import { staggerContainer, fadeUp } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -443,6 +444,9 @@ function ResultView({ result, name, jobTitle, onReset, toast }: {
           )}
         </CardBody>
       </Card>
+
+      {/* AI Deep Analysis (Layer 2) — loads after the statistical result above */}
+      <DeepAnalysis matchId={result.match_id} />
 
       <div className="flex items-center gap-2 text-caption text-ink-muted">
         <Lightbulb className="h-3.5 w-3.5" />

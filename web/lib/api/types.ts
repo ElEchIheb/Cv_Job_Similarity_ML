@@ -169,6 +169,31 @@ export interface EvaluatePayload {
   job_title: string;
 }
 
+// ── Layer 2: LLM deep analysis (additive) ─────────────────────────────────────
+export type DeepAnalysisStatus = "ok" | "disabled" | "unavailable" | "error";
+
+export interface DeepAnalysisContent {
+  career_trajectory: { summary: string; seniority_signal: string; progression: string };
+  red_flags: { issue: string; severity: string; evidence: string }[];
+  recommendations: { recommendation: string; rationale: string }[];
+  fit_justification: string;
+  interview_questions: { question: string; targets: string }[];
+}
+
+export interface DeepAnalysisEnvelope {
+  status: DeepAnalysisStatus;
+  model: string;
+  generated_at: string | null;
+  latency_ms: number | null;
+  analysis: DeepAnalysisContent | null;
+  error: string | null;
+}
+
+export interface DeepAnalysisResponse {
+  match_id: number;
+  ai_deep_analysis: DeepAnalysisEnvelope;
+}
+
 export interface CompareRow {
   model: ModelKey;
   percentage: number;

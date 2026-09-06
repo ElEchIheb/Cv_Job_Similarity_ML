@@ -7,6 +7,7 @@ import type {
   Candidate,
   CandidateStatus,
   CompareRow,
+  DeepAnalysisResponse,
   EvaluatePayload,
   JobOffer,
   JobStatus,
@@ -153,6 +154,13 @@ export const api = {
     req<EvaluatePayload>("/ui/evaluate", { method: "POST", body: JSON.stringify({ model: "hybrid", ...input }) }),
   evaluateFile: (form: FormData) =>
     req<EvaluatePayload>("/ui/evaluate/file", { method: "POST", body: form }),
+
+  // ── Layer 2: LLM deep analysis (fired after the main result renders) ──────
+  deepAnalysis: (match_id: number) =>
+    req<DeepAnalysisResponse>("/ui/evaluate/deep-analysis", {
+      method: "POST",
+      body: JSON.stringify({ match_id }),
+    }),
 
   // ── ai insights ─────────────────────────────────────────────────────────
   compare: (cv_text: string, job_text: string) =>
