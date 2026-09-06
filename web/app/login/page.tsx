@@ -57,7 +57,7 @@ export default function LoginPage() {
     <div className="relative min-h-screen bg-canvas lg:grid lg:grid-cols-[1.1fr_1fr]">
       {/* ── Ambient hero panel ─────────────────────────────────── */}
       <div className="relative hidden overflow-hidden border-r border-subtle/10 lg:block">
-        <AmbientBackground intensity={1.2} />
+        <AmbientBackground intensity={1.2} parallax />
         <div className="bg-grid absolute inset-0 opacity-60" />
         <div className="relative z-10 flex h-full flex-col justify-between p-10">
           <Logo />

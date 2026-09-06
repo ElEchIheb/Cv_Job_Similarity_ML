@@ -1,4 +1,7 @@
+"use client";
+
 import { motion } from "framer-motion";
+import { usePrefersReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "./Button";
 
@@ -30,6 +33,25 @@ export function Settle({ children, className }: { children: React.ReactNode; cla
   );
 }
 
+/** Slow radar-ping rings for empty-state ambiance. Off under reduced-motion. */
+function RadarSweep() {
+  const reduced = usePrefersReducedMotion();
+  if (reduced) return null;
+  return (
+    <div className="pointer-events-none absolute inset-0 grid place-items-center" aria-hidden>
+      {[0, 1, 2].map((i) => (
+        <motion.span
+          key={i}
+          className="absolute rounded-full border border-accent/25"
+          initial={{ width: 44, height: 44, opacity: 0 }}
+          animate={{ width: 128, height: 128, opacity: [0.5, 0] }}
+          transition={{ duration: 3, repeat: Infinity, delay: i, ease: "easeOut" }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function EmptyState({
   icon,
   title,
@@ -43,7 +65,10 @@ export function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center gap-3 rounded-xl border border-subtle/12 bg-surface p-11 text-center">
-      <div className="grid h-14 w-14 place-items-center rounded-xl bg-accent/10 text-accent-300">{icon}</div>
+      <div className="relative grid h-14 w-14 place-items-center">
+        <RadarSweep />
+        <div className="relative grid h-14 w-14 place-items-center rounded-xl bg-accent/10 text-accent-300">{icon}</div>
+      </div>
       <div className="font-display text-h3 font-semibold text-ink">{title}</div>
       <div className="max-w-sm text-body text-ink-secondary">{desc}</div>
       {action && <div className="mt-2">{action}</div>}

@@ -10,7 +10,9 @@ import * as THREE from "three";
  * rotating — designed to hold 60fps on mid-range laptops. Rendered only when
  * motion is allowed (the wrapper swaps in a static gradient otherwise).
  */
-function Field({ count = 90, accent, speed = 1 }: { count?: number; accent: THREE.Color; speed?: number }) {
+type PointerRef = { current: { x: number; y: number } } | null;
+
+function Field({ count = 90, accent, speed = 1, pointer = null }: { count?: number; accent: THREE.Color; speed?: number; pointer?: PointerRef }) {
   const group = useRef<THREE.Group>(null);
 
   const { positions, linePositions } = useMemo(() => {
@@ -50,7 +52,14 @@ function Field({ count = 90, accent, speed = 1 }: { count?: number; accent: THRE
     if (!group.current) return;
     // drift speed scales gently with platform activity (via `speed`)
     group.current.rotation.y += delta * (0.03 + speed * 0.03);
-    group.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.1) * 0.06;
+    let tiltX = Math.sin(state.clock.elapsedTime * 0.1) * 0.06;
+    if (pointer?.current) {
+      // gentle cursor parallax: shift + tilt toward the pointer
+      group.current.position.x = THREE.MathUtils.damp(group.current.position.x, pointer.current.x * 0.6, 3, delta);
+      group.current.position.y = THREE.MathUtils.damp(group.current.position.y, -pointer.current.y * 0.35, 3, delta);
+      tiltX += pointer.current.y * 0.12;
+    }
+    group.current.rotation.x = THREE.MathUtils.damp(group.current.rotation.x, tiltX, 4, delta);
   });
 
   return (
@@ -78,7 +87,7 @@ function Field({ count = 90, accent, speed = 1 }: { count?: number; accent: THRE
   );
 }
 
-export default function NeuralField({ intensity = 1 }: { intensity?: number }) {
+export default function NeuralField({ intensity = 1, pointer = null }: { intensity?: number; pointer?: PointerRef }) {
   const accent = useMemo(() => new THREE.Color("#7c5cff"), []);
   return (
     <Canvas
@@ -88,7 +97,7 @@ export default function NeuralField({ intensity = 1 }: { intensity?: number }) {
       style={{ pointerEvents: "none" }}
     >
       <fog attach="fog" args={["#090a12", 6, 18]} />
-      <Field accent={accent} count={Math.round(90 * intensity)} speed={intensity} />
+      <Field accent={accent} count={Math.round(90 * intensity)} speed={intensity} pointer={pointer} />
     </Canvas>
   );
 }

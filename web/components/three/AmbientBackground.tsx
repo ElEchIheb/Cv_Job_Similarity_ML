@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePrefersReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "@/lib/utils";
 
@@ -15,13 +15,16 @@ const NeuralField = dynamic(() => import("./NeuralField"), { ssr: false });
  */
 export function AmbientBackground({
   intensity = 1,
+  parallax = false,
   className,
 }: {
   intensity?: number;
+  parallax?: boolean;
   className?: string;
 }) {
   const reduced = usePrefersReducedMotion();
   const [allow3d, setAllow3d] = useState(false);
+  const pointer = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     if (reduced) {
@@ -32,6 +35,16 @@ export function AmbientBackground({
     const cores = navigator.hardwareConcurrency ?? 4;
     setAllow3d(cores >= 4);
   }, [reduced]);
+
+  useEffect(() => {
+    if (!parallax || reduced) return;
+    const onMove = (e: MouseEvent) => {
+      pointer.current.x = (e.clientX / window.innerWidth) * 2 - 1;
+      pointer.current.y = (e.clientY / window.innerHeight) * 2 - 1;
+    };
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [parallax, reduced]);
 
   return (
     <div className={cn("pointer-events-none absolute inset-0 overflow-hidden", className)} aria-hidden>
@@ -52,7 +65,7 @@ export function AmbientBackground({
       </div>
       {allow3d && (
         <div className="absolute inset-0">
-          <NeuralField intensity={intensity} />
+          <NeuralField intensity={intensity} pointer={parallax ? pointer : null} />
         </div>
       )}
     </div>
