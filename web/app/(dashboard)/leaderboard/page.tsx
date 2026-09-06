@@ -11,7 +11,9 @@ import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Pill } from "@/components/ui/Pill";
+import { CountUp } from "@/components/ui/CountUp";
 import { Select, Label } from "@/components/ui/Field";
+import { usePrefersReducedMotion } from "@/lib/use-reduced-motion";
 import { EmptyState } from "@/components/ui/DataStates";
 import { StrongFitBurst } from "@/components/score/StrongFitBurst";
 import { useToast } from "@/components/ui/Toast";
@@ -216,6 +218,8 @@ export default function LeaderboardPage() {
             </CardBody>
           </Card>
 
+          {valid.length >= 2 && <Podium top={valid.slice(0, 3)} />}
+
           <motion.div variants={staggerContainer(0.06)} initial="hidden" animate="show" className="flex flex-col gap-3">
             {results.map((r, i) => (
               <motion.div key={i} variants={fadeUp}>
@@ -237,6 +241,66 @@ export default function LeaderboardPage() {
           )}
         </>
       )}
+    </div>
+  );
+}
+
+const PODIUM_STYLE: Record<number, { grad: string; ring: string; h: number }> = {
+  1: { grad: "linear-gradient(180deg,#f7d774,#f5b445)", ring: "ring-warning/40", h: 128 },
+  2: { grad: "linear-gradient(180deg,#dfe2ec,#aeb2c4)", ring: "ring-subtle/30", h: 92 },
+  3: { grad: "linear-gradient(180deg,#e6b184,#c88a54)", ring: "ring-warning/20", h: 70 },
+};
+
+/** Top-3 podium — pedestals "step up" (3rd → 2nd → 1st) with floating info. */
+function Podium({ top }: { top: Ranked[] }) {
+  const reduced = usePrefersReducedMotion();
+  // visual order: 2nd (left), 1st (center), 3rd (right)
+  const order = [top[1] && { r: top[1], rank: 2 }, top[0] && { r: top[0], rank: 1 }, top[2] && { r: top[2], rank: 3 }]
+    .filter(Boolean) as { r: Ranked; rank: number }[];
+
+  return (
+    <div className="rounded-xl border border-subtle/12 bg-surface p-6 shadow-e2">
+      <div className="mb-1 flex items-center gap-2 text-micro font-semibold uppercase tracking-wide text-ink-muted">
+        <Trophy className="h-3.5 w-3.5 text-warning-fg" /> Podium · Top {order.length}
+      </div>
+      <div className="flex items-end justify-center gap-4 pt-5 sm:gap-8">
+        {order.map((c) => (
+          <PodiumCol key={c.rank} c={c} reduced={reduced} delay={reduced ? 0 : (3 - c.rank) * 0.15} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PodiumCol({ c, delay, reduced }: { c: { r: Ranked; rank: number }; delay: number; reduced: boolean }) {
+  const s = PODIUM_STYLE[c.rank];
+  const status = c.r.decision === "ERROR" ? "neutral" : DECISION_STATUS[c.r.decision];
+  return (
+    <div className="flex w-24 flex-col items-center sm:w-32">
+      <motion.div
+        initial={reduced ? false : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: delay + 0.25, type: "spring", stiffness: 300, damping: 24 }}
+        className="mb-3 flex flex-col items-center text-center"
+      >
+        <div className="mb-1.5 grid h-8 w-8 place-items-center rounded-full text-caption font-bold text-white shadow-e1" style={{ background: s.grad }}>
+          {c.rank}
+        </div>
+        <div className="max-w-[8rem] truncate text-caption font-semibold text-ink">{c.r.name}</div>
+        <div className="font-display text-h3 font-bold text-gradient tnum">
+          <CountUp to={c.r.score} decimals={0} suffix="%" duration={900} delay={reduced ? 0 : (delay + 0.25) * 1000} />
+        </div>
+        {c.r.decision !== "ERROR" && <Badge status={status as "success" | "warning" | "danger"}>{BAND_LABEL[c.r.decision]}</Badge>}
+      </motion.div>
+      <motion.div
+        initial={reduced ? false : { scaleY: 0 }}
+        animate={{ scaleY: 1 }}
+        transition={{ delay, type: "spring", stiffness: 200, damping: 20 }}
+        style={{ height: s.h, transformOrigin: "bottom", background: s.grad }}
+        className={cn("relative w-full overflow-hidden rounded-t-lg shadow-e2 ring-1", s.ring)}
+      >
+        <span className="absolute inset-x-0 bottom-1 text-center font-display text-h1 font-black text-white/30">{c.rank}</span>
+      </motion.div>
     </div>
   );
 }
