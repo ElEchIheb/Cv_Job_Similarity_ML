@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import { Search, CornerDownLeft } from "lucide-react";
 import { NAV } from "@/lib/nav";
 import { overlayScale } from "@/lib/motion";
@@ -65,29 +65,50 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
               />
               <kbd className="rounded bg-surface-overlay px-1.5 py-0.5 text-micro text-ink-muted">ESC</kbd>
             </div>
-            <div className="max-h-80 overflow-y-auto p-2">
-              {results.length === 0 && (
-                <div className="px-3 py-8 text-center text-body text-ink-muted">No matches for “{q}”.</div>
-              )}
-              {results.map((r, i) => (
-                <button
-                  key={r.href}
-                  onMouseEnter={() => setActive(i)}
-                  onClick={() => { router.push(r.href); onClose(); }}
-                  className={cn(
-                    "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-body transition-colors",
-                    i === active ? "bg-accent/12 text-ink" : "text-ink-secondary hover:bg-surface-raised/60",
-                  )}
-                >
-                  <span className={cn("grid h-5 w-5 place-items-center", i === active && "text-accent-300")}>
-                    {r.icon}
-                  </span>
-                  <span className="flex-1">{r.label}</span>
-                  <span className="text-micro uppercase tracking-wide text-ink-muted">{r.section}</span>
-                  {i === active && <CornerDownLeft className="h-3.5 w-3.5 text-ink-muted" />}
-                </button>
-              ))}
-            </div>
+            <MotionConfig reducedMotion="user">
+              <motion.div layout className="max-h-80 overflow-y-auto p-2">
+                {results.length === 0 && (
+                  <div className="px-3 py-8 text-center text-body text-ink-muted">No matches for “{q}”.</div>
+                )}
+                <AnimatePresence mode="popLayout" initial={false}>
+                  {results.map((r, i) => (
+                    <motion.button
+                      key={r.href}
+                      layout
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.96 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                      onMouseEnter={() => setActive(i)}
+                      onClick={() => { router.push(r.href); onClose(); }}
+                      className="relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-body"
+                    >
+                      {i === active && (
+                        <motion.span
+                          layoutId="cmd-active"
+                          transition={{ type: "spring", stiffness: 520, damping: 38 }}
+                          className="absolute inset-0 rounded-lg bg-accent/12 ring-1 ring-accent/20"
+                        />
+                      )}
+                      <motion.span
+                        animate={{ scale: i === active ? 1.12 : 1 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                        className={cn("relative z-10 grid h-5 w-5 place-items-center", i === active ? "text-accent-300" : "text-ink-secondary")}
+                      >
+                        {r.icon}
+                      </motion.span>
+                      <span className={cn("relative z-10 flex-1", i === active ? "text-ink" : "text-ink-secondary")}>{r.label}</span>
+                      <span className="relative z-10 text-micro uppercase tracking-wide text-ink-muted">{r.section}</span>
+                      {i === active && (
+                        <motion.span initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} className="relative z-10">
+                          <CornerDownLeft className="h-3.5 w-3.5 text-ink-muted" />
+                        </motion.span>
+                      )}
+                    </motion.button>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+            </MotionConfig>
           </motion.div>
         </motion.div>
       )}
