@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { Pill } from "@/components/ui/Pill";
 import { Select, Label } from "@/components/ui/Field";
 import { EmptyState } from "@/components/ui/DataStates";
+import { StrongFitBurst } from "@/components/score/StrongFitBurst";
 import { useToast } from "@/components/ui/Toast";
 import { staggerContainer, fadeUp } from "@/lib/motion";
 import { BAND_LABEL, DECISION_STATUS } from "@/lib/constants";
@@ -291,8 +292,9 @@ function LeaderCard({ rank, r }: { rank: number; r: Ranked }) {
           )}
           {err && <div className="mt-1 text-caption text-danger-fg">{r.summary}</div>}
         </div>
-        <div className="text-right">
-          <div className="font-display text-h1 font-bold text-gradient tnum">{r.score.toFixed(0)}%</div>
+        <div className="relative grid place-items-center text-right">
+          {r.decision === "HIRE" && <StrongFitBurst show size="sm" />}
+          <div className="relative font-display text-h1 font-bold text-gradient tnum">{r.score.toFixed(0)}%</div>
         </div>
       </div>
     </motion.div>

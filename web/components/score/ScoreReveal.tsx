@@ -9,6 +9,7 @@ import type { Decision } from "@/lib/api/types";
 import { ScoreObject } from "./ScoreObject";
 import { VerdictBadge } from "./VerdictBadge";
 import { ConfidenceBar } from "./ConfidenceBar";
+import { StrongFitBurst } from "./StrongFitBurst";
 
 /**
  * The emotional climax: score object fills 0→value (~1.2s), the numeral counts
@@ -38,15 +39,18 @@ export function ScoreReveal({
 
   return (
     <div className="flex flex-col items-center gap-5">
-      <ScoreObject value={percentage} tone={tone} size={248}>
-        <div className="flex flex-col items-center">
-          <div className="font-display text-[3.5rem] font-bold leading-none">
-            <CountUp to={percentage} decimals={0} duration={1200} className="text-gradient" />
-            <span className="text-gradient text-h2 align-top">%</span>
+      <div className="relative grid place-items-center">
+        <StrongFitBurst show={decision === "HIRE" && verdictIn} />
+        <ScoreObject value={percentage} tone={tone} size={248}>
+          <div className="flex flex-col items-center">
+            <div className="font-display text-[3.5rem] font-bold leading-none">
+              <CountUp to={percentage} decimals={0} duration={1200} className="text-gradient" />
+              <span className="text-gradient text-h2 align-top">%</span>
+            </div>
+            <span className="mt-1 text-caption uppercase tracking-widest text-ink-muted">Compatibility</span>
           </div>
-          <span className="mt-1 text-caption uppercase tracking-widest text-ink-muted">Compatibility</span>
-        </div>
-      </ScoreObject>
+        </ScoreObject>
+      </div>
 
       <div className="h-10">
         <AnimatePresence>
