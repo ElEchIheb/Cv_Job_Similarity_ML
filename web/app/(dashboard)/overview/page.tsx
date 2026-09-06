@@ -25,6 +25,11 @@ export default function OverviewPage() {
   }, []);
 
   const avgPct = ov ? (ov.avg_score <= 1 ? ov.avg_score * 100 : ov.avg_score) : 0;
+  // "Living" background: gently scale the neural field with real activity.
+  // Combines evaluation volume + avg compatibility; clamped so a quiet day still
+  // breathes (min 0.6) and a busy one never overwhelms (max ~1.2).
+  const activity = ov ? Math.min(1, (ov.total_matches / 40) * 0.6 + ov.avg_score * 0.4) : 0;
+  const bgIntensity = 0.6 + activity * 0.6;
   const dist = (["HIRE", "CONSIDER", "REJECT"] as const).map((d) => ({
     d,
     count: matches.filter((m) => m.decision === d).length,
@@ -40,7 +45,7 @@ export default function OverviewPage() {
         transition={{ type: "spring", stiffness: 220, damping: 26 }}
         className="relative overflow-hidden rounded-xl border border-subtle/12 bg-surface p-7 shadow-e3 md:p-9"
       >
-        <AmbientBackground intensity={0.7} />
+        <AmbientBackground intensity={bgIntensity} />
         <div className="bg-grid absolute inset-0 opacity-40" />
         <div className="relative z-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-xl">

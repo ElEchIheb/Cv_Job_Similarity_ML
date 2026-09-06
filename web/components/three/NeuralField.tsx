@@ -10,7 +10,7 @@ import * as THREE from "three";
  * rotating — designed to hold 60fps on mid-range laptops. Rendered only when
  * motion is allowed (the wrapper swaps in a static gradient otherwise).
  */
-function Field({ count = 90, accent }: { count?: number; accent: THREE.Color }) {
+function Field({ count = 90, accent, speed = 1 }: { count?: number; accent: THREE.Color; speed?: number }) {
   const group = useRef<THREE.Group>(null);
 
   const { positions, linePositions } = useMemo(() => {
@@ -48,7 +48,8 @@ function Field({ count = 90, accent }: { count?: number; accent: THREE.Color }) 
 
   useFrame((state, delta) => {
     if (!group.current) return;
-    group.current.rotation.y += delta * 0.04;
+    // drift speed scales gently with platform activity (via `speed`)
+    group.current.rotation.y += delta * (0.03 + speed * 0.03);
     group.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.1) * 0.06;
   });
 
@@ -87,7 +88,7 @@ export default function NeuralField({ intensity = 1 }: { intensity?: number }) {
       style={{ pointerEvents: "none" }}
     >
       <fog attach="fog" args={["#090a12", 6, 18]} />
-      <Field accent={accent} count={Math.round(90 * intensity)} />
+      <Field accent={accent} count={Math.round(90 * intensity)} speed={intensity} />
     </Canvas>
   );
 }
