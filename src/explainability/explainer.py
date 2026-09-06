@@ -137,12 +137,39 @@ class MatchingExplainer:
 
         # Radar dimensions (normalised to 0-100)
         years_exp       = float(cv_payload.get("years_experience", 0))
+        # Honest "could not detect" state: a parsing failure must NOT masquerade
+        # as a confirmed zero (see Bug 1 / BUGFIXES.md). Older payloads without
+        # the flag fall back to inferring detection from a positive year count.
+        experience_detected     = bool(cv_payload.get("experience_detected", years_exp > 0))
+        job_experience_detected = bool(job_payload.get("experience_detected", float(job_payload.get("years_experience", 0)) > 0))
         req_years       = float(job_payload.get("years_experience", 0)) or 3.0
         experience_score = min(100.0, (years_exp / req_years) * 100.0)
         soft_score      = min(100.0, 20.0 * len(cv_payload.get("soft_skills", [])))
         domain_score    = 90.0 if skill_details.get("same_domain") else 50.0
         technique_score = float(scores.get("skill_score", 0.0)) * 100.0
         semantic_score  = float(scores.get("embedding_score", 0.0)) * 100.0
+
+        # ── Required radar vector (Bug 3) ───────────────────────────────────
+        # Each "Required" axis is derived from THIS job offer wherever the data
+        # model supports it; axes that cannot be derived from JD text today are
+        # explicit, labelled hiring benchmarks. `job_requirements_source` tags
+        # every axis as "job" (derived) or "benchmark" so the UI/PDF can be
+        # honest about which is which. See BUGFIXES.md.
+        req_soft_count = len(job_payload.get("soft_skills", []))
+        req_soft   = min(100.0, 20.0 * req_soft_count) if req_soft_count else 65.0
+        req_domain = 90.0 if job_payload.get("domain", "generalist") != "generalist" else 50.0
+        # If the JD states required years, meeting them is the 100% bar; else benchmark.
+        req_experience = 100.0 if job_experience_detected else 70.0
+        req_technical  = 85.0   # BENCHMARK: target skill coverage (not derivable from JD text)
+        req_semantic   = 80.0   # BENCHMARK: target thematic alignment (not derivable from JD text)
+        job_requirements        = [req_technical, req_semantic, req_experience, req_soft, req_domain]
+        job_requirements_source = [
+            "benchmark",
+            "benchmark",
+            "job" if job_experience_detected else "benchmark",
+            "job" if req_soft_count else "benchmark",
+            "job",
+        ]
 
         # Strengths (English)
         strengths: List[str] = []
@@ -189,15 +216,21 @@ class MatchingExplainer:
             "confidence_level": decision_result.confidence_level,
         }
 
-        # Experience fit assessment
-        exp_status = (
-            "Exceeds requirements" if years_exp > req_years * 1.2
-            else "Meets requirements" if years_exp >= req_years * 0.8
-            else "Below requirements"
-        )
+        # Experience fit assessment. "Not detected" is a first-class status,
+        # distinct from a candidate with confirmed zero experience.
+        if not experience_detected:
+            exp_status = "Not detected"
+        else:
+            exp_status = (
+                "Exceeds requirements" if years_exp > req_years * 1.2
+                else "Meets requirements" if years_exp >= req_years * 0.8
+                else "Below requirements"
+            )
         experience_fit = {
             "candidate_years": years_exp,
+            "candidate_years_detected": experience_detected,
             "estimated_required_years": req_years,
+            "required_years_detected": job_experience_detected,
             "fit_status": exp_status,
             "education_level": cv_payload.get("education_level", "unknown").capitalize(),
         }
@@ -245,7 +278,13 @@ class MatchingExplainer:
                     round(soft_score, 1),
                     round(domain_score, 1),
                 ],
-                "job_requirements": [85.0, 80.0, 70.0, 65.0, 80.0],
+                # Per-job required vector (Bug 3): derived where the data allows,
+                # labelled benchmark otherwise via job_requirements_source.
+                "job_requirements":        [round(v, 1) for v in job_requirements],
+                "job_requirements_source": job_requirements_source,
+                # The Experience axis reads 0 when experience could not be parsed;
+                # this flag lets the UI render that as "N/A" rather than a real 0.
+                "experience_detected":     experience_detected,
             },
         }
 
