@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Table, type Column } from "@/components/ui/Table";
-import { EmptyState, SkeletonTable } from "@/components/ui/DataStates";
+import { EmptyState, SkeletonTable, SkeletonStats } from "@/components/ui/DataStates";
 import { Modal } from "@/components/ui/Modal";
 import { Input, Select, Textarea, Label } from "@/components/ui/Field";
 import { useToast } from "@/components/ui/Toast";
@@ -81,12 +81,14 @@ export default function JobsPage() {
         </div>
       </div>
 
-      <motion.div variants={staggerContainer(0.05)} initial="hidden" animate="show" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Total Positions" value={offers.length} icon={<Briefcase className="h-5 w-5" />} tone="accent" />
-        <StatCard label="Open Roles" value={openRoles} icon={<Target className="h-5 w-5" />} tone="cyan" />
-        <StatCard label="Candidates Evaluated" value={totalEvals} icon={<Users className="h-5 w-5" />} tone="success" />
-        <StatCard label="Closed Roles" value={closedRoles} icon={<XCircle className="h-5 w-5" />} tone="warning" />
-      </motion.div>
+      {loading ? <SkeletonStats /> : (
+        <motion.div variants={staggerContainer(0.05)} initial="hidden" animate="show" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <StatCard label="Total Positions" value={offers.length} icon={<Briefcase className="h-5 w-5" />} tone="accent" />
+          <StatCard label="Open Roles" value={openRoles} icon={<Target className="h-5 w-5" />} tone="cyan" />
+          <StatCard label="Candidates Evaluated" value={totalEvals} icon={<Users className="h-5 w-5" />} tone="success" />
+          <StatCard label="Closed Roles" value={closedRoles} icon={<XCircle className="h-5 w-5" />} tone="warning" />
+        </motion.div>
+      )}
 
       {loading ? <SkeletonTable /> : (
         <Table columns={columns} rows={offers} keyOf={(o) => o.id}

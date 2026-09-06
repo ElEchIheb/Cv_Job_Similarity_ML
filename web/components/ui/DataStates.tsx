@@ -1,4 +1,34 @@
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { Button } from "./Button";
+
+/**
+ * Shimmer block — a surface-toned placeholder with a light sweep, so loaders
+ * read as part of the same elevation/depth system as real content.
+ * The sweep uses the `animate-shimmer` keyframe, which the global
+ * prefers-reduced-motion rule freezes to a static block automatically.
+ */
+export function Shimmer({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <div className={cn("relative overflow-hidden rounded-md bg-surface-overlay", className)} style={style}>
+      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-[linear-gradient(90deg,transparent,rgb(var(--border-subtle)/0.12),transparent)]" />
+    </div>
+  );
+}
+
+/** Fades + lifts real content into place once loading resolves ("settle"). */
+export function Settle({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10, scale: 0.995 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: "spring", stiffness: 240, damping: 26 }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 export function EmptyState({
   icon,
@@ -21,12 +51,43 @@ export function EmptyState({
   );
 }
 
-export function SkeletonTable({ rows = 5 }: { rows?: number }) {
+/** Depth skeleton for tables — same border/elevation as the real table, with a
+ *  shimmer sweep and per-row/-cell staggered dimming. */
+export function SkeletonTable({ rows = 5, cols = 5 }: { rows?: number; cols?: number }) {
+  // varied cell widths so it reads like a real table, not equal bars
+  const widths = ["38%", "22%", "14%", "16%", "10%"];
   return (
-    <div className="overflow-hidden rounded-lg border border-subtle/12 bg-surface">
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25 }}
+      className="overflow-hidden rounded-lg border border-subtle/12 bg-surface shadow-e1"
+    >
+      <div className="flex items-center gap-4 border-b border-subtle/12 px-4 py-3">
+        {Array.from({ length: cols }).map((_, c) => (
+          <Shimmer key={c} className="h-2.5" style={{ width: widths[c % widths.length] }} />
+        ))}
+      </div>
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className="flex items-center gap-4 border-b border-subtle/8 px-4 py-4 last:border-0">
-          <div className="h-4 w-full animate-pulse rounded bg-surface-overlay" style={{ opacity: 1 - i * 0.14 }} />
+        <div key={i} className="flex items-center gap-4 border-b border-subtle/8 px-4 py-4 last:border-0" style={{ opacity: 1 - i * 0.12 }}>
+          {Array.from({ length: cols }).map((_, c) => (
+            <Shimmer key={c} className="h-4" style={{ width: widths[c % widths.length] }} />
+          ))}
+        </div>
+      ))}
+    </motion.div>
+  );
+}
+
+/** Depth skeleton for a stat-card row. */
+export function SkeletonStats({ count = 4 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="rounded-lg border border-subtle/12 bg-surface p-5 shadow-e2">
+          <Shimmer className="mb-4 h-10 w-10 rounded-lg" />
+          <Shimmer className="mb-2 h-7 w-20" />
+          <Shimmer className="h-3 w-28" />
         </div>
       ))}
     </div>

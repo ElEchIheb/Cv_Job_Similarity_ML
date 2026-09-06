@@ -10,7 +10,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Table, type Column } from "@/components/ui/Table";
-import { EmptyState, SkeletonTable, ProgressMini } from "@/components/ui/DataStates";
+import { EmptyState, SkeletonTable, SkeletonStats, ProgressMini } from "@/components/ui/DataStates";
 import { Modal } from "@/components/ui/Modal";
 import { Input, Select, Label } from "@/components/ui/Field";
 import { useToast } from "@/components/ui/Toast";
@@ -69,12 +69,14 @@ export default function CandidatesPage() {
         <Button variant="ghost" size="sm" icon={<RefreshCw className="h-3.5 w-3.5" />} onClick={load} className="mt-2" />
       </div>
 
-      <motion.div variants={staggerContainer(0.05)} initial="hidden" animate="show" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Total Candidates" value={cands.length} icon={<Users className="h-5 w-5" />} tone="accent" />
-        <StatCard label="Total Evaluations" value={totalEvals} icon={<Activity className="h-5 w-5" />} tone="cyan" />
-        <StatCard label="Avg Compatibility" value={avg} suffix="%" decimals={1} icon={<TrendingUp className="h-5 w-5" />} tone="success" />
-        <StatCard label="Best-scored" value={scored.length} icon={<Clock className="h-5 w-5" />} tone="warning" />
-      </motion.div>
+      {loading ? <SkeletonStats /> : (
+        <motion.div variants={staggerContainer(0.05)} initial="hidden" animate="show" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <StatCard label="Total Candidates" value={cands.length} icon={<Users className="h-5 w-5" />} tone="accent" />
+          <StatCard label="Total Evaluations" value={totalEvals} icon={<Activity className="h-5 w-5" />} tone="cyan" />
+          <StatCard label="Avg Compatibility" value={avg} suffix="%" decimals={1} icon={<TrendingUp className="h-5 w-5" />} tone="success" />
+          <StatCard label="Best-scored" value={scored.length} icon={<Clock className="h-5 w-5" />} tone="warning" />
+        </motion.div>
+      )}
 
       {loading ? <SkeletonTable /> : (
         <Table columns={columns} rows={cands} keyOf={(c) => c.id}
