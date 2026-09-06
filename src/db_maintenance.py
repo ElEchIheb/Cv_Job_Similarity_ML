@@ -53,6 +53,7 @@ _REQUIRED_COLUMNS: Dict[str, Dict[str, str]] = {
         "model_version": "VARCHAR",
         "evaluation_method": "VARCHAR",
         "weights_json": "TEXT",
+        "llm_analysis_json": "TEXT",
     },
 }
 

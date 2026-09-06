@@ -18,6 +18,7 @@ Design rules (per the parity mandate):
 from __future__ import annotations
 
 import json
+import logging
 import time
 from datetime import datetime
 from pathlib import Path
@@ -37,6 +38,8 @@ from src.decisioning import DecisionConfig
 from src.decisioning.decision_engine import DecisionConfigError
 
 router = APIRouter(prefix="/api/v1/ui", tags=["UI Parity"])
+
+logger = logging.getLogger("jobtest.ui")
 
 _ALLOWED_MODELS = {"hybrid", "embedding", "tfidf", "skill"}
 
@@ -480,6 +483,96 @@ async def evaluate_file(
         candidate_name, candidate_email,
         strong_fit_threshold, potential_fit_threshold,
     )
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# AI DEEP ANALYSIS  (Layer 2 — LLM qualitative reasoning via local Ollama)
+#
+# Strictly additive and independently callable: the frontend fires this AFTER
+# the main /evaluate result renders. If Ollama is unavailable this returns 200
+# with status="unavailable" so the core evaluation UI is never blocked/broken.
+# ═════════════════════════════════════════════════════════════════════════════
+class DeepAnalysisIn(BaseModel):
+    match_id: int
+
+
+def _evaluation_from_match(m: models_db.MatchResult) -> Dict:
+    """Reconstruct the statistical evaluation dict from a persisted MatchResult
+    (for grounding the LLM — no re-scoring happens)."""
+    payload = json.loads(m.explanation_json) if m.explanation_json else {}
+    explanation = payload.get("explanation", {}) or {}
+    band_label = (explanation.get("hiring_recommendation", {}) or {}).get("band_label", "")
+    percentage = explanation.get("global_score")
+    if percentage is None:
+        percentage = round((m.final_score or 0.0) * 100.0, 1)
+    return {
+        "result": {
+            "percentage": percentage,
+            "final_score": m.final_score,
+            "component_scores": {
+                "tfidf_score": m.score_keyword,
+                "embedding_score": m.score_semantic,
+                "skill_score": m.score_skill,
+            },
+        },
+        "explanation": explanation,
+        "decision": {"decision": m.decision, "band_label": band_label},
+    }
+
+
+@router.get("/deep-analysis/health")
+def deep_analysis_health(user: models_db.User = Depends(get_current_user)) -> Dict:
+    """Report whether the local LLM runtime is reachable and which model is set."""
+    from src.ai.llm_reasoning import check_availability
+    from src.config import settings as _s
+    info = check_availability()
+    return {
+        "enabled": _s.LLM_ENABLED,
+        "base_url": _s.OLLAMA_BASE_URL,
+        "model": _s.OLLAMA_MODEL,
+        "available": info["available"],
+        "models": info["models"],
+        "error": info["error"],
+    }
+
+
+@router.post("/evaluate/deep-analysis")
+def evaluate_deep_analysis(body: DeepAnalysisIn, db: Session = Depends(get_db),
+                           user: models_db.User = Depends(get_current_user)) -> Dict:
+    """Generate (and persist) the LLM deep-analysis for an existing match.
+
+    Never fails the request because of the LLM: on any Ollama problem it returns
+    a 200 with ai_deep_analysis.status in {disabled, unavailable, error}.
+    """
+    m = (
+        db.query(models_db.MatchResult)
+        .join(models_db.Candidate)
+        .filter(models_db.MatchResult.id == body.match_id,
+                models_db.Candidate.recruiter_id == user.id)
+        .first()
+    )
+    if not m:
+        raise HTTPException(status_code=404, detail="Match result not found.")
+
+    cv_text = m.cv.content_text if m.cv else ""
+    job_text = _job_text(m.job_offer) if m.job_offer else ""
+    evaluation = _evaluation_from_match(m)
+
+    from src.ai.llm_reasoning import generate_deep_analysis, STATUS_OK
+    envelope = generate_deep_analysis(cv_text, job_text, evaluation)
+
+    # Persist only successful analyses (additive column); tolerate a missing
+    # column on legacy DBs that somehow skipped migration.
+    if envelope.get("status") == STATUS_OK:
+        try:
+            m.llm_analysis_json = json.dumps(envelope)
+            db.add(m)
+            db.commit()
+        except Exception:  # pragma: no cover - best effort persistence
+            logger.exception("Failed to persist LLM deep analysis for match %s", body.match_id)
+            db.rollback()
+
+    return {"match_id": body.match_id, "ai_deep_analysis": envelope}
 
 
 # ═════════════════════════════════════════════════════════════════════════════

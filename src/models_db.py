@@ -115,6 +115,10 @@ class MatchResult(Base):
 
     model_used = Column(String, default="hybrid")
     explanation_json = Column(Text, nullable=True) # JSON string
+    # Layer 2 (LLM) qualitative deep-analysis envelope, if generated. Purely
+    # additive — the statistical columns above are unaffected and remain the
+    # single source of truth for score/decision.
+    llm_analysis_json = Column(Text, nullable=True)  # JSON string (ai_deep_analysis envelope)
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Relationships

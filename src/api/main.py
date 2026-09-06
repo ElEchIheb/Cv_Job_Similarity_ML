@@ -229,6 +229,12 @@ def create_app():
 
     try:
         Base.metadata.create_all(bind=engine)
+        # Additive-only column migration (idempotent) so existing databases gain
+        # newly introduced columns like match_results.llm_analysis_json without a
+        # destructive recreate. Does NOT run backfill/dedup (that stays in the
+        # Streamlit maintenance path) — schema only.
+        from src.db_maintenance import ensure_schema
+        ensure_schema(engine)
         logger.info("Database tables initialized.")
     except Exception as exc:
         logger.error(f"Error initializing DB tables: {exc}")
