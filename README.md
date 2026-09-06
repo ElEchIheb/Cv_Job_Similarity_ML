@@ -40,9 +40,11 @@ Documentation Swagger: [http://localhost:8000/api/v1/docs](http://localhost:8000
 
 ## Lancer le frontend
 
-```bash
-streamlit run frontend/app.py
-```
+Le frontend actuel est l'application **Next.js dans `web/`** (voir sa doc).
+
+> **`frontend/` (Streamlit) — DEPRECATED — superseded by the Next.js app in
+> `web/`. Kept for reference only, not maintained.** Exclu des tests/CI de
+> routine. Ne pas y développer de nouvelles fonctionnalités.
 
 ## Couche 2 — Analyse LLM locale (Ollama, optionnelle)
 

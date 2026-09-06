@@ -49,14 +49,19 @@ def test_prediction_does_not_refit_tfidf():
     assert vocab_before == vocab_after, "Vocabulary mutated during inference!"
     assert tfidf.is_fitted is True
 
+@pytest.mark.skip(
+    reason="Streamlit app (frontend/) is DEPRECATED — superseded by the Next.js "
+    "app in web/. Kept for reference only, not maintained or tested. The canonical "
+    "loader is covered by test_production_checkpoint_loads / test_loaded_tfidf_is_fitted."
+)
 def test_streamlit_hybrid_uses_fitted_model():
     """Verify that Streamlit's _load_models returns a fitted model."""
     from frontend.app import _load_models
-    
+
     services = _load_models()
     hybrid = services["hybrid"]
     tfidf = hybrid.models["tfidf"]
-    
+
     assert tfidf.is_fitted is True
     assert hasattr(tfidf.vectorizer, "vocabulary_")
 

@@ -2,6 +2,12 @@
 frontend/app.py
 NeuralHire AI Platform — Enterprise Entry Point v4.0
 
+============================================================================
+DEPRECATED — superseded by the Next.js app in web/. Kept for reference only,
+not maintained. Do not build new features here; all frontend work happens in
+web/. This module is excluded from routine tests/CI.
+============================================================================
+
 Architecture:
   Single-page app with custom sidebar navigation.
   NO multi-page Streamlit auto-detection (pages/ is a package, not a MPA dir).
