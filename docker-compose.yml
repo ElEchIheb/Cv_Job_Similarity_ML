@@ -1,27 +1,41 @@
 services:
+  db:
+    image: postgres:16
+    container_name: pfe-db
+    environment:
+      POSTGRES_DB: neuralhire
+      POSTGRES_USER: neuralhire
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-neuralhire_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U neuralhire -d neuralhire"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile.api
+    image: pfe_ai-api:latest
+    container_name: pfe-api-container
     ports:
       - "8000:8000"
-    volumes:
-      - ./:/app
-      - model_cache:/app/models
     command: uvicorn src.api.main:app --host 0.0.0.0 --port 8000
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
 
   frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
+    image: pfe_ai-frontend:latest
+    container_name: pfe-frontend-container
     ports:
       - "8501:8501"
-    volumes:
-      - ./:/app
     command: streamlit run frontend/app.py --server.address 0.0.0.0 --server.port 8501
     depends_on:
       - api
+    env_file:
+      - .env
 
 volumes:
-  model_cache:
-
+  postgres_data:

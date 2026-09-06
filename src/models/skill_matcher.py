@@ -21,7 +21,7 @@ class SkillMatcher(BaseMatchingModel):
     @staticmethod
     def _score_overlap(source: Set[str], target: Set[str]) -> float:
         if not target:
-            return 1.0
+            return 0.0
         return len(source & target) / len(target)
 
     @staticmethod
@@ -59,10 +59,21 @@ class SkillMatcher(BaseMatchingModel):
 
         hard_score = self._score_overlap(cv_hard, job_hard)
         soft_score = self._score_overlap(cv_soft, job_soft)
-        base_score = self.hard_skills_weight * hard_score + self.soft_skills_weight * soft_score
+        
+        # Dynamically redistribute weight if a skill category is completely absent in the job posting
+        weight_hard = self.hard_skills_weight if job_hard else 0.0
+        weight_soft = self.soft_skills_weight if job_soft else 0.0
+        total_weight = weight_hard + weight_soft
+        
+        if total_weight > 0:
+            base_score = (weight_hard * hard_score + weight_soft * soft_score) / total_weight
+        else:
+            base_score = 0.0
+            
         domain_bonus = 0.05 if cv_payload.get("domain") == job_payload.get("domain") else 0.0
-        certification_bonus = 0.03 * len(relevant_certifications)
-        critical_penalty = 0.10 if critical_missing else 0.0
+        certification_bonus = min(0.10, 0.03 * len(relevant_certifications))
+        critical_penalty = 0.20 * (len(critical_missing) / len(critical_skills)) if critical_skills else 0.0
+        
         final_score = float(np.clip(base_score + domain_bonus + certification_bonus - critical_penalty, 0.0, 1.0))
 
         self.last_analysis_ = {
@@ -86,7 +97,7 @@ class SkillMatcher(BaseMatchingModel):
             "coverage": {
                 "hard_coverage": round(hard_score, 4),
                 "soft_coverage": round(soft_score, 4),
-                "skill_coverage_text": f"{len(matching_hard)}/{len(job_hard) or 1} competences techniques requises",
+                "skill_coverage_text": f"{len(matching_hard)}/{len(job_hard) or 1} required skills",
             },
         }
         return self.last_analysis_

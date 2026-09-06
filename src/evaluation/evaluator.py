@@ -89,20 +89,22 @@ class EvaluationSuite:
         )
 
     @staticmethod
-    def bootstrap_confidence_interval(y_true: np.ndarray, y_scores: np.ndarray, metric: str, iterations: int = 1000) -> Tuple[float, float]:
+    def bootstrap_confidence_interval(y_true: np.ndarray, y_scores: np.ndarray, metric: str, iterations: int = 1000, threshold: float = 0.60) -> Tuple[float, float]:
         rng = np.random.default_rng(42)
         samples = []
-        for _ in range(iterations):
+        while len(samples) < iterations:
             indices = rng.integers(0, len(y_true), len(y_true))
             sample_true = y_true[indices]
+            if len(set(sample_true)) <= 1:
+                continue
             sample_scores = y_scores[indices]
-            sample_pred = (sample_scores >= 0.60).astype(int)
+            sample_pred = (sample_scores >= threshold).astype(int)
             if metric == "f1":
                 value = f1_score(sample_true, sample_pred, zero_division=0)
             elif metric == "accuracy":
                 value = accuracy_score(sample_true, sample_pred)
             else:
-                value = roc_auc_score(sample_true, sample_scores) if len(set(sample_true)) > 1 else 0.0
+                value = roc_auc_score(sample_true, sample_scores)
             samples.append(value)
         return float(np.percentile(samples, 2.5)), float(np.percentile(samples, 97.5))
 
@@ -118,13 +120,33 @@ class EvaluationSuite:
 
     @staticmethod
     def subgroup_analysis(df: pd.DataFrame, metrics_by_model: Dict[str, Dict[str, object]]) -> Dict[str, object]:
-        seniority_groups = {seniority: int((df["seniority"] == seniority).sum()) for seniority in sorted(df["seniority"].unique())}
-        technical_domains = {"Data Science / ML Engineering", "AI / NLP Engineering", "Backend Development", "DevOps / Cloud Engineering"}
-        technical_count = int(df["domain"].isin(technical_domains).sum())
+        seniority_metrics = {}
+        for seniority in df["seniority"].unique():
+            mask = df["seniority"] == seniority
+            if mask.sum() < 2: continue
+            
+            group_true = df.loc[mask, "label"].astype(int).to_numpy()
+            if len(set(group_true)) < 2: continue
+            
+            hybrid_scores = np.asarray(metrics_by_model["hybrid"]["scores"])[mask]
+            auc = roc_auc_score(group_true, hybrid_scores)
+            seniority_metrics[str(seniority)] = {"count": int(mask.sum()), "auc": float(auc)}
+            
+        domain_metrics = {}
+        for domain in df["domain"].unique():
+            mask = df["domain"] == domain
+            if mask.sum() < 2: continue
+            
+            group_true = df.loc[mask, "label"].astype(int).to_numpy()
+            if len(set(group_true)) < 2: continue
+            
+            hybrid_scores = np.asarray(metrics_by_model["hybrid"]["scores"])[mask]
+            auc = roc_auc_score(group_true, hybrid_scores)
+            domain_metrics[str(domain)] = {"count": int(mask.sum()), "auc": float(auc)}
+
         return {
-            "seniority_distribution": seniority_groups,
-            "technical_domain_rows": technical_count,
-            "generalist_rows": int(len(df) - technical_count),
+            "seniority_performance": seniority_metrics,
+            "domain_performance": domain_metrics,
             "models_evaluated": list(metrics_by_model.keys()),
         }
 
@@ -212,13 +234,24 @@ class EvaluationSuite:
 
     def _error_analysis(self, test_df: pd.DataFrame, metrics_by_model: Dict[str, Dict[str, object]]) -> Dict[str, object]:
         hybrid_scores = np.asarray(metrics_by_model["hybrid"]["scores"])
-        hybrid_pred = (hybrid_scores >= 0.60).astype(int)
+        # Fetch the optimal threshold applied to hybrid predictions
+        optimal_threshold = metrics_by_model["hybrid"].get("optimal_threshold", 0.60)
+        hybrid_pred = (hybrid_scores >= optimal_threshold).astype(int)
+        
         y_true = test_df["label"].astype(int).to_numpy()
-        false_positives = test_df[(hybrid_pred == 1) & (y_true == 0)].head(5)
-        false_negatives = test_df[(hybrid_pred == 0) & (y_true == 1)].head(5)
+        fp_mask = (hybrid_pred == 1) & (y_true == 0)
+        fn_mask = (hybrid_pred == 0) & (y_true == 1)
+        
+        false_positives = test_df[fp_mask]
+        false_negatives = test_df[fn_mask]
+        
         return {
-            "false_positives": false_positives[["id", "domain", "seniority", "match_reason"]].to_dict(orient="records"),
-            "false_negatives": false_negatives[["id", "domain", "seniority", "match_reason"]].to_dict(orient="records"),
+            "fp_count": int(fp_mask.sum()),
+            "fn_count": int(fn_mask.sum()),
+            "dominant_fp_domain": str(false_positives["domain"].mode()[0]) if len(false_positives) > 0 else None,
+            "dominant_fn_domain": str(false_negatives["domain"].mode()[0]) if len(false_negatives) > 0 else None,
+            "false_positives_examples": false_positives[["id", "domain", "seniority", "match_reason"]].head(5).to_dict(orient="records"),
+            "false_negatives_examples": false_negatives[["id", "domain", "seniority", "match_reason"]].head(5).to_dict(orient="records"),
         }
 
     def run_full_evaluation(self, dataset_path: str | Path) -> Dict[str, object]:
@@ -238,15 +271,17 @@ class EvaluationSuite:
             "skill": evaluate_model(skill, split.test),
         }
 
-        hybrid_scores = []
         start = time.perf_counter()
-        for cv_text, job_text in zip(split.test["cv_text"], split.test["job_text"]):
-            hybrid_scores.append(hybrid.predict(cv_text, job_text)["final_score"])
+        hybrid_scores_dicts = hybrid.batch_predict(split.test["cv_text"], split.test["job_text"])
+        hybrid_scores = [d["final_score"] for d in hybrid_scores_dicts]
         hybrid_inference_ms = (time.perf_counter() - start) * 1000.0 / max(1, len(split.test))
         y_true = split.test["label"].astype(int).to_numpy()
         hybrid_scores_array = np.asarray(hybrid_scores)
-        hybrid_pred = (hybrid_scores_array >= 0.60).astype(int)
+        optimal_threshold = getattr(hybrid, "optimal_threshold", 0.60)
+        hybrid_pred = (hybrid_scores_array >= optimal_threshold).astype(int)
+        
         metrics_by_model["hybrid"] = {
+            "optimal_threshold": optimal_threshold,
             "accuracy": float(accuracy_score(y_true, hybrid_pred)),
             "precision": float(precision_score(y_true, hybrid_pred, zero_division=0)),
             "recall": float(recall_score(y_true, hybrid_pred, zero_division=0)),
@@ -263,9 +298,9 @@ class EvaluationSuite:
         stats = {
             "bootstrap_ci": {
                 model_name: {
-                    "f1": self.bootstrap_confidence_interval(y_true, np.asarray(metrics["scores"]), "f1"),
-                    "accuracy": self.bootstrap_confidence_interval(y_true, np.asarray(metrics["scores"]), "accuracy"),
-                    "roc_auc": self.bootstrap_confidence_interval(y_true, np.asarray(metrics["scores"]), "roc_auc"),
+                    "f1": self.bootstrap_confidence_interval(y_true, np.asarray(metrics["scores"]), "f1", threshold=metrics.get("optimal_threshold", 0.60)),
+                    "accuracy": self.bootstrap_confidence_interval(y_true, np.asarray(metrics["scores"]), "accuracy", threshold=metrics.get("optimal_threshold", 0.60)),
+                    "roc_auc": self.bootstrap_confidence_interval(y_true, np.asarray(metrics["scores"]), "roc_auc", threshold=metrics.get("optimal_threshold", 0.60)),
                 }
                 for model_name, metrics in metrics_by_model.items()
             },
@@ -283,7 +318,7 @@ class EvaluationSuite:
             },
             "subgroup_analysis": self.subgroup_analysis(split.test, metrics_by_model),
             "weight_optimization": hybrid.weights,
-            "cross_validation": hybrid.cross_validate(df),
+            "cross_validation": hybrid.cross_validate(pd.concat([split.train, split.validation], ignore_index=True)),
             "error_analysis": self._error_analysis(split.test, metrics_by_model),
             "split_sizes": {"train": len(split.train), "validation": len(split.validation), "test": len(split.test)},
         }

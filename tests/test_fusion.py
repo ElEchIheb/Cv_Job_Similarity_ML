@@ -1,8 +1,12 @@
+"""
+tests/test_fusion.py
+Tests for HybridMatcher — uses session-scoped fixtures to avoid
+repeated model cold-starts (which cause PyTorch threading issues on Python 3.13).
+"""
 from __future__ import annotations
 
 import pandas as pd
-
-from src.fusion.hybrid_scorer import HybridMatcher
+import pytest
 
 
 def _sample_df():
@@ -17,19 +21,22 @@ def _sample_df():
     return pd.DataFrame(rows)
 
 
-def test_hybrid_predict_returns_expected_shape():
-    matcher = HybridMatcher()
-    result = matcher.predict("Python ML engineer with mlflow", "Required python mlflow docker")
+def test_hybrid_predict_returns_expected_shape(hybrid_matcher):
+    hybrid_matcher.models["tfidf"].fit(["Python ML engineer with mlflow docker kubernetes", "Required python mlflow docker kubernetes"])
+    """Uses session-scoped fixture — no repeated model loading."""
+    result = hybrid_matcher.predict("Python ML engineer with mlflow", "Required python mlflow docker")
     assert "final_score" in result
     assert "component_scores" in result
     assert 0.0 <= result["final_score"] <= 1.0
 
 
-def test_hybrid_optimize_weights_returns_normalized_weights():
+def test_hybrid_optimize_weights_returns_normalized_weights(hybrid_matcher):
     df = _sample_df()
-    matcher = HybridMatcher()
-    outcome = matcher.optimize_weights(df.iloc[:4].reset_index(drop=True), df.iloc[4:].reset_index(drop=True), step=0.5)
+    outcome = hybrid_matcher.optimize_weights(
+        df.iloc[:4].reset_index(drop=True),
+        df.iloc[4:].reset_index(drop=True),
+        step=0.5,
+    )
     total = sum(outcome["best_weights"].values())
     assert round(total, 3) == 1.0
     assert "validation_metrics" in outcome
-

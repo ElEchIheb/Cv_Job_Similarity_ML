@@ -1,37 +1,130 @@
-Pour l’exécuter en local sous Windows/PowerShell, le plus simple est :
+====================================================================
+  JobTest AI Platform v2.0 — How to Run
+====================================================================
 
-cd D:\education\pfe\pfe_ai
-python -m venv .venv
+PREREQUISITES
+─────────────
+- Python 3.10+ (recommended: 3.11)
+- Windows PowerShell or CMD
+
+SETUP (first time)
+──────────────────
+1. Create and activate virtual environment:
+
+   python -m venv .venv
+   .venv\Scripts\Activate.ps1
+
+2. Install all dependencies:
+
+   pip install -r requirements.txt
+
+3. Install spaCy language models (for full NLP support):
+
+   python -m spacy download en_core_web_sm
+   python -m spacy download fr_core_news_sm
+
+4. (Optional) Configure environment:
+   The .env file is pre-filled with sensible defaults.
+   Edit it to change models, API limits, or CORS origins.
+
+RUNNING THE PROJECT
+───────────────────
+
+OPTION 1 — Streamlit Dashboard (recommended for demos)
+
+   streamlit run frontend/app.py
+
+   Opens at http://localhost:8501
+   Features: Single Match, Candidate Ranking, Batch Analysis,
+             Model Comparison, PDF Export, Evaluation Dashboard
+
+OPTION 2 — FastAPI REST API
+
+   uvicorn src.api.main:app --reload
+
+   Opens at http://localhost:8000
+   API docs: http://localhost:8000/api/v1/docs
+   
+   New endpoints in v2:
+   - POST /api/v1/rank         → rank multiple candidates
+   - POST /api/v1/report/pdf   → generate PDF report
+   - GET  /api/v1/health/detailed → full model status
+
+OPTION 3 — Generate the dataset (if missing)
+
+   python data/datasets/generate_dataset.py
+
+OPTION 4 — Run scientific evaluation
+
+   python -c "from src.evaluation.evaluator import EvaluationSuite; EvaluationSuite().run_full_evaluation('data/datasets/cv_job_dataset.csv')"
+
+OPTION 5 — Docker (API + Frontend together)
+
+   docker compose up --build
+   
+   API:      http://localhost:8000
+   Frontend: http://localhost:8501
+
+RUNNING TESTS
+─────────────
+   pytest -v                           # all tests
+   pytest tests/test_pdf_generator.py  # PDF tests only
+   pytest tests/test_api_extended.py   # API v2 tests only
+   pytest -q                           # quiet mode
+
+WHAT'S NEW IN v2.0
+──────────────────
+✅ Professional dark-theme Streamlit UI (SaaS-style)
+✅ PDF report generation (7-section enterprise HR report)
+✅ Candidate ranking page (N CVs vs 1 job description)
+✅ Upgraded embedding model (all-mpnet-base-v2)
+✅ English UI and AI outputs (previously mixed French/English)
+✅ HIRE / CONSIDER / REJECT hiring recommendation with justification
+✅ Experience fit assessment
+✅ Expanded resource map (25+ technologies)
+✅ Environment variable configuration (.env)
+✅ Secure CORS (configurable origins, no more wildcard)
+✅ Structured logging throughout backend
+✅ New API endpoints: /rank and /report/pdf
+✅ Detailed health check endpoint
+✅ Fixed deprecated st.experimental_rerun() → st.rerun()
+✅ LRU cache eviction on embedding cache
+✅ New test files: test_pdf_generator.py, test_api_extended.py
+
+====================================================================
+
+To run the JobTest AI Platform v2.0 locally without Docker, you'll need to start both the backend API and the Streamlit frontend. Here are the step-by-step instructions.
+
+Open two separate PowerShell or Command Prompt terminals and navigate to the project root directory (d:\education\pfe\pfe_ai) in both.
+
+Terminal 1: Start the Backend (FastAPI)
+Activate the virtual environment:
+
+powershell
+
+
 .venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-Pour profiter du mode NLP complet avec spaCy, installe aussi les modèles :
+(If you are using Command Prompt, use .venv\Scripts\activate.bat)
 
-python -m spacy download en_core_web_sm
-python -m spacy download fr_core_news_sm
-Ensuite tu as 4 façons de lancer le projet.
+Run the backend server:
 
-1. Générer le dataset
+powershell
 
-python data/datasets/generate_dataset.py
-2. Lancer l’API FastAPI
 
-uvicorn src.api.main:app --reload
-Puis ouvre http://localhost:8000/api/v1/docs
+python -m uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
+The API will now be available at http://localhost:8000. You can view the API documentation at http://localhost:8000/docs.
 
-3. Lancer le dashboard Streamlit
-Dans un autre terminal :
+Terminal 2: Start the Frontend (Streamlit)
+Activate the virtual environment:
 
-cd D:\education\pfe\pfe_ai
+powershell
+
+
 .venv\Scripts\Activate.ps1
-streamlit run frontend/app.py
-Puis ouvre http://localhost:8501
+Run the Streamlit application:
 
-4. Lancer l’évaluation scientifique
+powershell
 
-python -c "from src.evaluation.evaluator import EvaluationSuite; EvaluationSuite().run_full_evaluation('data/datasets/cv_job_dataset.csv')"
-Tests
 
-pytest -q
-Option Docker
-
-docker compose up --build
+python -m streamlit run frontend/app.py --server.port 8501 --server.headless true
+The new premium frontend dashboard will automatically open in your browser at http://localhost:8501.

@@ -1,173 +1,344 @@
+"""
+frontend/app.py
+NeuralHire AI Platform — Enterprise Entry Point v4.0
+
+Architecture:
+  Single-page app with custom sidebar navigation.
+  NO multi-page Streamlit auto-detection (pages/ is a package, not a MPA dir).
+"""
 from __future__ import annotations
 
-import json
 import sys
+import time
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict
+from src.config import settings
+from src.database import SessionLocal
+from src import models_db
 
-import matplotlib.pyplot as plt
-import pandas as pd
-import streamlit as st
-
+# ── Path setup — must be first ─────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.evaluation.evaluator import EvaluationSuite
+import matplotlib
+matplotlib.use("Agg")
+
+import streamlit as st
+
+# ── Page config — FIRST st call ─────────────────────────────────────────────
+st.set_page_config(
+    page_title="NeuralHire — AI Recruitment Platform",
+    page_icon="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2' fill='%2300BFFF'/></svg>",
+    layout="wide",
+    initial_sidebar_state="expanded",
+    menu_items={
+        "Get help":     None,
+        "Report a bug": None,
+        "About":        "NeuralHire v4.0 — AI-powered recruitment evaluation.",
+    },
+)
+
+# ── Design system injection ────────────────────────────────────────────────
+from frontend.styles.theme import build_css, ICONS
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+st.markdown(build_css(st.session_state.theme), unsafe_allow_html=True)
+
+# ── Backend imports ────────────────────────────────────────────────────────
 from src.explainability.explainer import MatchingExplainer, RecommendationEngine
 from src.fusion.hybrid_scorer import HybridMatcher
 from src.models.embedding_model import EmbeddingMatcher
 from src.models.skill_matcher import SkillMatcher
 from src.models.tfidf_model import TFIDFMatcher
+from src.parsing.parser import extract_text_from_pdf, extract_text_from_docx
 
+try:
+    from src.reporting.pdf_generator import MatchReportPDF
+    _PDF_AVAILABLE = True
+except Exception:
+    _PDF_AVAILABLE = False
+    MatchReportPDF = None
 
-st.set_page_config(page_title="CV Matching Dashboard", layout="wide")
+# ── Authentication Check ───────────────────────────────────────────────────
+import requests
 
-HYBRID = HybridMatcher()
-EXPLAINER = MatchingExplainer()
-RECOMMENDER = RecommendationEngine()
-MODELS = {
-    "tfidf": TFIDFMatcher(),
-    "embedding": EmbeddingMatcher(),
-    "skill": SkillMatcher(),
-    "hybrid": HYBRID,
-}
+API_BASE_URL = "http://localhost:8000/api/v1"
 
+def check_auth():
+    # Attempt to recover from cookies if technically supported (Streamlit >= 1.39)
+    if "access_token" not in st.session_state:
+        if hasattr(st, "context") and hasattr(st.context, "cookies"):
+            token = st.context.cookies.get("access_token")
+            if token:
+                st.session_state.access_token = token
 
-def draw_gauge(score_percentage: float):
-    figure, axis = plt.subplots(figsize=(4, 2.6), subplot_kw={"projection": "polar"})
-    axis.set_theta_zero_location("W")
-    axis.set_theta_direction(-1)
-    axis.set_ylim(0, 1)
-    axis.barh(0.5, width=3.14, left=0, height=0.35, color="#e9ecef")
-    angle = 3.14 * min(max(score_percentage / 100.0, 0.0), 1.0)
-    axis.barh(0.5, width=angle, left=0, height=0.35, color="#2a9d8f")
-    axis.set_axis_off()
-    st.pyplot(figure, clear_figure=True)
+    if "access_token" not in st.session_state:
+        return False
+        
+    if "user_id" not in st.session_state:
+        try:
+            response = requests.get(
+                f"{API_BASE_URL}/auth/me", 
+                headers={"Authorization": f"Bearer {st.session_state.access_token}"}
+            )
+            if response.status_code == 200:
+                data = response.json()
+                st.session_state.user_id = data["id"]
+                st.session_state.user_full_name = data["full_name"]
+                st.session_state.user_role = data["role"]
+                return True
+            else:
+                del st.session_state["access_token"]
+                return False
+        except Exception:
+            return False
+            
+    return True
 
+if not check_auth():
+    from frontend.pages import auth
+    auth.render()
+    st.stop()
 
-def draw_radar(radar_data: Dict[str, List[float]]):
-    labels = radar_data["labels"]
-    values = radar_data["cv_scores"] + [radar_data["cv_scores"][0]]
-    requirements = radar_data["job_requirements"] + [radar_data["job_requirements"][0]]
-    angles = [n / float(len(labels)) * 2 * 3.14159 for n in range(len(labels))]
-    angles += angles[:1]
+if "just_logged_out" in st.session_state:
+    st.components.v1.html(
+        '<script>document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";</script>',
+        height=0, width=0
+    )
+    del st.session_state["just_logged_out"]
 
-    figure, axis = plt.subplots(figsize=(5, 5), subplot_kw={"projection": "polar"})
-    axis.plot(angles, values, linewidth=2, label="CV")
-    axis.fill(angles, values, alpha=0.20)
-    axis.plot(angles, requirements, linewidth=2, label="Offre")
-    axis.set_xticks(angles[:-1])
-    axis.set_xticklabels(labels)
-    axis.set_yticklabels([])
-    axis.legend(loc="upper right")
-    st.pyplot(figure, clear_figure=True)
+# Set cookie if just logged in
+if "just_logged_in" in st.session_state:
+    token = st.session_state.just_logged_in
+    st.components.v1.html(
+        f'<script>document.cookie = "access_token={token}; path=/; max-age=86400";</script>',
+        height=0, width=0
+    )
+    del st.session_state["just_logged_in"]
 
-
-def run_match(cv_text: str, job_text: str, model: str = "hybrid") -> Dict[str, object]:
-    if model == "hybrid":
-        result = HYBRID.predict(cv_text, job_text)
-    else:
-        score = float(MODELS[model].predict(cv_text, job_text))
-        result = {
-            "final_score": score,
-            "percentage": round(score * 100.0, 1),
-            "label": 1 if score >= 0.60 else 0,
-            "component_scores": {f"{model}_score": round(score, 4)},
-            "skill_details": MODELS["skill"].predict_detailed(cv_text, job_text),
-        }
-    explanation = EXPLAINER.explain(cv_text, job_text, result)
-    recommendations = RECOMMENDER.generate(explanation["gap_analysis"])
-    return {"result": result, "explanation": explanation, "recommendations": recommendations}
-
-
-page = st.sidebar.radio(
-    "Pages",
-    ["Matching individuel", "Comparaison modeles", "Analyse batch", "Dashboard evaluation"],
+# ── Page imports ───────────────────────────────────────────────────────────
+from frontend.pages import (
+    dashboard, single_match, ranking,
+    model_comparison,
+    evaluation_metrics, settings,
+    candidate_history, job_offers, analysis_history
 )
 
-st.title("Systeme hybride de matching CV / offre")
 
-if page == "Matching individuel":
-    cv_text = st.text_area("CV", height=240, value="PROFIL\nML Engineer avec 5 ans d'experience en python, mlflow, docker, kubernetes.\nCOMPETENCES\npython, mlflow, kubernetes, pytorch, fastapi, communication")
-    job_text = st.text_area("Offre", height=240, value="Nous cherchons un ML Engineer. Competences obligatoires: python, mlflow, kubernetes, docker, model serving. Soft skills: communication, collaboration.")
-    if st.button("Calculer le matching"):
-        payload = run_match(cv_text, job_text, model="hybrid")
-        result = payload["result"]
-        explanation = payload["explanation"]
-        recommendations = payload["recommendations"]
+# ══════════════════════════════════════════════════════════════════════════
+# AI MODEL LOADING
+# ══════════════════════════════════════════════════════════════════════════
 
-        left, right = st.columns(2)
-        with left:
-            st.metric("Score global", f"{result['percentage']}%")
-            draw_gauge(result["percentage"])
-        with right:
-            draw_radar(explanation["radar_data"])
+@st.cache_resource(show_spinner="Loading AI models — this takes a moment on first run…")
+def _load_models() -> Dict:
+    from src.models.model_loader import load_production_models
+    return load_production_models()
 
-        st.subheader("Analyse")
-        st.json(explanation)
-        st.subheader("Recommandations")
-        st.json(recommendations)
 
-elif page == "Comparaison modeles":
-    cv_text = st.text_area("CV compare", height=200)
-    job_text = st.text_area("Offre compare", height=200)
-    if st.button("Comparer"):
-        rows = []
-        for model_name in ["tfidf", "embedding", "skill", "hybrid"]:
-            payload = run_match(cv_text, job_text, model=model_name)
-            rows.append(
-                {
-                    "modele": model_name,
-                    "score": payload["result"]["final_score"],
-                    "pourcentage": payload["result"]["percentage"],
-                    "label": payload["result"]["label"],
-                }
-            )
-        st.dataframe(pd.DataFrame(rows), use_container_width=True)
+@st.cache_resource(show_spinner=False)
+def _run_db_maintenance() -> Dict:
+    """Ensure schema + backfill legacy decisions once per process."""
+    from src.database import engine
+    from src.db_maintenance import run_maintenance
+    return run_maintenance(engine)
 
-elif page == "Analyse batch":
-    uploaded = st.file_uploader("Uploader un CSV avec les colonnes cv_text et job_text", type=["csv"])
-    if uploaded is not None:
-        df = pd.read_csv(uploaded)
-        if {"cv_text", "job_text"}.issubset(df.columns):
-            rows = []
-            for _, row in df.iterrows():
-                payload = run_match(str(row["cv_text"]), str(row["job_text"]), model="hybrid")
-                rows.append({"score": payload["result"]["final_score"], "percentage": payload["result"]["percentage"], "label": payload["result"]["label"]})
-            result_df = pd.concat([df.reset_index(drop=True), pd.DataFrame(rows)], axis=1)
-            st.dataframe(result_df, use_container_width=True)
-            st.download_button("Telecharger les resultats", result_df.to_csv(index=False).encode("utf-8"), file_name="batch_results.csv")
-        else:
-            st.error("Le fichier doit contenir les colonnes cv_text et job_text.")
 
-else:
-    results_path = PROJECT_ROOT / "evaluation" / "results" / "evaluation_results.json"
-    if results_path.exists():
-        payload = json.loads(results_path.read_text(encoding="utf-8"))
-        st.subheader("Metriques")
-        st.json(payload["metrics"])
-        st.subheader("Analyse statistique")
-        st.json(payload["analysis"])
-        figures_dir = PROJECT_ROOT / "evaluation" / "figures"
-        for figure_name in [
-            "roc_curves.png",
-            "confusion_matrices.png",
-            "score_boxplot.png",
-            "domain_score_heatmap.png",
-            "f1_scores.png",
-            "embedding_vs_skill.png",
-        ]:
-            figure_path = figures_dir / figure_name
-            if figure_path.exists():
-                st.image(str(figure_path), caption=figure_name)
-    else:
-        st.info("Aucun resultat d'evaluation trouve. Lancez d'abord le pipeline d'evaluation.")
-        if st.button("Generer une evaluation de demonstration"):
-            dataset_path = PROJECT_ROOT / "data" / "datasets" / "cv_job_dataset.csv"
-            if dataset_path.exists():
-                suite = EvaluationSuite()
-                suite.run_full_evaluation(dataset_path)
-                st.experimental_rerun()
-            else:
-                st.error("Dataset manquant. Generez d'abord le dataset.")
+_run_db_maintenance()
+MODELS      = _load_models()
+HYBRID      = MODELS["hybrid"]
+EXPLAINER   = MODELS["explainer"]
+RECOMMENDER = MODELS["recommender"]
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# CORE MATCHING FUNCTION
+# ══════════════════════════════════════════════════════════════════════════
+
+def run_match(cv_text: str, job_text: str, model: str = "hybrid",
+              candidate_name: str = None, candidate_email: str = None,
+              job_offer_id: int = None, persist: bool = True) -> Dict:
+    """Run a CV–Job evaluation through the canonical matching service.
+
+    Decision, confidence, thresholds and metadata all come from the single
+    DecisionEngine via src.matching.service, and are persisted with de-duplicated
+    Candidate/Job entities. Returns {result, explanation, recommendations, ...}.
+    """
+    from src.matching.service import evaluate_and_persist
+    from frontend.decision_state import get_active_config
+
+    config       = get_active_config()
+    recruiter_id = st.session_state.get("user_id")
+    db = SessionLocal()
+    try:
+        payload = evaluate_and_persist(
+            db, MODELS, cv_text, job_text,
+            model_key=model,
+            candidate_name=candidate_name,
+            candidate_email=candidate_email,
+            job_offer_id=job_offer_id,
+            recruiter_id=recruiter_id,
+            config=config,
+            persist=persist,
+        )
+    finally:
+        db.close()
+    return payload
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# SIDEBAR NAVIGATION
+# Keys used for routing — no emojis, no technical jargon
+# ══════════════════════════════════════════════════════════════════════════
+
+# Initialize current route state if not set
+if "current_route" not in st.session_state:
+    st.session_state.current_route = "dashboard"
+
+# Navigation items: (display label, route key, icon descriptor)
+_NAV = [
+    ("Overview",                  "dashboard",    ":material/dashboard:"),
+    ("Candidate History",         "candidates",   ":material/group:"),
+    ("Job Offers",                "jobs",         ":material/work:"),
+    ("Analysis History",          "history",      ":material/history:"),
+    ("Candidate Analysis",        "single_match", ":material/person_search:"),
+    ("Talent Leaderboard",        "ranking",      ":material/leaderboard:"),
+    ("AI Insights",               "comparison",   ":material/psychology:"),
+    ("AI Quality Center",         "metrics",      ":material/analytics:"),
+    ("Settings",                  "settings",     ":material/settings:"),
+]
+
+with st.sidebar:
+    # ── Brand ──────────────────────────────────────────────────────────────
+    st.markdown(f"""
+    <div class="nh-brand">
+      <div class="nh-brand-row">
+        <div class="nh-brand-icon">{ICONS['zap']}</div>
+        <div>
+          <div class="nh-brand-text-name">Neural<span class="accent">Hire</span></div>
+          <div class="nh-brand-text-sub">AI Recruitment Platform</div>
+        </div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ── Nav section label ──────────────────────────────────────────────────
+    st.markdown('<div class="nh-nav-section-label">NAVIGATION</div>', unsafe_allow_html=True)
+
+    # ── Enterprise Button Navigation — 0 Raw SVG text ──────────────────────
+    for label, route_key, icon_str in _NAV:
+        is_active = (st.session_state.current_route == route_key)
+        btn_kind  = "primary" if is_active else "secondary"
+        if st.button(
+            label,
+            key=f"nav_item_{route_key}",
+            icon=icon_str,
+            type=btn_kind,
+            width="stretch",
+        ):
+            if st.session_state.current_route != route_key:
+                st.session_state.current_route = route_key
+                st.rerun()
+
+    current_route = st.session_state.current_route
+
+    # ── Appearance, Status & Logout ────────────────────────────────────────
+    st.markdown("<hr style='margin: 0.9rem 0;'>", unsafe_allow_html=True)
+
+    _is_dark = st.session_state.theme == "dark"
+    _toggle_label = "Light mode" if _is_dark else "Dark mode"
+    _toggle_icon  = ":material/light_mode:" if _is_dark else ":material/dark_mode:"
+    if st.button(_toggle_label, key="btn_theme_toggle", icon=_toggle_icon,
+                 width="stretch"):
+        st.session_state.theme = "light" if _is_dark else "dark"
+        st.rerun()
+
+    if st.button("Logout", key="btn_logout", icon=":material/logout:", width="stretch"):
+        for key in ["access_token", "user_id", "user_full_name", "user_role", "auth_view"]:
+            if key in st.session_state:
+                del st.session_state[key]
+        # Erase cookie on logout
+        st.session_state.just_logged_out = True
+        st.rerun()
+
+    st.markdown("""
+    <div class="nh-sidebar-footer">
+      <div class="nh-sidebar-status-badge">
+        <div class="nh-status-dot"></div>
+        <div class="nh-status-label">All systems online</div>
+      </div>
+      <div class="nh-sidebar-version">NeuralHire v4.0 · Enterprise</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# PAGE ROUTING
+# ══════════════════════════════════════════════════════════════════════════
+
+# ── Executive Top Bar ──────────────────────────────────────────────────
+current_page_label = next((label for label, route, _ in _NAV if route == current_route), "NeuralHire")
+user_name = st.session_state.get("user_full_name", "HR")
+initials = "".join([n[0] for n in user_name.split() if n]).upper()[:2] if user_name else "HR"
+
+st.markdown(f"""
+<div class="nh-topbar">
+  <div class="nh-topbar-left">
+    <div class="nh-topbar-breadcrumb">
+      <span class="root">NeuralHire</span>
+      <span class="sep">/</span>
+      <span class="current">{current_page_label}</span>
+    </div>
+  </div>
+  <div class="nh-topbar-center">
+    <div class="nh-topbar-search">
+      {ICONS['search']}
+      <input type="text" placeholder="Search candidates, positions, skill keywords..." disabled />
+    </div>
+  </div>
+  <div class="nh-topbar-right">
+    <div class="nh-topbar-status">
+      <div class="nh-status-dot"></div>
+      <span>All Systems Operational</span>
+    </div>
+    <div class="nh-topbar-avatar" title="{user_name}">{initials}</div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
+if current_route == "dashboard":
+    dashboard.render()
+
+elif current_route == "candidates":
+    candidate_history.render()
+
+elif current_route == "jobs":
+    job_offers.render()
+
+elif current_route == "history":
+    analysis_history.render()
+
+elif current_route == "single_match":
+    single_match.render(
+        run_match_fn    = run_match,
+        extract_pdf_fn  = extract_text_from_pdf,
+        extract_docx_fn = extract_text_from_docx,
+        pdf_available   = _PDF_AVAILABLE,
+        MatchReportPDF  = MatchReportPDF,
+    )
+
+elif current_route == "ranking":
+    ranking.render(
+        run_match_fn    = run_match,
+        extract_pdf_fn  = extract_text_from_pdf,
+        extract_docx_fn = extract_text_from_docx,
+    )
+
+elif current_route == "comparison":
+    model_comparison.render(run_match_fn=run_match)
+
+elif current_route == "metrics":
+    evaluation_metrics.render(project_root=PROJECT_ROOT)
+
+elif current_route == "settings":
+    settings.render(models=MODELS, project_root=PROJECT_ROOT)

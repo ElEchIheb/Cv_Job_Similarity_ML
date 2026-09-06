@@ -24,12 +24,22 @@ class FoldMetrics:
 
 class HybridMatcher:
     def __init__(self, weights: Dict[str, float] | None = None) -> None:
-        self.weights = self._normalize_weights(weights or {"embedding": 0.50, "skill": 0.30, "tfidf": 0.20})
-        self.models = {
+        self.models: Dict[str, object] = {
             "tfidf": TFIDFMatcher(),
             "embedding": EmbeddingMatcher(),
             "skill": SkillMatcher(),
         }
+        self.weights = self._normalize_weights(weights) if weights else {"tfidf": 0.2, "embedding": 0.4, "skill": 0.4}
+        self.optimal_threshold = 0.60
+        
+    def _calculate_confidence(self, score: float) -> str:
+        import math
+        # Calibrate distance to a [0, 1] scale using a scaled sigmoid
+        # This is a Score Confidence, NOT a calibrated probability.
+        prob = 1.0 / (1.0 + math.exp(-10 * (score - getattr(self, "optimal_threshold", 0.60))))
+        if prob >= 0.85 or prob <= 0.15: return "high"
+        if prob >= 0.65 or prob <= 0.35: return "medium"
+        return "low"
 
     @staticmethod
     def _normalize_weights(weights: Dict[str, float]) -> Dict[str, float]:
@@ -56,8 +66,8 @@ class HybridMatcher:
         return {
             "final_score": round(final_score, 4),
             "percentage": round(final_score * 100.0, 1),
-            "label": 1 if final_score >= 0.60 else 0,
-            "confidence": "high" if abs(final_score - 0.60) > 0.15 else "medium",
+            "label": 1 if final_score >= getattr(self, "optimal_threshold", 0.60) else 0,
+            "confidence": self._calculate_confidence(final_score),
             "component_scores": {key: round(value, 4) for key, value in scores.items()},
             "weights_used": dict(self.weights),
             "skill_details": skill_details,
@@ -80,8 +90,8 @@ class HybridMatcher:
         )
 
     @staticmethod
-    def _metric_bundle(y_true: np.ndarray, y_scores: np.ndarray) -> Dict[str, float]:
-        y_pred = (y_scores >= 0.60).astype(int)
+    def _metric_bundle(y_true: np.ndarray, y_scores: np.ndarray, threshold: float = 0.60) -> Dict[str, float]:
+        y_pred = (y_scores >= threshold).astype(int)
         metrics = {
             "accuracy": float(accuracy_score(y_true, y_pred)),
             "precision": float(precision_score(y_true, y_pred, zero_division=0)),
@@ -123,17 +133,43 @@ class HybridMatcher:
                 )
 
         best_weights = self.weights
-        best_metrics = {"f1": -1.0, "roc_auc": -1.0}
+        best_auc = -1.0
+        
+        # Optimize weights purely on AUC (threshold independent)
         for weights in candidate_weights:
             scores = self._score_with_weights(validation_components, weights)
-            metrics = self._metric_bundle(y_true, scores)
-            if (metrics["f1"], metrics["roc_auc"]) > (best_metrics["f1"], best_metrics["roc_auc"]):
+            auc = float(roc_auc_score(y_true, scores)) if len(set(y_true)) > 1 else 0.0
+            if auc > best_auc:
                 best_weights = weights
-                best_metrics = metrics
+                best_auc = auc
 
         self.weights = best_weights
+        
+        # Find optimal classification threshold for best weights using F1
+        best_scores = self._score_with_weights(validation_components, best_weights)
+        best_threshold = 0.60
+        best_f1 = -1.0
+        
+        min_score = float(np.min(best_scores))
+        max_score = float(np.max(best_scores))
+        if max_score <= min_score + 0.02:
+            min_score = max(0.0, min_score - 0.05)
+            max_score = min(1.0, max_score + 0.05)
+            
+        search_grid = np.arange(min_score, max_score + 0.02, 0.02)
+        
+        for thresh in search_grid:
+            metrics = self._metric_bundle(y_true, best_scores, threshold=thresh)
+            if metrics["f1"] > best_f1:
+                best_f1 = metrics["f1"]
+                best_threshold = thresh
+                
+        self.optimal_threshold = round(float(best_threshold), 4)
+        best_metrics = self._metric_bundle(y_true, best_scores, threshold=self.optimal_threshold)
+
         return {
             "best_weights": best_weights,
+            "optimal_threshold": self.optimal_threshold,
             "validation_metrics": best_metrics,
             "train_size": int(len(train_df)),
             "validation_size": int(len(validation_df)),
@@ -148,12 +184,14 @@ class HybridMatcher:
             train_df = df.iloc[train_index].reset_index(drop=True)
             test_df = df.iloc[test_index].reset_index(drop=True)
             matcher = HybridMatcher(weights=dict(self.weights))
+            matcher.models["embedding"] = self.models["embedding"]
+            matcher.models["skill"] = self.models["skill"]
             matcher.optimize_weights(train_df, step=step)
             matcher.fit(train_df)
             components = matcher._compute_component_scores(test_df)
             y_true = test_df["label"].astype(int).to_numpy()
             y_scores = matcher._score_with_weights(components, matcher.weights)
-            metrics = matcher._metric_bundle(y_true, y_scores)
+            metrics = matcher._metric_bundle(y_true, y_scores, threshold=matcher.optimal_threshold)
             fold_metrics.append(FoldMetrics(**metrics))
 
         summary = {

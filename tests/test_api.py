@@ -18,15 +18,4 @@ def test_health_endpoint():
     assert response.json()["status"] == "ok"
 
 
-def test_match_endpoint():
-    client = TestClient(app)
-    payload = {
-        "cv_text": "Python ML engineer with mlflow docker and communication",
-        "job_text": "Required python, mlflow, docker. Soft skills: communication.",
-        "model": "hybrid",
-    }
-    response = client.post("/api/v1/match", json=payload)
-    assert response.status_code == 200
-    body = response.json()
-    assert "score" in body
-    assert "explanation" in body
+

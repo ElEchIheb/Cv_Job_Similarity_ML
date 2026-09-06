@@ -1,0 +1,42 @@
+# ── Secrets / environment ────────────────────────────────────────────────
+.env
+.env.local
+.env*.local
+!.env.example
+
+# ── Databases (may contain PII / local test data) ────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+
+# ── Python ───────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+pytest-cache-files-*/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# ── Node / Next.js (web/) ────────────────────────────────────────────────
+node_modules/
+.next/
+out/
+next-env.d.ts
+.vercel/
+
+# ── Logs / debug / scratch ───────────────────────────────────────────────
+*.log
+debug*.txt
+
+# ── Local model weights / large binaries ─────────────────────────────────
+# (keep committed if intentionally versioned; remove this line if so)
+
+# ── OS / editor ──────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

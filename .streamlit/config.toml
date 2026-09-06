@@ -1,0 +1,18 @@
+[browser]
+gatherUsageStats = false
+
+[client]
+showErrorDetails = false
+showSidebarNavigation = false
+
+[server]
+headless = true
+enableCORS = false
+
+[theme]
+base = "dark"
+primaryColor = "#6366F1"
+backgroundColor = "#0A0E17"
+secondaryBackgroundColor = "#111726"
+textColor = "#F1F5F9"
+font = "sans serif"

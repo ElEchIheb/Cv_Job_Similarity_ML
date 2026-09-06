@@ -13,6 +13,7 @@ JOB_TEXT = "Required: python, fastapi, docker, postgresql. Soft skills: communic
 
 def test_tfidf_matcher_predict_and_persistence():
     matcher = TFIDFMatcher()
+    matcher.fit([CV_TEXT, JOB_TEXT])
     score = matcher.predict(CV_TEXT, JOB_TEXT)
     assert 0.0 <= score <= 1.0
 

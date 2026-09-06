@@ -39,12 +39,12 @@ class TFIDFMatcher(BaseMatchingModel):
     def fit_pairs(self, cvs: Iterable[str], jobs: Iterable[str]) -> "TFIDFMatcher":
         return self.fit(list(cvs) + list(jobs))
 
-    def _ensure_fitted_for_inputs(self, cvs: List[str], jobs: List[str]) -> None:
+    def _ensure_fitted_for_inputs(self) -> None:
         if not self.is_fitted:
-            self.fit_pairs(cvs, jobs)
+            raise RuntimeError("TFIDFMatcher is not fitted. Fit the model using training data before inference.")
 
     def predict(self, cv: str, job: str) -> float:
-        self._ensure_fitted_for_inputs([cv], [job])
+        self._ensure_fitted_for_inputs()
         matrix = self.vectorizer.transform([cv or "", job or ""])
         score = cosine_similarity(matrix[0:1], matrix[1:2])[0, 0]
         return float(np.clip(score, 0.0, 1.0))
@@ -54,7 +54,7 @@ class TFIDFMatcher(BaseMatchingModel):
         job_list = list(jobs)
         if len(cv_list) != len(job_list):
             raise ValueError("CV and job lists must have the same length.")
-        self._ensure_fitted_for_inputs(cv_list, job_list)
+        self._ensure_fitted_for_inputs()
         cv_matrix = self.vectorizer.transform([text or "" for text in cv_list])
         job_matrix = self.vectorizer.transform([text or "" for text in job_list])
         scores = cosine_similarity(cv_matrix, job_matrix).diagonal()

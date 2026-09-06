@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.git/
+.gitignore
+.pytest_cache/
+tests_tmp/
+evaluation/results/
+evaluation/figures/
+pytest-cache-files-*/
