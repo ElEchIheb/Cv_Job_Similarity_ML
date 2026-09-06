@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 from collections import Counter, defaultdict
+from datetime import date
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Set, Tuple
 
@@ -153,12 +154,92 @@ class SkillExtractor:
                             break
         return ngram_matches
 
-    @staticmethod
-    def _detect_years_experience(text: str) -> int:
-        patterns = re.findall(r"(\d{1,2})\s*\+?\s*(?:years?|yrs?|ans?|annees?)", clean_text(text), flags=re.IGNORECASE)
-        if patterns:
-            return max(int(value) for value in patterns)
-        return 0
+    # Month names (English + French, full and common abbreviations) → month number.
+    _MONTHS = {
+        "jan": 1, "january": 1, "janvier": 1,
+        "feb": 2, "february": 2, "fevrier": 2, "février": 2, "fev": 2, "fév": 2,
+        "mar": 3, "march": 3, "mars": 3,
+        "apr": 4, "april": 4, "avril": 4, "avr": 4,
+        "may": 5, "mai": 5,
+        "jun": 6, "june": 6, "juin": 6,
+        "jul": 7, "july": 7, "juillet": 7, "juil": 7,
+        "aug": 8, "august": 8, "aout": 8, "août": 8,
+        "sep": 9, "sept": 9, "september": 9, "septembre": 9,
+        "oct": 10, "october": 10, "octobre": 10,
+        "nov": 11, "november": 11, "novembre": 11,
+        "dec": 12, "december": 12, "decembre": 12, "décembre": 12, "déc": 12,
+    }
+    # Tokens that mark an open-ended (still-ongoing) role → resolves to today.
+    _PRESENT_TOKENS = {
+        "present", "présent", "current", "now", "today", "actuel", "actuelle",
+        "ongoing", "aujourd'hui", "aujourd’hui", "todate", "to date", "en cours",
+    }
+    # A single date range: optional month name + year, a separator, then an
+    # optional month name + (year | present-token). Years are boundary-guarded so
+    # we never grab digits from inside a longer number.
+    _RANGE_RE = re.compile(
+        r"(?:(?P<sm>[a-zéûôàèçé]{3,9})[.\s]+)?"
+        r"(?<!\d)(?P<sy>(?:19|20)\d{2})(?!\d)"
+        r"\s*(?:[-–—]|to|until|au|à|jusqu['’]?\s*(?:au|à)?)\s*"
+        r"(?:(?P<em>[a-zéûôàèçé]{3,9})[.\s]+)?"
+        r"(?P<ey>(?:19|20)\d{2}|present|présent|current|now|today|actuel(?:le)?|ongoing|aujourd['’]hui|en\s+cours)",
+        re.IGNORECASE,
+    )
+
+    @classmethod
+    def _detect_years_experience(cls, text: str) -> Optional[float]:
+        """Estimate total years of professional experience from *raw* CV text.
+
+        Returns ``None`` (an honest "could not detect" state) when neither an
+        explicit "N years" phrase nor a parseable date range is present, so
+        callers can distinguish a parsing failure from a confirmed zero. The
+        caller MUST pass raw text: :func:`clean_text` scrubs compact
+        ``YYYY-YYYY`` ranges as if they were phone numbers, which is exactly how
+        well-formatted date ranges used to go undetected.
+        """
+        normalized = (text or "").lower()
+        today = date.today()
+
+        # 1) Explicit "N years"/"N ans" (kept from the original behaviour).
+        explicit = [
+            int(value)
+            for value in re.findall(
+                r"(\d{1,2})\s*\+?\s*(?:years?|yrs?|ans?|annees?|années?)",
+                normalized,
+                flags=re.IGNORECASE,
+            )
+        ]
+        explicit_max = float(max(explicit)) if explicit else 0.0
+
+        # 2) Date ranges — summed across every entry (multiple jobs add up).
+        range_total = 0.0
+        found_range = False
+        for match in cls._RANGE_RE.finditer(normalized):
+            start_year = int(match.group("sy"))
+            end_raw = match.group("ey").strip().lower()
+            start_month = cls._MONTHS.get((match.group("sm") or "").strip().lower())
+            end_month = cls._MONTHS.get((match.group("em") or "").strip().lower())
+
+            if end_raw in cls._PRESENT_TOKENS or not end_raw[:4].isdigit():
+                end_year, resolved_end_month = today.year, today.month
+            else:
+                end_year, resolved_end_month = int(end_raw[:4]), None
+
+            has_months = start_month is not None or end_month is not None
+            if has_months:
+                s_m = start_month or 1
+                e_m = resolved_end_month or end_month or 12
+                duration = ((end_year * 12 + (e_m - 1)) - (start_year * 12 + (s_m - 1))) / 12.0
+            else:
+                duration = float(end_year - start_year)
+
+            if 0.0 <= duration <= 60.0:  # ignore reversed or absurd ranges
+                range_total += duration
+                found_range = True
+
+        if not explicit and not found_range:
+            return None
+        return round(max(explicit_max, range_total), 1)
 
     @staticmethod
     def _detect_education_level(text: str) -> str:
@@ -194,6 +275,10 @@ class SkillExtractor:
         return best_domain if best_score > 0 else "generalist"
 
     def extract(self, text: str) -> Dict[str, object]:
+        # Detect experience from the RAW text: clean_text (used by _apply_variants
+        # below) strips compact YYYY-YYYY ranges as phone numbers, so date-range
+        # parsing must see the original string.
+        detected_years = self._detect_years_experience(text)
         normalized = self._apply_variants(text)
         dictionary_hits = self._dictionary_matches(normalized)
         ner_hits = self._ner_matches(normalized)
@@ -242,7 +327,8 @@ class SkillExtractor:
             "hard_skills": sorted(hard_skills),
             "soft_skills": sorted(soft_skills),
             "certifications": sorted(certifications),
-            "years_experience": self._detect_years_experience(normalized),
+            "years_experience": detected_years if detected_years is not None else 0,
+            "experience_detected": detected_years is not None,
             "education_level": self._detect_education_level(normalized),
             "confidence_scores": dict(sorted(confidence_scores.items())),
             "domain": self.detect_domain(normalized),
