@@ -96,7 +96,7 @@ axis is tagged in `radar_data.job_requirements_source` as `"job"` (derived) or `
 > fall back to benchmarks and only Domain is job-derived — the source labels make this explicit
 > instead of silently presenting fixed numbers as job-specific.
 
-## Bug 4 — Score inflation from CV/JD textual similarity (keyword gaming) — FLAGGED, NOT changed
+## Bug 4 — Score inflation from CV/JD textual similarity (keyword gaming) — RESOLVED (2026-09-09)
 
 **Investigation (empirical, controlled):** using the production checkpoint
 (`models/checkpoints/hybrid.pkl`, weights **tfidf 0.9 / embedding 0.0 / skill 0.1**,
@@ -118,11 +118,15 @@ known not to drive recruiter decisions — those use the 75/55 DecisionEngine) s
 this checkpoint overfit a particular synthetic validation split rather than reflecting an intended
 production weighting. The documented default is `0.2 / 0.4 / 0.4`.
 
-**Decision required (not made here):** per the ground rules, the production weighting was **not**
-changed — it affects every historical and future score. Recommendation for sign-off: re-export
-the checkpoint with the documented `0.2/0.4/0.4` split (or re-run `optimize_weights` with
-regularization / a held-out test set and a non-degenerate threshold), then re-baseline. This is a
-product decision, flagged for the user.
+**Resolution (approved):** the production checkpoint was re-exported at the documented fixed
+weights: **tfidf 0.2 / embedding 0.4 / skill 0.4**. Its operating threshold is now calibrated
+from validation data only (`0.2636`), rather than retaining the old jointly-tuned `0.04` value.
+This is commit `38e50e8`.
+
+**Post-fix control run:** on the re-exported checkpoint, the echo CV scored **94.4%** and the
+equivalent paraphrase scored **84.8%**: a **9.6-point** wording gap, down from 25.6 points. The
+individual TF-IDF values differ from the original experiment because the model was refit, but the
+controlled skills/substance and JD were unchanged.
 
 ---
 
@@ -132,8 +136,33 @@ Pre-fix `MatchResult` rows produced for similarly-formatted CVs may have **under
 experience (any CV whose experience was expressed only as a date range → `years=0`, Experience
 radar `0%`) and **understated skill coverage** (any job/CV using HTML, CSS, HTML5, CSS3, or SCSS
 → those skills dropped from the coverage denominator). These records were **not** retroactively
-recomputed; re-running an affected evaluation now yields the corrected values. Bug 4 does not
-change any stored score (weights were left untouched pending sign-off).
+recomputed; re-running an affected evaluation now yields the corrected values.
+
+Additionally, `MatchResult` records created before **2026-09-09** were computed with the
+overfit `0.9 / 0.0 / 0.1` fusion checkpoint and are not directly comparable to future records
+computed with `0.2 / 0.4 / 0.4`. Historical records are intentionally retained as-is; this is a
+documented score-scale discontinuity introduced by commit `38e50e8`.
+
+## Benchmark integrity — calibrated thresholds and held-out evaluation (2026-09-09)
+
+The old offline benchmark applied a hard-coded `0.60` cutoff to every component despite their
+native score distributions. That caused the high-AUC/near-zero-F1 pathology for TF-IDF and skills.
+The harness now calibrates one operating threshold per method using validation data only, then
+reports metrics once on the held-out test partition.
+
+| Method | Before accuracy / F1 / AUC | After accuracy / F1 / AUC |
+| --- | --- | --- |
+| TF-IDF relevance | 29.8% / 0.0% / 0.979 | 92.8% / 95.0% / 0.979 |
+| Semantic embedding | 51.2% / 47.9% / 0.801 | 77.7% / 84.9% / 0.811 |
+| Skills assessment | 30.2% / 1.1% / 0.947 | 89.4% / 92.8% / 0.947 |
+| Hybrid overall match | 92.8% / 95.0% / 0.983 | 90.8% / 93.4% / 0.964 |
+
+The source dataset contains 12,000 distinct normalized candidate/job pairs (zero duplicate pair
+rows), so direct validation/test leakage was **not confirmed** in that completed run. The old
+harness nonetheless lacked a group-disjoint assertion and used an optimizer-selected hybrid.
+The replacement split groups normalized CV/JD pairs, asserts all train/validation/test intersections
+are empty, fixes fusion weights before evaluation, and never uses held-out test results to tune
+weights or thresholds. A regression warning now flags AUC-ROC >= 0.80 combined with F1 <= 0.05.
 
 ## Files changed
 
