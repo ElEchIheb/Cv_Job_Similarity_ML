@@ -241,7 +241,7 @@ export interface Quality {
       dominant_fn_domain?: string;
     };
   };
-  provenance?: { source: string; generated: string; n_samples?: number | null };
+  provenance?: { source: string; generated: string; n_samples?: number | null; methodology?: string | null };
 }
 export interface QualityFigure {
   name: string;

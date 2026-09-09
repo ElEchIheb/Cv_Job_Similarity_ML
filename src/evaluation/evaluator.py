@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import time
+import hashlib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Tuple
@@ -24,19 +25,20 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import train_test_split
 
-from src.fusion.hybrid_scorer import HybridMatcher
+from src.fusion.hybrid_scorer import DOCUMENTED_DEFAULT_WEIGHTS, HybridMatcher
 from src.models.embedding_model import EmbeddingMatcher
 from src.models.skill_matcher import SkillMatcher
 from src.models.tfidf_model import TFIDFMatcher
 
 
-def evaluate_model(model, test_df) -> Dict[str, object]:
+def evaluate_model(model, test_df, threshold: float = 0.60) -> Dict[str, object]:
     start = time.perf_counter()
     y_scores = np.asarray(model.batch_predict(test_df["cv_text"].tolist(), test_df["job_text"].tolist()))
     elapsed = (time.perf_counter() - start) * 1000.0 / max(1, len(test_df))
     y_true = test_df["label"].astype(int).to_numpy()
-    y_pred = (y_scores >= 0.60).astype(int)
+    y_pred = (y_scores >= threshold).astype(int)
     return {
+        "operating_threshold": float(threshold),
         "accuracy": float(accuracy_score(y_true, y_pred)),
         "precision": float(precision_score(y_true, y_pred, zero_division=0)),
         "recall": float(recall_score(y_true, y_pred, zero_division=0)),
@@ -68,25 +70,78 @@ class EvaluationSuite:
 
     @staticmethod
     def stratified_split(df: pd.DataFrame, random_state: int = 42) -> DatasetSplit:
-        stratify_key = df["label"].astype(str) + "_" + df["domain"].astype(str)
-        train_df, temp_df = train_test_split(
-            df,
+        """Create train/validation/test partitions with pair groups disjoint.
+
+        The generated dataset has no durable candidate/job identifiers, so the
+        normalized CV+JD pair is the narrowest truthful entity group available.
+        This also catches future datasets that accidentally duplicate a pair.
+        """
+        pair_groups = df.apply(
+            lambda row: hashlib.sha256(
+                " ".join(str(row["cv_text"]).lower().split()).encode("utf-8")
+                + b"\x1f"
+                + " ".join(str(row["job_text"]).lower().split()).encode("utf-8")
+            ).hexdigest(),
+            axis=1,
+        )
+        group_frame = pd.DataFrame({
+            "pair_group": pair_groups,
+            "stratum": df["label"].astype(str) + "_" + df["domain"].astype(str),
+        })
+        if group_frame.groupby("pair_group")["stratum"].nunique().gt(1).any():
+            raise ValueError("A candidate/job pair has conflicting label or domain strata.")
+        groups = group_frame.drop_duplicates("pair_group")
+        train_groups, temp_groups = train_test_split(
+            groups,
             test_size=0.30,
             random_state=random_state,
-            stratify=stratify_key,
+            stratify=groups["stratum"],
         )
-        temp_key = temp_df["label"].astype(str) + "_" + temp_df["domain"].astype(str)
-        validation_df, test_df = train_test_split(
-            temp_df,
+        validation_groups, test_groups = train_test_split(
+            temp_groups,
             test_size=0.50,
             random_state=random_state,
-            stratify=temp_key,
+            stratify=temp_groups["stratum"],
         )
-        return DatasetSplit(
-            train=train_df.reset_index(drop=True),
-            validation=validation_df.reset_index(drop=True),
-            test=test_df.reset_index(drop=True),
+        split = DatasetSplit(
+            train=df[pair_groups.isin(set(train_groups["pair_group"]))].reset_index(drop=True),
+            validation=df[pair_groups.isin(set(validation_groups["pair_group"]))].reset_index(drop=True),
+            test=df[pair_groups.isin(set(test_groups["pair_group"]))].reset_index(drop=True),
         )
+        EvaluationSuite.assert_pair_groups_disjoint(split)
+        return split
+
+    @staticmethod
+    def _pair_groups(df: pd.DataFrame) -> set[str]:
+        return set(df.apply(
+            lambda row: hashlib.sha256(
+                " ".join(str(row["cv_text"]).lower().split()).encode("utf-8")
+                + b"\x1f"
+                + " ".join(str(row["job_text"]).lower().split()).encode("utf-8")
+            ).hexdigest(),
+            axis=1,
+        ))
+
+    @staticmethod
+    def assert_pair_groups_disjoint(split: DatasetSplit) -> None:
+        groups = [EvaluationSuite._pair_groups(part) for part in (split.train, split.validation, split.test)]
+        if groups[0] & groups[1] or groups[0] & groups[2] or groups[1] & groups[2]:
+            raise AssertionError("Candidate/job pair groups overlap across benchmark splits.")
+
+    @staticmethod
+    def calibrate_threshold(y_true: np.ndarray, y_scores: np.ndarray) -> float:
+        """Select an F1 operating point using validation data only."""
+        return HybridMatcher._best_f1_threshold(y_true, y_scores)
+
+    @staticmethod
+    def operating_point_warnings(metrics_by_model: Dict[str, Dict[str, object]]) -> list[str]:
+        warnings = []
+        for name, metrics in metrics_by_model.items():
+            if float(metrics.get("roc_auc", 0.0)) >= 0.80 and float(metrics.get("f1", 0.0)) <= 0.05:
+                warnings.append(
+                    f"{name}: high AUC-ROC with near-zero F1; inspect score scale and operating threshold."
+                )
+        return warnings
 
     @staticmethod
     def bootstrap_confidence_interval(y_true: np.ndarray, y_scores: np.ndarray, metric: str, iterations: int = 1000, threshold: float = 0.60) -> Tuple[float, float]:
@@ -234,8 +289,7 @@ class EvaluationSuite:
 
     def _error_analysis(self, test_df: pd.DataFrame, metrics_by_model: Dict[str, Dict[str, object]]) -> Dict[str, object]:
         hybrid_scores = np.asarray(metrics_by_model["hybrid"]["scores"])
-        # Fetch the optimal threshold applied to hybrid predictions
-        optimal_threshold = metrics_by_model["hybrid"].get("optimal_threshold", 0.60)
+        optimal_threshold = metrics_by_model["hybrid"].get("operating_threshold", 0.60)
         hybrid_pred = (hybrid_scores >= optimal_threshold).astype(int)
         
         y_true = test_df["label"].astype(int).to_numpy()
@@ -261,14 +315,32 @@ class EvaluationSuite:
         tfidf = TFIDFMatcher().fit_pairs(split.train["cv_text"].tolist(), split.train["job_text"].tolist())
         embedding = EmbeddingMatcher()
         skill = SkillMatcher()
-        hybrid = HybridMatcher()
-        hybrid.optimize_weights(split.train, split.validation)
-        hybrid.fit(pd.concat([split.train, split.validation], ignore_index=True))
+        # Avoid constructing duplicate embedding backends; this benchmark
+        # deliberately reuses the three standalone component instances below.
+        hybrid = HybridMatcher.__new__(HybridMatcher)
+        hybrid.weights = dict(DOCUMENTED_DEFAULT_WEIGHTS)
+        hybrid.optimal_threshold = 0.60
+        # Reuse the standalone instances so validation/test scores are exactly
+        # the components fused by hybrid, and so semantic encodings are cached
+        # once rather than recomputed for each method.
+        hybrid.models = {"tfidf": tfidf, "embedding": embedding, "skill": skill}
+
+        validation_models = {"tfidf": tfidf, "embedding": embedding, "skill": skill}
+        thresholds = {}
+        validation_y = split.validation["label"].astype(int).to_numpy()
+        for name, model in validation_models.items():
+            validation_scores = np.asarray(model.batch_predict(split.validation["cv_text"], split.validation["job_text"]))
+            thresholds[name] = self.calibrate_threshold(validation_y, validation_scores)
+        hybrid_validation_scores = np.asarray([
+            result["final_score"] for result in hybrid.batch_predict(split.validation["cv_text"], split.validation["job_text"])
+        ])
+        thresholds["hybrid"] = self.calibrate_threshold(validation_y, hybrid_validation_scores)
+        hybrid.optimal_threshold = thresholds["hybrid"]
 
         metrics_by_model = {
-            "tfidf": evaluate_model(tfidf, split.test),
-            "embedding": evaluate_model(embedding, split.test),
-            "skill": evaluate_model(skill, split.test),
+            "tfidf": evaluate_model(tfidf, split.test, thresholds["tfidf"]),
+            "embedding": evaluate_model(embedding, split.test, thresholds["embedding"]),
+            "skill": evaluate_model(skill, split.test, thresholds["skill"]),
         }
 
         start = time.perf_counter()
@@ -277,11 +349,11 @@ class EvaluationSuite:
         hybrid_inference_ms = (time.perf_counter() - start) * 1000.0 / max(1, len(split.test))
         y_true = split.test["label"].astype(int).to_numpy()
         hybrid_scores_array = np.asarray(hybrid_scores)
-        optimal_threshold = getattr(hybrid, "optimal_threshold", 0.60)
+        optimal_threshold = thresholds["hybrid"]
         hybrid_pred = (hybrid_scores_array >= optimal_threshold).astype(int)
         
         metrics_by_model["hybrid"] = {
-            "optimal_threshold": optimal_threshold,
+            "operating_threshold": optimal_threshold,
             "accuracy": float(accuracy_score(y_true, hybrid_pred)),
             "precision": float(precision_score(y_true, hybrid_pred, zero_division=0)),
             "recall": float(recall_score(y_true, hybrid_pred, zero_division=0)),
@@ -298,9 +370,9 @@ class EvaluationSuite:
         stats = {
             "bootstrap_ci": {
                 model_name: {
-                    "f1": self.bootstrap_confidence_interval(y_true, np.asarray(metrics["scores"]), "f1", threshold=metrics.get("optimal_threshold", 0.60)),
-                    "accuracy": self.bootstrap_confidence_interval(y_true, np.asarray(metrics["scores"]), "accuracy", threshold=metrics.get("optimal_threshold", 0.60)),
-                    "roc_auc": self.bootstrap_confidence_interval(y_true, np.asarray(metrics["scores"]), "roc_auc", threshold=metrics.get("optimal_threshold", 0.60)),
+                    "f1": self.bootstrap_confidence_interval(y_true, np.asarray(metrics["scores"]), "f1", threshold=metrics.get("operating_threshold", 0.60)),
+                    "accuracy": self.bootstrap_confidence_interval(y_true, np.asarray(metrics["scores"]), "accuracy", threshold=metrics.get("operating_threshold", 0.60)),
+                    "roc_auc": self.bootstrap_confidence_interval(y_true, np.asarray(metrics["scores"]), "roc_auc", threshold=metrics.get("operating_threshold", 0.60)),
                 }
                 for model_name, metrics in metrics_by_model.items()
             },
@@ -317,10 +389,13 @@ class EvaluationSuite:
                 ),
             },
             "subgroup_analysis": self.subgroup_analysis(split.test, metrics_by_model),
-            "weight_optimization": hybrid.weights,
-            "cross_validation": hybrid.cross_validate(pd.concat([split.train, split.validation], ignore_index=True)),
+            "fixed_fusion_weights": hybrid.weights,
+            "operating_thresholds": thresholds,
+            "operating_point_warnings": self.operating_point_warnings(metrics_by_model),
+            "cross_validation": {"not_run": "Final metrics use a single untouched held-out test split."},
             "error_analysis": self._error_analysis(split.test, metrics_by_model),
             "split_sizes": {"train": len(split.train), "validation": len(split.validation), "test": len(split.test)},
+            "split_grouping": "normalized candidate/job pair; groups are asserted disjoint",
         }
 
         self._plot_roc_curves(y_true, metrics_by_model)
@@ -330,7 +405,13 @@ class EvaluationSuite:
         self._plot_f1_bars(metrics_by_model)
         self._plot_embedding_skill_scatter(metrics_by_model)
 
-        payload = {"metrics": metrics_by_model, "analysis": stats}
+        payload = {
+            "dataset_size": int(len(df)),
+            "test_size": int(len(split.test)),
+            "methodology": "Fixed documented hybrid weights; per-method validation-calibrated thresholds; pair-group-disjoint held-out test.",
+            "metrics": metrics_by_model,
+            "analysis": stats,
+        }
         result_file = self.results_dir / "evaluation_results.json"
         result_file.write_text(json.dumps(payload, indent=2), encoding="utf-8")
         return payload

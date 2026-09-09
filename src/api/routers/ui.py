@@ -630,7 +630,12 @@ def quality(user: models_db.User = Depends(get_current_user)) -> Dict:
         "available": True,
         "metrics": payload.get("metrics", {}),
         "analysis": payload.get("analysis", {}),
-        "provenance": {"source": results_path.name, "generated": mtime, "n_samples": n_samples},
+        "provenance": {
+            "source": results_path.name,
+            "generated": mtime,
+            "n_samples": n_samples,
+            "methodology": payload.get("methodology"),
+        },
     }
 
 

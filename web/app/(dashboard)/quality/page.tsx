@@ -62,7 +62,7 @@ export default function QualityPage() {
         <div className="flex items-start gap-3 rounded-lg border border-subtle/12 bg-accent/8 px-4 py-3 text-caption text-ink-secondary ring-1 ring-accent/10">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent-300" />
           <span>Source: offline evaluation run — {q.provenance.source}, generated {q.provenance.generated}.
-            {q.provenance.n_samples ? ` Test set: ${q.provenance.n_samples} pairs.` : ""} These figures reflect the last benchmark run on the held-out dataset — they are not recomputed live.</span>
+            {q.provenance.n_samples ? ` Test set: ${q.provenance.n_samples} pairs.` : ""} {q.provenance.methodology ?? "These figures reflect the last benchmark run on the held-out dataset."} They are not recomputed live.</span>
         </div>
       )}
 
