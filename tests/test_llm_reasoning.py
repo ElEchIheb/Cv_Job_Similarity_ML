@@ -39,6 +39,44 @@ def _valid_analysis():
     }
 
 
+def _reject_evaluation():
+    return {
+        "result": {"percentage": 18.3,
+                   "component_scores": {"tfidf_score": 0.0981, "embedding_score": 0.4088, "skill_score": 0.0}},
+        "explanation": {
+            "skill_analysis": {
+                "matching_skills": ["docker", "postgresql"],
+                "missing_skills": ["javascript", "react", "typescript"],
+                "critical_missing": ["javascript", "react", "typescript"],
+                "skill_coverage": "2/11 required skills",
+            },
+            "experience_fit": {"candidate_years": 6.0, "candidate_years_detected": True,
+                               "estimated_required_years": 3.0, "education_level": "Master"},
+        },
+        "decision": {"decision": "REJECT", "band_label": "Low Fit"},
+    }
+
+
+def _contradictory_analysis():
+    return {
+        "career_trajectory": {"summary": "Strong alignment with this role.", "seniority_signal": "senior", "progression": "Perfect match."},
+        "red_flags": [{"issue": "No red flags", "severity": "low", "evidence": "No concerns."}],
+        "recommendations": [{"recommendation": "Proceed", "rationale": "High likelihood of success."}],
+        "fit_justification": "This is a perfect match.",
+        "interview_questions": [{"question": "Describe Python work?", "targets": "Python"}],
+    }
+
+
+def _reject_consistent_analysis():
+    return {
+        "career_trajectory": {"summary": "The CV shows ML experience, not the requested web stack.", "seniority_signal": "senior", "progression": "The transition to this full-stack role is not evidenced."},
+        "red_flags": [{"issue": "Critical frontend gaps", "severity": "high", "evidence": "JavaScript, React, and TypeScript are listed as missing."}],
+        "recommendations": [{"recommendation": "Do not advance for this role without evidence of the missing web skills.", "rationale": "Coverage is limited to 2 of 11 required skills."}],
+        "fit_justification": "The REJECT decision is consistent with the documented web-stack gaps.",
+        "interview_questions": [{"question": "What production JavaScript and React work can you evidence?", "targets": "JavaScript and React gaps"}],
+    }
+
+
 # ── context + prompt grounding ────────────────────────────────────────────────
 def test_build_context_pulls_statistical_fields():
     ctx = L.build_context("CV", "JOB", _evaluation())
@@ -56,6 +94,13 @@ def test_prompt_is_grounded_in_numbers():
     # every required output key is described in the schema block
     for key in REQUIRED_KEYS:
         assert key in up
+
+
+def test_reject_prompt_frontloads_authoritative_verdict():
+    up = build_user_prompt(L.build_context("ML Engineer", "Full Stack Web Developer", _reject_evaluation()))
+    assert "**DECISION: REJECT — OFFICIAL SCORE: 18.3%**" in up
+    assert "**SKILL COVERAGE: 2/11 required skills — CRITICAL MISSING SKILLS: javascript, react, typescript**" in up
+    assert up.index("AUTHORITATIVE VERDICT") < up.index("PRE-COMPUTED STATISTICAL RESULTS")
 
 
 # ── JSON extraction tolerance ─────────────────────────────────────────────────
@@ -130,6 +175,54 @@ def test_happy_path_with_mocked_ollama(monkeypatch):
     assert env["analysis"]["career_trajectory"]["seniority_signal"] == "mid-level"
     assert env["analysis"]["interview_questions"][0]["question"] == "q?"
     assert env["latency_ms"] is not None
+
+
+def test_reject_contradiction_retries_with_stricter_verdict_prompt(monkeypatch):
+    monkeypatch.setattr(L.settings, "LLM_ENABLED", True)
+    monkeypatch.setattr(L, "check_availability", lambda: {"available": True, "models": ["m"], "error": None})
+    prompts = []
+    responses = iter([json.dumps(_contradictory_analysis()), json.dumps(_reject_consistent_analysis())])
+    monkeypatch.setattr(L, "_call_ollama", lambda system, prompt: (prompts.append(prompt), next(responses))[1])
+
+    env = L.generate_deep_analysis("ML Engineer", "Full Stack Web Developer", _reject_evaluation())
+
+    assert env["status"] == L.STATUS_OK
+    assert len(prompts) == 2
+    assert "CRITICAL RETRY" in prompts[1]
+    assert "Critical frontend gaps" == env["analysis"]["red_flags"][0]["issue"]
+
+
+def test_reject_remains_unavailable_after_second_contradiction(monkeypatch):
+    monkeypatch.setattr(L.settings, "LLM_ENABLED", True)
+    monkeypatch.setattr(L, "check_availability", lambda: {"available": True, "models": ["m"], "error": None})
+    monkeypatch.setattr(L, "_call_ollama", lambda system, prompt: json.dumps(_contradictory_analysis()))
+
+    env = L.generate_deep_analysis("ML Engineer", "Full Stack Web Developer", _reject_evaluation())
+
+    assert env["status"] == L.STATUS_INCONSISTENT
+    assert env["analysis"] is None
+    assert "AI analysis unavailable" in env["error"]
+
+
+def test_reject_guard_catches_role_alignment_wording():
+    analysis = _reject_consistent_analysis()
+    analysis["career_trajectory"]["summary"] = "The candidate aligns well with the Full Stack Web Developer role."
+    context = L.build_context("ML Engineer", "Full Stack Web Developer", _reject_evaluation())
+    assert "role alignment" in L._contradictory_claims(analysis, context)
+
+
+def test_reject_guard_catches_role_relevance_wording():
+    analysis = _reject_consistent_analysis()
+    analysis["career_trajectory"]["summary"] = "The ML background is relevant to the Full Stack Web Developer role."
+    context = L.build_context("ML Engineer", "Full Stack Web Developer", _reject_evaluation())
+    assert "role relevance" in L._contradictory_claims(analysis, context)
+
+
+def test_reject_guard_catches_claimed_role_qualification():
+    analysis = _reject_consistent_analysis()
+    analysis["career_trajectory"]["progression"] = "They have the skills expected in a Full Stack Web Developer role."
+    context = L.build_context("ML Engineer", "Full Stack Web Developer", _reject_evaluation())
+    assert "claimed role qualification" in L._contradictory_claims(analysis, context)
 
 
 def test_retry_then_fail_on_malformed(monkeypatch):

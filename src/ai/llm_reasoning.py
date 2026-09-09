@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import time
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
@@ -40,6 +41,7 @@ STATUS_OK = "ok"
 STATUS_DISABLED = "disabled"
 STATUS_UNAVAILABLE = "unavailable"
 STATUS_ERROR = "error"
+STATUS_INCONSISTENT = "inconsistent"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -208,6 +210,79 @@ def _clean_objs(items, fields) -> List[Dict[str, str]]:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Verdict consistency guard — fail closed for low-fit cases
+# ─────────────────────────────────────────────────────────────────────────────
+_POSITIVE_CONTRADICTIONS = (
+    ("strong alignment", r"\bstrong\s+alignment\b"),
+    ("role alignment", r"\balign(?:s|ed|ment)?\s+(?:well\s+)?with\s+(?:the\s+)?(?:[a-z\s]{0,50})?(?:role|position|job|need|requirements?|demands?|expectations?)\b"),
+    ("well aligned", r"\b(?:well|strongly)\s+align(?:ed|ment)\b"),
+    ("role relevance", r"\brelevant\s+to\s+(?:the\s+)?(?:[a-z\s]{0,50})?(?:role|position|job)\b"),
+    ("claimed role qualification", r"\b(?:skills?|experience)\s+(?:expected|required)\s+(?:in|for)\s+(?:a\s+|the\s+)?(?:[a-z\s]{0,50})?(?:role|position|job)\b"),
+    ("strong fit", r"\bstrong\s+fit\b"),
+    ("perfect match", r"\bperfect\s+match\b"),
+    ("no red flags", r"\bno\s+(?:material\s+)?red\s+flags?\b"),
+    ("high likelihood of success", r"\bhigh\s+likelihood\s+of\s+success\b"),
+    ("ideal candidate", r"\bideal\s+candidate\b"),
+    ("skills align", r"\bskills?\s+(?:are\s+)?(?:well\s+)?align(?:ed|ment)\b"),
+)
+
+
+def _requires_low_fit_consistency(context: Dict[str, object]) -> bool:
+    """Whether an LLM response must be screened for positive verdict conflicts."""
+    statistical = context.get("statistical", {}) or {}
+    skills = context.get("skills", {}) or {}
+    if not isinstance(statistical, dict) or not isinstance(skills, dict):
+        return False
+
+    decision = str(statistical.get("decision", "")).upper()
+    band = str(statistical.get("band_label", "")).upper()
+    if "REJECT" in decision or "LOW FIT" in band:
+        return True
+
+    coverage = skills.get("coverage")
+    if isinstance(coverage, (int, float)):
+        return float(coverage) < 0.5
+    fraction = re.search(r"(\d+(?:\.\d+)?)\s*/\s*(\d+(?:\.\d+)?)", str(coverage or ""))
+    return bool(fraction and float(fraction.group(2)) and
+                float(fraction.group(1)) / float(fraction.group(2)) < 0.5)
+
+
+def _analysis_claim_text(analysis: Dict) -> str:
+    """Collect recruiter-visible narrative claims for consistency screening."""
+    career = analysis.get("career_trajectory") or {}
+    parts = [str(career.get(key, "")) for key in ("summary", "progression")]
+    parts.append(str(analysis.get("fit_justification", "")))
+    for flag in analysis.get("red_flags", []) or []:
+        if isinstance(flag, dict):
+            parts.extend(str(flag.get(key, "")) for key in ("issue", "evidence"))
+    for recommendation in analysis.get("recommendations", []) or []:
+        if isinstance(recommendation, dict):
+            parts.extend(str(recommendation.get(key, "")) for key in ("recommendation", "rationale"))
+    return " ".join(parts).lower()
+
+
+def _contradictory_claims(analysis: Dict, context: Dict[str, object]) -> List[str]:
+    """Find unsafe positive claims in a REJECT/low-coverage response."""
+    if not _requires_low_fit_consistency(context):
+        return []
+
+    text = _analysis_claim_text(analysis)
+    claims: List[str] = []
+    for label, pattern in _POSITIVE_CONTRADICTIONS:
+        for match in re.finditer(pattern, text, flags=re.IGNORECASE):
+            # Do not reject an explicit negation such as "not a strong fit".
+            prefix = text[max(0, match.start() - 28):match.start()]
+            if label != "no red flags" and re.search(
+                r"\b(?:not|no|lack(?:s|ing)?|missing|insufficient|without|does\s+not|doesn't)\b[^.]{0,20}$",
+                prefix,
+            ):
+                continue
+            claims.append(label)
+            break
+    return claims
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Ollama call
 # ─────────────────────────────────────────────────────────────────────────────
 def _call_ollama(system_prompt: str, user_prompt: str) -> str:
@@ -252,10 +327,14 @@ def generate_deep_analysis(cv_text: str, job_text: str, evaluation: Dict) -> Dic
     started = time.perf_counter()
 
     last_error = "unknown error"
-    # One initial attempt + one retry on malformed/invalid JSON.
-    for attempt in (1, 2):
+    next_prompt = user_prompt
+    format_retry_used = False
+    consistency_retry_used = False
+    # A malformed-JSON repair and verdict-consistency retry are independent.
+    # The rare path where both are needed may use three local calls.
+    for attempt in (1, 2, 3):
         try:
-            raw = _call_ollama(SYSTEM_PROMPT, user_prompt if attempt == 1 else _repair_hint(user_prompt))
+            raw = _call_ollama(SYSTEM_PROMPT, next_prompt)
         except Exception as exc:  # noqa: BLE001
             last_error = _friendly_error(exc)
             logger.warning("Ollama call failed (attempt %d): %s", attempt, last_error)
@@ -265,18 +344,41 @@ def generate_deep_analysis(cv_text: str, job_text: str, evaluation: Dict) -> Dic
         parsed = _extract_json(raw)
         if parsed is None:
             last_error = "Model returned non-JSON output."
-            logger.info("Deep analysis: unparseable output on attempt %d; %s",
-                        attempt, "retrying" if attempt == 1 else "giving up")
+            if format_retry_used:
+                break
+            format_retry_used = True
+            next_prompt = _repair_hint(user_prompt)
+            logger.info("Deep analysis: unparseable output on attempt %d; retrying", attempt)
             continue
 
         problems = _validate(parsed)
         if problems:
             last_error = "Malformed analysis: " + "; ".join(problems)
+            if format_retry_used:
+                break
+            format_retry_used = True
+            next_prompt = _repair_hint(user_prompt)
             logger.info("Deep analysis: schema problems on attempt %d (%s)", attempt, last_error)
             continue
 
+        normalized = _normalize(parsed)
+        contradictions = _contradictory_claims(normalized, context)
+        if contradictions:
+            last_error = "LLM response contradicted the authoritative low-fit verdict: " + ", ".join(contradictions)
+            logger.warning("Deep analysis: %s", last_error)
+            if consistency_retry_used:
+                latency_ms = (time.perf_counter() - started) * 1000.0
+                return _envelope(
+                    STATUS_INCONSISTENT,
+                    error="AI analysis unavailable: the local model contradicted the statistical decision after retry.",
+                    latency_ms=latency_ms,
+                )
+            consistency_retry_used = True
+            next_prompt = _consistency_hint(user_prompt, context)
+            continue
+
         latency_ms = (time.perf_counter() - started) * 1000.0
-        return _envelope(STATUS_OK, analysis=_normalize(parsed), latency_ms=latency_ms)
+        return _envelope(STATUS_OK, analysis=normalized, latency_ms=latency_ms)
 
     latency_ms = (time.perf_counter() - started) * 1000.0
     return _envelope(STATUS_ERROR, error=last_error, latency_ms=latency_ms)
@@ -286,3 +388,16 @@ def _repair_hint(user_prompt: str) -> str:
     return (user_prompt
             + "\n\nIMPORTANT: Your previous response was not valid JSON matching the schema. "
               "Return ONLY the JSON object, with all required keys, and nothing else.")
+
+
+def _consistency_hint(user_prompt: str, context: Dict[str, object]) -> str:
+    stat = context.get("statistical", {}) or {}
+    skills = context.get("skills", {}) or {}
+    return (
+        user_prompt
+        + "\n\nCRITICAL RETRY: Your prior JSON contradicted the authoritative statistical verdict. "
+        + f"DECISION={stat.get('decision')}; SCORE={stat.get('percentage')}%; "
+        + f"COVERAGE={skills.get('coverage')}; CRITICAL_MISSING={skills.get('critical_missing')}. "
+        + "Return a replacement JSON that explicitly treats the role-relevant missing skills as gaps. "
+          "Do not claim strong alignment, a perfect match, no red flags, or high likelihood of success."
+    )

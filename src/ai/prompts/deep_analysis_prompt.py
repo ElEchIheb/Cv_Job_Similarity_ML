@@ -70,10 +70,11 @@ Your role and hard constraints:
 1. GROUNDING: Base every statement strictly on the CV text, the job description, and the \
 pre-computed statistical results you are given. Do NOT invent skills, employers, dates, \
 or achievements that are not present in the source text. If something is not evidenced, say so.
-2. NO COMPETING SCORE: The statistical engine already produced the official compatibility \
-percentage and HIRE/CONSIDER/REJECT decision. You MUST NOT produce your own percentage or \
-overturn the decision. If your qualitative read diverges from the number, express that only as \
-a note inside "red_flags" or "fit_justification" — never as a competing score.
+2. AUTHORITATIVE VERDICT: The statistical engine already produced the official compatibility \
+percentage and HIRE/CONSIDER/REJECT decision. Your analysis MUST be consistent with that decision \
+and the listed critical skill gaps. You MUST NOT produce your own percentage, overturn the decision, \
+claim a strong/perfect match for a REJECT or low-coverage case, or say there are no red flags when \
+critical skills are missing.
 3. FAIRNESS (non-negotiable): Do NOT infer, mention, or base any judgement on protected or \
 sensitive characteristics — age, gender, ethnicity, nationality, religion, marital status, \
 disability, sexual orientation, or photographs. Ignore any such signals even if they are \
@@ -81,8 +82,10 @@ inferable from the CV. Assess only professional qualifications, skills, and expe
 4. TONE: Professional, concise, HR-appropriate, and specific. Avoid generic boilerplate; \
 tie observations to this candidate and this role.
 5. RED FLAGS: Never describe a matched skill or an otherwise positive qualification as a red \
-flag. If no concrete concern is evidenced, return one low-severity item saying "No material \
-red flag evidenced" and cite the relevant CV/JD evidence. Do not copy schema-placeholder text.
+flag. If the authoritative verdict is REJECT/Low Fit or critical skills are missing, include the \
+specific role-relevant gaps as concerns; do not say "no red flags". Otherwise, if no concrete \
+concern is evidenced, return one low-severity item saying "No material red flag evidenced" and \
+cite the relevant CV/JD evidence. Do not copy schema-placeholder text.
 6. OUTPUT: Return ONLY a single valid JSON object matching the requested schema. Before sending, \
 check that it has all five keys: career_trajectory, red_flags, recommendations, \
 fit_justification, and interview_questions. No markdown, no code fences, no commentary before \
@@ -119,6 +122,13 @@ def build_user_prompt(context: Dict[str, object], *, cv_char_limit: int = 6000,
 
     return f"""Evaluate the following candidate for the target role, then return the JSON object.
 
+=== AUTHORITATIVE VERDICT — MUST NOT BE OVERRIDDEN ===
+**DECISION: {stat.get('decision', 'n/a')} — OFFICIAL SCORE: {stat.get('percentage', 'n/a')}%**
+**SKILL COVERAGE: {skills.get('coverage', 'n/a')} — CRITICAL MISSING SKILLS: {_fmt_list(skills.get('critical_missing', []))}**
+Your analysis MUST be consistent with this verdict. For REJECT/Low Fit or low coverage, describe
+the stated gaps; do not claim strong alignment, a perfect match, no red flags, or a high likelihood
+of success. Do not say skills align when critical skills above are missing.
+
 === PRE-COMPUTED STATISTICAL RESULTS (authoritative — do not recompute) ===
 Overall compatibility score: {stat.get('percentage', 'n/a')}%
 Decision: {stat.get('decision', 'n/a')} ({stat.get('band_label', '')})
@@ -145,4 +155,5 @@ and shapes (arrays may have 2-5 items each; keep every string concise):
 {schema_str}
 
 Remember: ground everything in the text above, do not output any compatibility percentage \
-of your own, and never reference protected characteristics."""
+of your own, never reference protected characteristics, and keep the JSON consistent with the \
+authoritative verdict at the top."""

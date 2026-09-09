@@ -170,7 +170,7 @@ export interface EvaluatePayload {
 }
 
 // ── Layer 2: LLM deep analysis (additive) ─────────────────────────────────────
-export type DeepAnalysisStatus = "ok" | "disabled" | "unavailable" | "error";
+export type DeepAnalysisStatus = "ok" | "disabled" | "unavailable" | "error" | "inconsistent";
 
 export interface DeepAnalysisContent {
   career_trajectory: { summary: string; seniority_signal: string; progression: string };
