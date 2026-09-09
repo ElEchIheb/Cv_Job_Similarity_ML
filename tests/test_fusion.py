@@ -7,6 +7,9 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
+import numpy as np
+
+from src.fusion.hybrid_scorer import DOCUMENTED_DEFAULT_WEIGHTS, HybridMatcher
 
 
 def _sample_df():
@@ -40,3 +43,23 @@ def test_hybrid_optimize_weights_returns_normalized_weights(hybrid_matcher):
     total = sum(outcome["best_weights"].values())
     assert round(total, 3) == 1.0
     assert "validation_metrics" in outcome
+
+
+def test_default_weights_match_the_documented_production_fusion():
+    assert HybridMatcher().weights == DOCUMENTED_DEFAULT_WEIGHTS
+
+
+def test_calibrate_threshold_uses_validation_scores_only():
+    matcher = HybridMatcher.__new__(HybridMatcher)
+    matcher.weights = dict(DOCUMENTED_DEFAULT_WEIGHTS)
+    matcher._compute_component_scores = lambda _df: {
+        "tfidf": np.asarray([0.1, 0.2, 0.8, 0.9]),
+        "embedding": np.asarray([0.1, 0.2, 0.8, 0.9]),
+        "skill": np.asarray([0.1, 0.2, 0.8, 0.9]),
+    }
+    validation = pd.DataFrame({"label": [0, 0, 1, 1]})
+
+    outcome = matcher.calibrate_threshold(validation)
+
+    assert outcome["optimal_threshold"] == 0.8
+    assert matcher.optimal_threshold == 0.8

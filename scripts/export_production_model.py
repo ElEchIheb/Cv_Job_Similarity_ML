@@ -10,7 +10,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.evaluation.evaluator import EvaluationSuite
-from src.fusion.hybrid_scorer import HybridMatcher
+from src.fusion.hybrid_scorer import DOCUMENTED_DEFAULT_WEIGHTS, HybridMatcher
 from src.models.tfidf_model import TFIDFMatcher
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -31,20 +31,17 @@ def export_model():
     
     logger.info(f"Split sizes: Train={len(split.train)}, Validation={len(split.validation)}, Test={len(split.test)}")
     
-    logger.info("Setting mathematically validated weights and threshold...")
-    
-    # Bypass HybridMatcher.__init__ to prevent EmbeddingMatcher from loading 
-    # heavy HuggingFace models, which cause native C++ thread crashes on Windows during GC/pickle.
-    from src.models.tfidf_model import TFIDFMatcher
-    hybrid = HybridMatcher.__new__(HybridMatcher)
-    hybrid.models = {"tfidf": TFIDFMatcher()}
-    hybrid.weights = {"tfidf": 0.9, "embedding": 0.0, "skill": 0.1}
-    hybrid.optimal_threshold = 0.04
-    
-    logger.info(f"Using weights: {hybrid.weights}")
-    logger.info(f"Using threshold: {hybrid.optimal_threshold}")
-    
-    logger.info("Fitting TFIDFMatcher on Training & Validation data...")
+    logger.info("Using the documented production fusion weights (no weight optimization)...")
+    hybrid = HybridMatcher(weights=DOCUMENTED_DEFAULT_WEIGHTS)
+    hybrid.fit(split.train)
+    calibration = hybrid.calibrate_threshold(split.validation)
+    logger.info("Using weights: %s", hybrid.weights)
+    logger.info("Validation-calibrated threshold: %s", hybrid.optimal_threshold)
+
+    # The validation split selects only the operating threshold. Refit the
+    # vocabulary on train+validation for the deployable checkpoint; test is
+    # never read by this export path.
+    logger.info("Refitting TFIDFMatcher on Training & Validation data...")
     hybrid.fit(pd.concat([split.train, split.validation], ignore_index=True))
     
     logger.info(f"TFIDF is_fitted status: {hybrid.models['tfidf'].is_fitted}")

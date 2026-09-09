@@ -12,6 +12,8 @@ from src.models.embedding_model import EmbeddingMatcher
 from src.models.skill_matcher import SkillMatcher
 from src.models.tfidf_model import TFIDFMatcher
 
+DOCUMENTED_DEFAULT_WEIGHTS = {"tfidf": 0.2, "embedding": 0.4, "skill": 0.4}
+
 
 @dataclass
 class FoldMetrics:
@@ -29,7 +31,7 @@ class HybridMatcher:
             "embedding": EmbeddingMatcher(),
             "skill": SkillMatcher(),
         }
-        self.weights = self._normalize_weights(weights) if weights else {"tfidf": 0.2, "embedding": 0.4, "skill": 0.4}
+        self.weights = self._normalize_weights(weights) if weights else dict(DOCUMENTED_DEFAULT_WEIGHTS)
         self.optimal_threshold = 0.60
         
     def _calculate_confidence(self, score: float) -> str:
@@ -101,6 +103,40 @@ class HybridMatcher:
         metrics["roc_auc"] = float(roc_auc_score(y_true, y_scores)) if len(set(y_true)) > 1 else 0.0
         return metrics
 
+    @staticmethod
+    def _best_f1_threshold(y_true: np.ndarray, y_scores: np.ndarray) -> float:
+        """Calibrate one operating point on validation data only.
+
+        Scores remain on their native 0--1 scale. Ties deliberately prefer the
+        threshold closest to the documented 0.60 default rather than the first
+        value encountered, making the result deterministic without touching the
+        held-out test set.
+        """
+        if len(y_true) == 0 or len(set(y_true)) < 2:
+            return 0.60
+        candidates = np.unique(np.clip(y_scores, 0.0, 1.0))
+        best_threshold = 0.60
+        best_f1 = -1.0
+        for threshold in candidates:
+            f1 = f1_score(y_true, (y_scores >= threshold).astype(int), zero_division=0)
+            if f1 > best_f1 or (f1 == best_f1 and abs(threshold - 0.60) < abs(best_threshold - 0.60)):
+                best_f1 = float(f1)
+                best_threshold = float(threshold)
+        return round(best_threshold, 4)
+
+    def calibrate_threshold(self, validation_df) -> Dict[str, object]:
+        """Calibrate the fixed fusion weights on a disjoint validation split."""
+        components = self._compute_component_scores(validation_df)
+        y_true = validation_df["label"].astype(int).to_numpy()
+        scores = self._score_with_weights(components, self.weights)
+        self.optimal_threshold = self._best_f1_threshold(y_true, scores)
+        return {
+            "optimal_threshold": self.optimal_threshold,
+            "validation_metrics": self._metric_bundle(y_true, scores, self.optimal_threshold),
+            "validation_size": int(len(validation_df)),
+            "weights": dict(self.weights),
+        }
+
     def optimize_weights(self, train_df, validation_df=None, step: float = 0.1) -> Dict[str, object]:
         if validation_df is None:
             stratify = train_df["label"].astype(str) + "_" + train_df["domain"].astype(str)
@@ -147,24 +183,7 @@ class HybridMatcher:
         
         # Find optimal classification threshold for best weights using F1
         best_scores = self._score_with_weights(validation_components, best_weights)
-        best_threshold = 0.60
-        best_f1 = -1.0
-        
-        min_score = float(np.min(best_scores))
-        max_score = float(np.max(best_scores))
-        if max_score <= min_score + 0.02:
-            min_score = max(0.0, min_score - 0.05)
-            max_score = min(1.0, max_score + 0.05)
-            
-        search_grid = np.arange(min_score, max_score + 0.02, 0.02)
-        
-        for thresh in search_grid:
-            metrics = self._metric_bundle(y_true, best_scores, threshold=thresh)
-            if metrics["f1"] > best_f1:
-                best_f1 = metrics["f1"]
-                best_threshold = thresh
-                
-        self.optimal_threshold = round(float(best_threshold), 4)
+        self.optimal_threshold = self._best_f1_threshold(y_true, best_scores)
         best_metrics = self._metric_bundle(y_true, best_scores, threshold=self.optimal_threshold)
 
         return {
