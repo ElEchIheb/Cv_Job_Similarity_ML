@@ -132,7 +132,7 @@ function Unavailable({ env, onRetry }: { env: DeepAnalysisEnvelope; onRetry: () 
           <div className="mx-auto mt-2 max-w-md rounded-lg bg-surface-raised/60 px-3 py-2 text-left text-caption text-ink-muted">
             Setup: install <span className="text-ink-secondary">Ollama</span>, run{" "}
             <code className="text-accent-300">ollama serve</code>, then{" "}
-            <code className="text-accent-300">ollama pull llama3.2:3b</code>.
+            <code className="text-accent-300">ollama pull qwen2.5:1.5b</code>.
           </div>
         )}
       </div>

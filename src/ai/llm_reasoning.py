@@ -11,7 +11,7 @@ This module is strictly ADDITIVE and NON-BLOCKING for the core pipeline:
     show an "AI analysis unavailable" state instead of erroring the evaluation.
 
 Runtime: a local Ollama server (http://localhost:11434 by default) serving a
-small quantized instruct model (default llama3.2:3b). No training/fine-tuning —
+small quantized instruct model (default qwen2.5:1.5b). No training/fine-tuning —
 the model reasons zero-shot using its pretrained knowledge, grounded in the
 structured statistical results (see src/ai/prompts/deep_analysis_prompt.py).
 """
@@ -220,7 +220,9 @@ def _call_ollama(system_prompt: str, user_prompt: str) -> str:
         ],
         "stream": False,
         "format": "json",  # Ollama JSON-mode: constrains output to valid JSON
-        "options": {"temperature": 0.2, "num_ctx": 8192},
+        # The default generation cap can truncate this five-part response on
+        # very small models. 2,048 leaves enough room for every required key.
+        "options": {"temperature": 0.2, "num_ctx": 8192, "num_predict": 2048},
     }
     resp = httpx.post(
         f"{settings.OLLAMA_BASE_URL}/api/chat",

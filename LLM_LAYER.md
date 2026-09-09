@@ -58,19 +58,23 @@ parameters to a dataset we don't trust.
 - **Runtime:** [Ollama](https://ollama.com) — a local LLM server exposing an
   OpenAI-ish HTTP API at `http://localhost:11434`. Chosen for zero-config local
   inference, a JSON/format-constrained generation mode, and easy model swapping.
-- **Default model:** **`llama3.2:3b`** (quantized, ~2 GB).
+- **Default model:** **`qwen2.5:1.5b`** (quantized; ~986 MB download, ~1.4 GB resident
+  process in the verified run).
 
 ### Model choice rationale (capability vs. hardware)
 
-The development machine was profiled before choosing: **7.7 GB RAM, CPU-only
-(Intel i3-1115G4, 2 cores), integrated GPU (no CUDA)**. On that envelope:
+The verification machine was profiled immediately before the live run: **7.75 GB
+RAM, 4 logical CPUs, and 1.96 GB free RAM** under its normal foreground workload.
+It is CPU-only for this workload. On that envelope:
 
-- A 7–8B model (the common default) needs ~5 GB just for Q4 weights plus context
-  — it would swap heavily or fail to load, and CPU latency would be impractical.
-- A **3B instruct model** (`llama3.2:3b` / `qwen2.5:3b`) fits comfortably (~2 GB),
-  follows instructions and JSON constraints well, and keeps latency tolerable
-  (~10–60 s/analysis on CPU) — acceptable because Layer 2 runs **after** the score
-  renders and never blocks it.
+- A 3B model has roughly the entire currently free-RAM budget in weights alone;
+  it was not risked alongside the application and embedding process. A 7–8B model
+  would swap heavily or fail to load.
+- **`qwen2.5:1.5b`** is the smallest model that produced a grounded, first-attempt
+  schema-valid analysis here. It occupied ~1.4 GB while loaded and completed the
+  canonical CPU run in **51.7 s**. The 0.5B variant ran but produced shallow,
+  schema-placeholder content, so it is not the shipped default. This latency is
+  acceptable because Layer 2 runs **after** the score renders and never blocks it.
 
 The model is **not** hard-coded. `OLLAMA_MODEL` overrides it, so a stronger
 defense machine (16 GB+) can run `OLLAMA_MODEL=llama3.1:8b` for higher-quality
@@ -85,7 +89,7 @@ hardware, and expose the knob to trade back.
 # 2. Start the server (installer usually auto-starts it):
 ollama serve
 # 3. Pull the model:
-ollama pull llama3.2:3b
+ollama pull qwen2.5:1.5b
 # 4. Verify:
 curl http://localhost:11434/api/tags        # lists installed models
 ```
@@ -96,7 +100,7 @@ Backend config (all optional, sane defaults) — via env or `.env`:
 |---|---|---|
 | `LLM_ENABLED` | `true` | Master switch for Layer 2 |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama server |
-| `OLLAMA_MODEL` | `llama3.2:3b` | Model tag |
+| `OLLAMA_MODEL` | `qwen2.5:1.5b` | Model tag |
 | `OLLAMA_TIMEOUT` | `120` | Generation timeout (s) |
 | `OLLAMA_CONNECT_TIMEOUT` | `3` | Health/connect timeout (s) |
 
@@ -111,7 +115,7 @@ A single structured-output call returns strict JSON under `ai_deep_analysis`:
 ```jsonc
 "ai_deep_analysis": {
   "status": "ok",                 // ok | disabled | unavailable | error
-  "model": "llama3.2:3b",
+  "model": "qwen2.5:1.5b",
   "generated_at": "2026-…Z",
   "latency_ms": 24310.4,
   "error": null,
@@ -219,11 +223,51 @@ a **rubric-scored qualitative study**, not a benchmark accuracy. The
 `scripts/verify_deep_analysis.py` harness produces the raw Layer 2 output for one
 canonical case (Alex Martin / Full Stack Web Developer) to seed this study.
 
-> Populate this section with real scored outputs after running the harness on the
-> defense machine (Ollama installed). The integration was built and verified for
-> correctness (graceful degradation, schema validation, routing, persistence) on
-> a machine without Ollama; the live model outputs must be generated where Ollama
-> runs, and were not fabricated here.
+### Genuine local run — 2026-09-09
+
+This was generated on the verification machine above using local
+`qwen2.5:1.5b`, Ollama, and the real production hybrid Layer 1. It completed in
+**51,672.3 ms**, returned `status: ok` on the first attempt, and passed the
+service's JSON-schema validation (no retry/fallback path).
+
+Layer 1 result: **75.9%**, **HIRE**, **11/11 required skills**. The following is
+the exact `ai_deep_analysis.analysis` payload from that genuine run:
+
+```json
+{
+  "career_trajectory": {
+    "summary": "Alex Martin has a strong background in Full Stack Web Development, with experience in modern web application design, development, and maintenance. This role requires skills in HTML, CSS, JavaScript, React, Node.js, Express, MongoDB, SQL, Git, REST API, and Docker, which Alex has demonstrated proficiency in.",
+    "seniority_signal": "mid-level",
+    "progression": "Alex's experience aligns well with the role's expectations, as it involves designing, developing, and maintaining modern web applications with REST API integration and relational databases, which is a critical aspect of the job."
+  },
+  "red_flags": [],
+  "recommendations": [
+    {
+      "recommendation": "Alex Martin's demonstrated skills and experience in Full Stack Web Development make them a strong fit for the role. Their ability to work in an agile team and collaborate effectively is particularly relevant.",
+      "rationale": "Alex's comprehensive skill set and demonstrated ability to work in a team environment make them a valuable addition to the team."
+    }
+  ],
+  "fit_justification": "The overall compatibility score of 75.9% and the HIRE decision strongly indicate that Alex Martin is a strong fit for the role. The statistical analysis supports the HIRE decision by highlighting their proficiency in required skills and their ability to work in an agile team environment, which is crucial for the role.",
+  "interview_questions": [
+    {
+      "question": "Can you discuss how you have collaborated with a team to design and develop modern web applications, including the integration of REST API services and relational databases?",
+      "targets": "communication"
+    },
+    {
+      "question": "How do you approach problem-solving in the context of web development, and have you ever encountered a situation where you had to integrate multiple technologies to solve a complex issue?",
+      "targets": "problem-solving"
+    }
+  ]
+}
+```
+
+Author review of this run: all skills, role responsibilities, employer context,
+and the 75.9% score are present in the supplied CV/JD or Layer 1 result; no
+protected-characteristic language or competing score appears. The tailored
+questions use the stated REST API/database, teamwork, and problem-solving
+evidence. The recommendation is useful but still somewhat broad, an expected
+limitation of a 1.5B local model; it should support, not replace, recruiter
+judgement.
 
 ---
 

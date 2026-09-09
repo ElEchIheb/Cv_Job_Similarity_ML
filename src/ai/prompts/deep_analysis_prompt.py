@@ -80,8 +80,15 @@ disability, sexual orientation, or photographs. Ignore any such signals even if 
 inferable from the CV. Assess only professional qualifications, skills, and experience.
 4. TONE: Professional, concise, HR-appropriate, and specific. Avoid generic boilerplate; \
 tie observations to this candidate and this role.
-5. OUTPUT: Return ONLY a single valid JSON object matching the requested schema. No markdown, \
-no code fences, no commentary before or after the JSON."""
+5. RED FLAGS: Never describe a matched skill or an otherwise positive qualification as a red \
+flag. If no concrete concern is evidenced, return one low-severity item saying "No material \
+red flag evidenced" and cite the relevant CV/JD evidence. Do not copy schema-placeholder text.
+6. OUTPUT: Return ONLY a single valid JSON object matching the requested schema. Before sending, \
+check that it has all five keys: career_trajectory, red_flags, recommendations, \
+fit_justification, and interview_questions. No markdown, no code fences, no commentary before \
+or after the JSON. The schema's explanatory phrases (for example, "string — ..." and \
+"growth pattern / relevance") are NOT values: replace every field with an actual, grounded \
+statement. Every interview question must name a CV/JD skill, responsibility, or evidenced gap."""
 
 
 # ── User prompt builder ───────────────────────────────────────────────────────

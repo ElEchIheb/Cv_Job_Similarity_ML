@@ -5,7 +5,7 @@ End-to-end verification of NeuralHire's Layer 2 (LLM deep analysis) against a
 REAL local Ollama server. Run this on a machine where Ollama is installed:
 
     ollama serve            # (if not already running)
-    ollama pull llama3.2:3b
+    ollama pull qwen2.5:1.5b
     python scripts/verify_deep_analysis.py
 
 It runs Layer 1 (the real statistical engine) on the Alex Martin / Full Stack
@@ -14,7 +14,7 @@ LLM output. If Ollama is unreachable it exits cleanly with setup instructions
 (the point being: Layer 2 degrades gracefully, it never breaks Layer 1).
 
 Override the model with OLLAMA_MODEL, e.g.:
-    OLLAMA_MODEL=qwen2.5:3b python scripts/verify_deep_analysis.py
+    OLLAMA_MODEL=qwen2.5:1.5b python scripts/verify_deep_analysis.py
 """
 from __future__ import annotations
 

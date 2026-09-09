@@ -55,7 +55,7 @@ n'est pas lancé, le score et la décision fonctionnent exactement comme avant.
 ```bash
 # 1. Installer Ollama : https://ollama.com/download
 ollama serve                 # démarrer le serveur (souvent auto-démarré)
-ollama pull llama3.2:3b      # modèle par défaut (~2 Go, adapté CPU/8 Go RAM)
+ollama pull qwen2.5:1.5b    # modèle par défaut vérifié (~1 Go téléchargé, CPU/8 Go RAM)
 curl http://localhost:11434/api/tags   # vérifier
 ```
 
