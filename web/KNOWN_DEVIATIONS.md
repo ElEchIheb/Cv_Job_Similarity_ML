@@ -1,4 +1,4 @@
-# NeuralHire — Known, Approved Deviations from the Streamlit App
+# JobTest — Known, Approved Deviations from the Streamlit App
 
 The Next.js rebuild is a design/UX reskin with full functional parity. The
 following are the **only** intentional behavioral differences from the original

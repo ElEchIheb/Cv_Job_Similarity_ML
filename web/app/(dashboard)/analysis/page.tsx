@@ -109,7 +109,7 @@ export default function AnalysisPage() {
               badge="Candidate Evaluation"
               title="Candidate"
               highlight="Analysis"
-              subtitle="Evaluate a candidate's profile against a job description using the NeuralHire AI engine — receive a compatibility score, skill breakdown, and a clear hire recommendation."
+              subtitle="Evaluate a candidate's profile against a job description using the JobTest AI engine — receive a compatibility score, skill breakdown, and a clear hire recommendation."
             />
 
             <div className="grid gap-4 lg:grid-cols-[1fr_1.4fr]">
@@ -247,7 +247,7 @@ function ResultView({ result, name, jobTitle, onReset, toast }: {
       });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url; a.download = `NeuralHire_${displayName.replace(/\s+/g, "_")}.pdf`;
+      a.href = url; a.download = `JobTest_${displayName.replace(/\s+/g, "_")}.pdf`;
       document.body.appendChild(a); a.click(); a.remove();
       URL.revokeObjectURL(url);
       toast("success", "Report generated successfully.");

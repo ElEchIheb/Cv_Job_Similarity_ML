@@ -37,7 +37,7 @@ export function TopBar({ userName }: { userName: string }) {
     <>
       <header className="sticky top-0 z-50 flex h-16 items-center gap-4 border-b border-subtle/10 glass px-5">
         <div className="flex items-center gap-2 text-body">
-          <span className="text-ink-muted">NeuralHire</span>
+          <span className="text-ink-muted">JobTest</span>
           <span className="text-ink-muted">/</span>
           <span className="font-medium text-ink">{current?.label ?? "Overview"}</span>
         </div>

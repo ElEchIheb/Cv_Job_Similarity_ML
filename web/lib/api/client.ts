@@ -62,7 +62,7 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
       },
     });
   } catch {
-    throw new ApiError("Cannot reach the NeuralHire backend. Is the API running on :8000?", 0);
+    throw new ApiError("Cannot reach the JobTest backend. Is the API running on :8000?", 0);
   }
   if (!res.ok) {
     const detail = await res.json().catch(() => ({}));

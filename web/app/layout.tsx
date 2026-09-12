@@ -4,7 +4,7 @@ import { Providers } from "./providers";
 import { themeInitScript } from "@/lib/theme";
 
 export const metadata: Metadata = {
-  title: "NeuralHire — Precision Intelligence",
+  title: "JobTest — Intelligent CV Matching Platform",
   description: "AI-powered candidate evaluation. A high-end diagnostics instrument for hiring.",
 };
 

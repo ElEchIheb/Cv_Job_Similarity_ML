@@ -143,7 +143,7 @@ export default function SettingsPage() {
             <div className="font-display text-h1 font-bold text-ink">Neural<span className="text-gradient">Hire</span></div>
             <div className="text-micro font-semibold uppercase tracking-[0.16em] text-ink-muted">Enterprise Edition · v4.0</div>
             <p className="max-w-xl text-body-lg text-ink-secondary">
-              NeuralHire is an AI-powered recruitment evaluation platform designed to help HR professionals screen, compare, and rank candidates objectively and efficiently — built with three complementary evaluation engines (keyword, semantic, and skills detection) combined into a single explainable compatibility score.
+              JobTest is an AI-powered recruitment evaluation platform designed to help HR professionals screen, compare, and rank candidates objectively and efficiently — built with three complementary evaluation engines (keyword, semantic, and skills detection) combined into a single explainable compatibility score.
             </p>
             <div className="mt-2 grid gap-2 sm:grid-cols-2">
               {[

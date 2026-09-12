@@ -58,7 +58,7 @@ export default function OverviewPage() {
               <span className="text-gradient">Hire with confidence.</span>
             </h1>
             <p className="mt-3 text-body-lg text-ink-secondary">
-              NeuralHire combines semantic understanding, skill analysis, and gap profiling into
+              JobTest combines semantic understanding, skill analysis, and gap profiling into
               objective, explainable candidate decisions.
             </p>
           </div>

@@ -1,4 +1,4 @@
-# NeuralHire — Executive Summary
+# JobTest — Executive Summary
 
 NeuralHire is an enterprise-grade AI Recruitment and Talent Intelligence Platform designed to automate the screening, analysis, and ranking of candidates by matching CVs against Job Descriptions. By utilizing a hybrid NLP scoring engine, NeuralHire removes the subjectivity of manual screening, accelerates the recruitment pipeline, and provides HR professionals with actionable, explainable insights.
 

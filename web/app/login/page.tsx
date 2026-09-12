@@ -15,10 +15,10 @@ export default function LoginPage() {
   const router = useRouter();
   const toast = useToast();
   const [mode, setMode] = useState<"login" | "register">("login");
-  const [email, setEmail] = useState("wajihhassyoui123@gmail.com");
-  const [password, setPassword] = useState("demo1234");
-  const [confirm, setConfirm] = useState("demo1234");
-  const [name, setName] = useState("Wajih Hassyoui");
+  const [email, setEmail] = useState("testadmin@gmail.com");
+  const [password, setPassword] = useState("test1234");
+  const [confirm, setConfirm] = useState("test1234");
+  const [name, setName] = useState("Test Admin");
   const [loading, setLoading] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
@@ -70,7 +70,7 @@ export default function LoginPage() {
               Evaluate talent with a <span className="text-gradient">diagnostic&nbsp;instrument</span>, not a spreadsheet.
             </motion.h1>
             <motion.p variants={fadeUp} className="mt-5 text-body-lg text-ink-secondary">
-              NeuralHire fuses semantic, keyword, and skill signals into one confident, explainable verdict — with the evidence to back it.
+              JobTest fuses semantic, keyword, and skill signals into one confident, explainable verdict — with the evidence to back it.
             </motion.p>
           </motion.div>
           <motion.div variants={fadeUp} initial="hidden" animate="show" className="flex gap-8 text-caption text-ink-muted">

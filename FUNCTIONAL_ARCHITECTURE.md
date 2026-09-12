@@ -1,4 +1,4 @@
-# NeuralHire — Functional Architecture
+# JobTest — Functional Architecture
 
 The platform is one coherent pipeline, not a set of independent pages:
 

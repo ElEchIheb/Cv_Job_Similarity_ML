@@ -1,4 +1,4 @@
-# NeuralHire Data Redesign Audit
+# JobTest Data Redesign Audit
 
 ## 1. Current State
 ### `src/models_db.py`

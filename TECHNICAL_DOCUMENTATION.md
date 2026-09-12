@@ -1,4 +1,4 @@
-# NeuralHire — Technical Documentation
+# JobTest — Technical Documentation
 
 ## 1. General Project Presentation
 

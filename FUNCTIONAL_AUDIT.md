@@ -1,4 +1,4 @@
-# NeuralHire — Functional Audit & Repair
+# JobTest — Functional Audit & Repair
 
 _Full functional audit of the platform (backend, AI engine, persistence, API,
 frontend workflows) with the fixes implemented. This is a functional/data

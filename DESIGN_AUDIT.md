@@ -1,4 +1,4 @@
-# NeuralHire — Design Audit
+# JobTest — Design Audit
 
 _Product-wide UI/UX audit performed before the design overhaul. Scope: the entire
 Streamlit frontend (`frontend/`), its design system (`frontend/styles/theme.py`),

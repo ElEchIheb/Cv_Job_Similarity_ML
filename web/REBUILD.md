@@ -1,4 +1,4 @@
-# NeuralHire — Next.js Rebuild ("Precision Intelligence")
+# JobTest — Next.js Rebuild ("Precision Intelligence")
 
 A **design/UX reskin with full functional parity** to the Streamlit app. Every
 page, feature, and calculation exists and works identically in Next.js; only the

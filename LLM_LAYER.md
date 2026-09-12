@@ -1,4 +1,4 @@
-# NeuralHire — Layer 2: LLM Qualitative Reasoning (Local, via Ollama)
+# JobTest — Layer 2: LLM Qualitative Reasoning (Local, via Ollama)
 
 *Architecture write-up for the thesis / defense. Companion to `PROJECT_REPORT.md`
 (which documents Layer 1, the statistical engine).*

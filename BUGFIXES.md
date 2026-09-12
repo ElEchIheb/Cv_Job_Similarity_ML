@@ -1,4 +1,4 @@
-# NeuralHire — AI Engine Bug Fixes (Logic Layer)
+# JobTest — AI Engine Bug Fixes (Logic Layer)
 
 Date: 2026-09-06 · Scope: matching/scoring engine only (no frontend design/motion/3D changes).
 

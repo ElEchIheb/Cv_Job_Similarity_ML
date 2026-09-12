@@ -117,7 +117,7 @@ export default function LeaderboardPage() {
     const csv = [header.join(","), ...lines].join("\n");
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
     const a = document.createElement("a");
-    a.href = url; a.download = "neuralhire_ranking.csv"; document.body.appendChild(a); a.click(); a.remove();
+    a.href = url; a.download = "jobtest_ranking.csv"; document.body.appendChild(a); a.click(); a.remove();
     URL.revokeObjectURL(url);
   };
 
@@ -126,7 +126,7 @@ export default function LeaderboardPage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader badge="Talent Leaderboard" title="Talent" highlight="Leaderboard"
-        subtitle="Upload multiple CVs and a single job description. NeuralHire ranks every candidate by AI compatibility score with a full skill breakdown and hire decision for each." />
+        subtitle="Upload multiple CVs and a single job description. JobTest ranks every candidate by AI compatibility score with a full skill breakdown and hire decision for each." />
 
       <div className="grid gap-4 lg:grid-cols-[1fr_1.6fr]">
         <Card elevation={2}>

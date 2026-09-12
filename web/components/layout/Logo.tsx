@@ -29,7 +29,7 @@ export function Logo({ compact = false, className }: { compact?: boolean; classN
       </span>
       {!compact && (
         <span className="font-display text-h4 font-semibold tracking-tight text-ink">
-          Neural<span className="text-gradient">Hire</span>
+          Job<span className="text-gradient">Test</span>
         </span>
       )}
     </div>

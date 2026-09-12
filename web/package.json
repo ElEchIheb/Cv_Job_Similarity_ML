@@ -1,8 +1,8 @@
 {
-  "name": "neuralhire-web",
+  "name": "jobtest-web",
   "version": "1.0.0",
   "private": true,
-  "description": "NeuralHire — Precision Intelligence recruitment UI (Next.js rebuild)",
+  "description": "JobTest — Intelligent CV Matching Platform UI (Next.js rebuild)",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

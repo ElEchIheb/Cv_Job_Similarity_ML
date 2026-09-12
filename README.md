@@ -48,7 +48,7 @@ Le frontend actuel est l'application **Next.js dans `web/`** (voir sa doc).
 
 ## Couche 2 — Analyse LLM locale (Ollama, optionnelle)
 
-NeuralHire ajoute une seconde couche de *raisonnement qualitatif* par LLM local,
+JobTest ajoute une seconde couche de *raisonnement qualitatif* par LLM local,
 en plus du moteur statistique. Elle est **additive et optionnelle** : si Ollama
 n'est pas lancé, le score et la décision fonctionnent exactement comme avant.
 
