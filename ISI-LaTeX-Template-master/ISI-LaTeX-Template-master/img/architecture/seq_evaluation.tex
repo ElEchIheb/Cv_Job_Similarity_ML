@@ -1,0 +1,19 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[seqpart] at (0,0) {Recruteur}; \node[seqpart] at (2.7,0) {Next.js};
+  \node[seqpart] at (5.4,0) {FastAPI}; \node[seqpart] at (8.1,0) {Service\\d'évaluation};
+  \node[seqpart] at (10.8,0) {Layer 1}; \node[seqpart] at (13.5,0) {PostgreSQL};
+  \foreach \x in {0,2.7,5.4,8.1,10.8,13.5} \draw[seqline] (\x,-.35)--(\x,-8.2);
+  \draw[seqmsg] (0,-.8)--node[above]{choisir offre et CV} (2.7,-.8);
+  \draw[seqmsg] (2.7,-1.35)--node[above]{POST /ui/evaluate\\ou /evaluate/file} (5.4,-1.35);
+  \draw[seqmsg] (5.4,-1.9)--node[above]{valider CV et propriété de l'offre} (13.5,-1.9);
+  \draw[seqmsg] (5.4,-2.5)--node[above]{texte normalisé + configuration} (8.1,-2.5);
+  \draw[seqmsg] (8.1,-3.1)--node[above]{TF--IDF, embeddings,\\compétences} (10.8,-3.1);
+  \draw[seqmsg] (10.8,-3.7)--node[above]{scores élémentaires} (8.1,-3.7);
+  \draw[seqmsg] (8.1,-4.3)--node[above]{agréger 0,2 / 0,4 / 0,4} (10.8,-4.3);
+  \draw[seqmsg] (10.8,-4.9)--node[above]{score hybride} (8.1,-4.9);
+  \draw[seqmsg] (8.1,-5.5)--node[above]{décision, explication,\\recommandations} (10.8,-5.5);
+  \draw[seqmsg] (8.1,-6.1)--node[above]{persist\_evaluation} (13.5,-6.1);
+  \draw[seqmsg] (13.5,-6.7)--node[above]{MatchResult} (8.1,-6.7);
+  \draw[seqmsg] (8.1,-7.3)--node[above]{résultat sérialisé} (5.4,-7.3);
+  \draw[seqmsg] (5.4,-7.85)--node[above]{score, verdict, explication} (2.7,-7.85);
+\end{tikzpicture}

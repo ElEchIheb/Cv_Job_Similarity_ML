@@ -1,0 +1,15 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[classbox] (user) at (1.7,5.3) {\textbf{Utilisateur (User)}\\id, email, rôle\\mot de passe haché};
+  \node[classbox] (cand) at (1.7,2.5) {\textbf{Candidat (Candidate)}\\id, nom, e-mail\\statut, recruteur\_id};
+  \node[classbox] (job) at (7.1,5.3) {\textbf{Offre (JobOffer)}\\id, code, titre\\statut, recruteur\_id};
+  \node[classbox] (cv) at (1.7,-.2) {\textbf{CV}\\id, nom fichier\\texte extrait, candidat\_id};
+  \node[classbox] (match) at (7.1,2.2) {\textbf{Résultat (MatchResult)}\\id, scores, décision\\seuils, poids, version\\explication JSON, analyse LLM JSON};
+  \node[classbox] (skill) at (11.5,5.3) {\textbf{Compétence (Skill)}\\id, nom, catégorie};
+  \draw[-{Stealth[length=1.7mm]}] (user)--node[left,font=\scriptsize]{1} node[right,font=\scriptsize]{0..*} (cand);
+  \draw[-{Stealth[length=1.7mm]}] (user)--node[above,font=\scriptsize]{1} node[above,font=\scriptsize,pos=.8]{0..*} (job);
+  \draw[-{Stealth[length=1.7mm]}] (cand)--node[left,font=\scriptsize]{1} node[right,font=\scriptsize]{0..*} (cv);
+  \draw[-{Stealth[length=1.7mm]}] (cand)--node[above,font=\scriptsize]{1} node[below,font=\scriptsize]{0..*} (match);
+  \draw[-{Stealth[length=1.7mm]}] (cv)--node[below,font=\scriptsize]{1} (match);
+  \draw[-{Stealth[length=1.7mm]}] (job)--node[right,font=\scriptsize]{1} node[left,font=\scriptsize]{0..*} (match);
+  \node[align=center,font=\scriptsize] at (11.5,3.7) {Relations N--N via\\\texttt{cv\_skills} et \texttt{job\_skills}};
+\end{tikzpicture}

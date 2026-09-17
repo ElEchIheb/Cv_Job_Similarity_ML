@@ -1,0 +1,92 @@
+
+%=== File containing Global Configuration of the report ===%
+%                                                          %
+% Copyright (C) ISI - All Rights Reserved                  %
+% Proprietary                                              %
+% Written by Med Hossam <med.hossam@gmail.com>, April 2016 %
+%                                                          %
+% @author: HEDHILI Med Houssemeddine                       %
+% @linkedin: http://tn.linkedin.com/in/medhossam           %
+%==========================================================%
+
+%=========== You MUST type your information here ==========%
+% global_config.tex file is designed to configure your     %
+% cover pages (main, back and black covers)                %
+%==========================================================%
+
+%============= Config new columns type ==============%
+\newcolumntype{L}{>{\raggedright\arraybackslash}}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}}
+\newcolumntype{C}{>{\centering\arraybackslash}}
+%==================================================%
+
+%========= Config the cover section ==========%
+
+\title{Conception et développement d'une plateforme intelligente d'aide au recrutement et de mise en correspondance entre CV et offres d'emploi}
+
+\author{Iheb El Ech}
+%%% if necessary
+% Set isBinomal to true and type second author name
+%\setboolean{isBinomal}{true}
+%\secondAuthor{Prénom NOM}
+
+\diplomaName{Mastère Professionnel}
+\speciality{Applications Web Intelligentes}
+%\speciality{Génie des Télécommunications et Réseaux}
+%\speciality{Génie Informatique des Systèmes Industriels}
+
+%% Encadrant professionnel
+\proFramerName{Dr. Trabelsi Emna}
+\proFramerSpeciality{\strut}
+
+%% Encadrant académique
+\academicFramerName{Dr. Louati Aymen}
+\academicFramerSpeciality{\strut}
+
+%% Entreprise d'accueil
+\companyName{CyberCloud Solutions}
+
+%% Année universitaire
+\collegeYear{2025--2026}
+
+%%%%%% Signatures section %%%%%%
+
+% You can simply remove theses sentences by typing an empty string
+% \proSignSentence{}
+
+\proSignSentence{J'autorise l'étudiant à faire le dépôt de son rapport de stage en vue d'une soutenance.}
+
+\academicSignSentence{J'autorise l'étudiant à faire le dépôt de son rapport de stage en vue d'une soutenance.}
+
+%%% AR
+\arabicAbstract{يوضع الملخص باللغة العربية هنا... يوضع الملخص باللغة العربية هنا... يوضع الملخص باللغة العربية هنا... يوضع الملخص باللغة العربية هنا... يوضع الملخص باللغة العربية هنا... الرجاء أن يكون في حدود العشر أسطر... يوضع الملخص باللغة العربية هنا... الرجاء أن يكون في حدود العشر أسطر... يوضع الملخص باللغة العربية هنا... الرجاء أن يكون في حدود العشر أسطر... يوضع الملخص باللغة العربية هنا... الرجاء أن يكون في حدود العشر أسطر... يوضع الملخص باللغة العربية هنا... الرجاء أن يكون في حدود العشر أسطر... يوضع الملخص باللغة العربية هنا... الرجاء أن يكون في حدود العشر أسطر... يوضع الملخص باللغة العربية هنا... الرجاء أن يكون في حدود العشر أسطر... يمكنك أن تكتب كلمات بحروف لاتينية في وسط الملخص مثال \textLR{Exemple ici} يوضع الملخص باللغة العربية هنا...}
+
+\arabicAbstractKeywords{الرجاء عدم تجاوز الخمس كلمات}
+
+%% To use latin characters inside the arabic text
+% just put them inside the command \textLR{}
+%%%%
+
+% Version spécifique à JobTest, placée après l'exemple du modèle.
+\arabicAbstract{يقدم هذا المشروع منصة ويب باسم \textLR{JobTest} لمساعدة مسؤول التوظيف في مقارنة السير الذاتية بعروض العمل. تجمع المنصة بين تحليل معجمي ودلالي وتحليل للمهارات، ثم تعرض نتيجة قابلة للتفسير مع بقاء القرار النهائي بيد المسؤول. تعتمد البنية على \textLR{Next.js} و\textLR{FastAPI} وقاعدة بيانات علائقية، مع خدمة تحليل محلية اختيارية. تم التحقق من المسارات الرئيسية ومن النشر التجريبي في بيئة حاويات على \textLR{Azure}. تبقى النتائج التجريبية مرتبطة ببيانات اصطناعية ولا تمثل قرار توظيف حقيقيا.}
+\arabicAbstractKeywords{التوظيف، الذكاء الاصطناعي، مطابقة السير الذاتية، منصة ويب، قابلية التفسير}
+
+%%% FR
+\frenchAbstract{Ce mémoire présente JobTest, une plateforme Web d'aide à la présélection qui rapproche des CV et des offres d'emploi. La solution associe des signaux TF--IDF, sémantiques et de compétences, puis applique une décision explicite et restitue ses composantes au recruteur. Elle comprend un frontend Next.js, une API FastAPI, une persistance relationnelle, un export PDF et une analyse générative locale optionnelle, séparée du verdict. Les validations documentent les parcours principaux, le benchmark sur données synthétiques et un déploiement de démonstration conteneurisé sur Azure. JobTest assiste le recruteur sans remplacer son jugement ni une décision humaine.}
+
+\frenchAbstractKeywords{recrutement, appariement CV-offre, IA explicable, FastAPI, Next.js}
+
+%%% EN
+\englishAbstract{This thesis presents JobTest, a web platform that assists recruiters in matching resumes with job offers. The solution combines TF--IDF, semantic and skill-based signals, applies an explicit decision policy, and exposes the components of the result to the recruiter. It includes a Next.js frontend, a FastAPI API, relational persistence, PDF export, and an optional local generative analysis that is kept separate from the official verdict. The documented validation covers the main user flows, a synthetic-data benchmark, and a containerized demonstration deployment on Azure. JobTest supports recruiters without replacing their judgement or human decision-making.}
+
+\englishAbstractKeywords{recruitment, CV-job matching, explainable AI, FastAPI, Next.js}
+
+%% if you want to get rid of the company address just set the boolean variable to false
+% PS : it's optional
+\setboolean{wantToTypeCompanyAddress}{false}
+
+\companyEmail{}
+\companyTel{+216 28 463 599}
+\companyFax{}
+\companyAddressAR{}
+\companyAddressFR{}

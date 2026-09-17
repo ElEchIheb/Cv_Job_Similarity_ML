@@ -1,0 +1,24 @@
+# Sorties de compilation LaTeX (régénérables par pdflatex + bibtex)
+*.aux
+*.bbl
+*.blg
+*.idx
+*.ilg
+*.ind
+*.lof
+*.log
+*.lot
+*.maf
+*.mtc
+*.mtc[0-9]*
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+main-blx.bib
+tmp/
+_pdf_review/
+# Sauvegardes de travail
+*.bak
+*.pre3
+*.tex.bak

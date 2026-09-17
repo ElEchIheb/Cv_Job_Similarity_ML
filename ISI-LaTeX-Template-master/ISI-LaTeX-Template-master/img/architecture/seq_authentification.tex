@@ -1,0 +1,15 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[seqpart] at (0,0) {Recruteur}; \node[seqpart] at (3.2,0) {Next.js};
+  \node[seqpart] at (6.4,0) {FastAPI}; \node[seqpart] at (9.6,0) {Service\\d'authentification};
+  \node[seqpart] at (12.8,0) {PostgreSQL};
+  \foreach \x in {0,3.2,6.4,9.6,12.8} \draw[seqline] (\x,-.35)--(\x,-5.4);
+  \draw[seqmsg] (0,-.8)--node[above]{identifiants} (3.2,-.8);
+  \draw[seqmsg] (3.2,-1.35)--node[above]{POST /auth/login} (6.4,-1.35);
+  \draw[seqmsg] (6.4,-1.9)--node[above]{vérifier mot de passe} (9.6,-1.9);
+  \draw[seqmsg] (9.6,-2.45)--node[above]{rechercher e-mail} (12.8,-2.45);
+  \draw[seqmsg] (12.8,-3.0)--node[above]{utilisateur} (9.6,-3.0);
+  \draw[seqmsg] (9.6,-3.55)--node[above]{JWT bearer} (6.4,-3.55);
+  \draw[seqmsg] (6.4,-4.1)--node[above]{jeton} (3.2,-4.1);
+  \draw[seqmsg] (3.2,-4.65)--node[above]{GET /auth/me + bearer} (6.4,-4.65);
+  \draw[seqmsg] (6.4,-5.15)--node[above]{profil de session} (3.2,-5.15);
+\end{tikzpicture}

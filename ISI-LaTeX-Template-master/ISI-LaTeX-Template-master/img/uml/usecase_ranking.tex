@@ -1,0 +1,12 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+ \node[umlsystem,minimum width=11.8cm,minimum height=5.4cm] at (6,0) {};
+ \node[anchor=north west,font=\bfseries] at (.25,2.45) {JobTest};
+ \draw[line width=.5pt] (-1,1)--(-1,.1) (-1.3,.65)--(-.7,.65) (-1,.1)--(-1.3,-.5) (-1,.1)--(-.7,-.5);
+ \node[font=\footnotesize\bfseries] at (-1,-.85) {Recruteur};
+ \node[umlcase] (rank) at (3.1,.7) {Classer plusieurs\\candidats};
+ \node[umlcase] (job) at (8.3,1.6) {Choisir une offre\\ouverte};
+ \node[umlcase] (upload) at (8.3,.2) {Téléverser plusieurs\\CV PDF/DOCX};
+ \node[umlcase] (sort) at (8.3,-1.2) {Afficher l'ordre décroissant\\et exporter en CSV};
+ \draw[umlrel] (-.65,.65)--(rank.west);
+ \foreach \x in {job,upload,sort} \draw[umlinclude] (rank.east)--(\x.west);
+\end{tikzpicture}

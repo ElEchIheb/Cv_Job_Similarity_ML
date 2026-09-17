@@ -1,0 +1,11 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[seqpart] at (0,0) {Recruteur}; \node[seqpart] at (3.5,0) {Next.js};
+  \node[seqpart] at (7,0) {FastAPI}; \node[seqpart] at (10.5,0) {Générateur\\ReportLab};
+  \foreach \x in {0,3.5,7,10.5} \draw[seqline] (\x,-.35)--(\x,-4.7);
+  \draw[seqmsg] (0,-.8)--node[above]{exporter le rapport} (3.5,-.8);
+  \draw[seqmsg] (3.5,-1.45)--node[above]{POST /report/pdf\\résultat + explication} (7,-1.45);
+  \draw[seqmsg] (7,-2.1)--node[above]{composer le document} (10.5,-2.1);
+  \draw[seqmsg] (10.5,-2.75)--node[above]{octets PDF} (7,-2.75);
+  \draw[seqmsg] (7,-3.4)--node[above]{application/pdf + pièce jointe} (3.5,-3.4);
+  \draw[seqmsg] (3.5,-4.05)--node[above]{téléchargement} (0,-4.05);
+\end{tikzpicture}

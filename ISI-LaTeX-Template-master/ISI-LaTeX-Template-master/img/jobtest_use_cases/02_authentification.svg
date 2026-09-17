@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="900" viewBox="0 0 1500 900">
+<defs>
+  <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,8 L10,4 z" fill="#263238"/></marker>
+</defs>
+<style>
+  .txt { font-family: 'DejaVu Sans', Arial, sans-serif; fill:#17202a; }
+  .boundary { fill:#fbfcfd; stroke:#34495e; stroke-width:2.5; }
+  .usecase { fill:#eef5ff; stroke:#245b9e; stroke-width:2.5; }
+  .actor,.assoc { fill:none; stroke:#17202a; stroke-width:3; }
+  .dep { fill:none; stroke:#263238; stroke-width:2.2; stroke-dasharray:10 8; }
+</style>
+<rect width="100%" height="100%" fill="white"/>
+<text x="750.0" y="55.0" text-anchor="middle" class="txt" font-size="32" font-weight="bold"><tspan x="750.0" dy="0">UC-01 — Authentification et gestion de session</tspan></text>
+<rect x="260" y="95" width="1180" height="745" rx="8" class="boundary"/>
+<text x="295" y="135.0" text-anchor="start" class="txt" font-size="25" font-weight="bold"><tspan x="295" dy="0">Système JobTest</tspan></text>
+<circle cx="120" cy="310" r="30" class="actor"/><line x1="120" y1="340" x2="120" y2="435" class="actor"/><line x1="65" y1="380" x2="175" y2="380" class="actor"/><line x1="120" y1="435" x2="75" y2="505" class="actor"/><line x1="120" y1="435" x2="165" y2="505" class="actor"/><text x="120" y="536.08" text-anchor="middle" class="txt" font-size="24" font-weight="bold"><tspan x="120" dy="0">Visiteur non</tspan><tspan x="120" dy="28.32">authentifié</tspan></text><circle cx="1370" cy="410" r="30" class="actor"/><line x1="1370" y1="440" x2="1370" y2="535" class="actor"/><line x1="1315" y1="480" x2="1425" y2="480" class="actor"/><line x1="1370" y1="535" x2="1325" y2="605" class="actor"/><line x1="1370" y1="535" x2="1415" y2="605" class="actor"/><text x="1370" y="636.08" text-anchor="middle" class="txt" font-size="24" font-weight="bold"><tspan x="1370" dy="0">Recruteur</tspan><tspan x="1370" dy="28.32">authentifié</tspan></text><ellipse cx="520" cy="260" rx="165.0" ry="45.0" class="usecase"/><text x="520" y="268.0" text-anchor="middle" class="txt" font-size="23" font-weight="normal"><tspan x="520" dy="0">Créer un compte</tspan></text><ellipse cx="520" cy="470" rx="165.0" ry="45.0" class="usecase"/><text x="520" y="478.0" text-anchor="middle" class="txt" font-size="23" font-weight="normal"><tspan x="520" dy="0">S’authentifier</tspan></text><ellipse cx="980" cy="360" rx="180.0" ry="45.0" class="usecase"/><text x="980" y="368.0" text-anchor="middle" class="txt" font-size="23" font-weight="normal"><tspan x="980" dy="0">Consulter son profil</tspan></text><ellipse cx="980" cy="590" rx="160.0" ry="45.0" class="usecase"/><text x="980" y="598.0" text-anchor="middle" class="txt" font-size="23" font-weight="normal"><tspan x="980" dy="0">Se déconnecter</tspan></text><line x1="175" y1="370" x2="355" y2="260" class="assoc"/><line x1="175" y1="420" x2="355" y2="470" class="assoc"/><line x1="1315" y1="470" x2="1160" y2="360" class="assoc"/><line x1="1315" y1="525" x2="1140" y2="590" class="assoc"/></svg>

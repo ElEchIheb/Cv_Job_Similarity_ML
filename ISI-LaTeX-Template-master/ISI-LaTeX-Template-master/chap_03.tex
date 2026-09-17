@@ -1,0 +1,168 @@
+\chapter{Conception fonctionnelle et architecturale}
+
+\section*{Introduction}
+\addcontentsline{toc}{section}{Introduction}
+Le chapitre précédent a défini le périmètre de JobTest et les besoins du recruteur. Le présent chapitre traduit ces besoins en une conception vérifiable dans l'application : responsabilités, données, interactions et déploiement logique. La conception sépare volontairement le calcul déterministe de correspondance de l'analyse générative. Ainsi, le recruteur conserve la décision finale ; le système restitue un résultat de correspondance et des éléments d'interprétation, sans automatiser l'embauche.
+
+\section{Démarche de conception}
+Dans le cycle en cascade retenu, la conception établit le passage des exigences du chapitre 2 vers des composants implémentables, avant leur réalisation et leur validation. Elle fixe les responsabilités et les échanges qui doivent demeurer stables lorsque l'interface ou l'infrastructure évoluent.
+
+La notation UML 2.5.1 est employée de manière ciblée : le diagramme de classes représente les objets persistants et leurs liens, tandis que les diagrammes de séquence montrent l'ordre des appels et les alternatives importantes. La spécification UML de l'OMG sert de référence de notation \cite{omg_uml251}. Le diagramme global de cas d'utilisation reste celui de la figure~\ref{fig:uc-global}; il n'est donc pas reproduit ici.
+
+\section{Vue fonctionnelle globale}
+La vue complémentaire de la figure~\ref{fig:fonctionnelle} organise les fonctions par enchaînement plutôt que par acteur. L'authentification ouvre une session de recruteur. Celui-ci gère ses offres et ses candidats, lance l'évaluation puis consulte un résultat persistant. Le résultat constitue le point d'entrée du rapport PDF, de l'historique et de l'analyse approfondie. Cette dernière est une couche complémentaire : elle reçoit des informations déjà calculées et ne revient jamais modifier le score ni le verdict déterministe.
+
+\begin{figure}[htbp]
+\centering
+\input{img/architecture/vue_fonctionnelle}
+\caption{Vue de synthèse fonctionnelle de JobTest}
+\label{fig:fonctionnelle}
+\end{figure}
+
+\section{Architecture logique de JobTest}
+La solution déployée est un monolithe modulaire conteneurisé, et non un ensemble de microservices métier autonomes. Le navigateur ne joint publiquement que Nginx sur le port~80. Nginx relaie le préfixe \texttt{/api/v1/} vers FastAPI et les autres chemins vers Next.js. Les ports 3000, 8000, 5432 et 11434 sont internes au réseau Docker : ils ne sont pas publiés sur Internet.
+
+La figure~\ref{fig:architecture-logique} représente cette organisation ainsi que les frontières réseau qui la délimitent.
+
+\begin{figure}[htbp]
+\centering
+\input{img/architecture/architecture_logique}
+\caption{Architecture logique et frontières réseau de JobTest}
+\label{fig:architecture-logique}
+\end{figure}
+
+La couche de présentation est une application Next.js. Son client API conserve le jeton bearer dans le stockage local du navigateur et utilise le même origin \texttt{/api/v1}. La couche FastAPI porte l'authentification, les routes HTTP, les contrôles d'appartenance et l'orchestration des services. Elle appelle en processus la Layer~1, composée des modèles TF--IDF, embeddings et compétences, du moteur de décision et du générateur d'explications.
+
+La Layer~2 appelle Ollama à l'intérieur du réseau Docker avec un contexte structuré issu de l'évaluation déjà persistée. PostgreSQL est la persistance du déploiement; l'application conserve néanmoins SQLite comme valeur par défaut de développement à travers \texttt{DATABASE\_URL}. Le chapitre~6 détaillera les choix d'exploitation Azure, sans les confondre avec cette vue logique.
+
+\section{Architecture applicative et responsabilités}
+Le tableau~\ref{tab:modules-jobtest} relie les responsabilités de conception aux modules réellement présents. Les routes \texttt{/ui} sont un routeur de parité ajoutant une façade HTTP pour l'interface Next.js : elles réutilisent les mêmes services de calcul, modèles SQLAlchemy et moteur de décision.
+
+{\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{2.8cm}|>{\raggedright\arraybackslash}p{5.35cm}|>{\raggedright\arraybackslash}p{4.95cm}|}
+\caption{Modules applicatifs et responsabilités}\label{tab:modules-jobtest}\\
+\hline
+\textbf{Couche ou module} & \textbf{Éléments vérifiés} & \textbf{Responsabilité}\\
+\hline
+\endfirsthead
+\hline
+\textbf{Couche ou module} & \textbf{Éléments vérifiés} & \textbf{Responsabilité}\\
+\hline
+\endhead
+Interface utilisateur & \texttt{web/app}, composants d'analyse, \texttt{web/lib/api/client.ts} & Écrans Next.js, saisie des offres et CV, restitution des résultats, appel des routes et téléchargement du PDF.\\
+\hline
+Exposition HTTP & \texttt{src/api/routers/auth.py}, \texttt{src/api/routers/ui.py}, \texttt{src/api/main.py} & JWT, validation Pydantic, contrôle du recruteur connecté, routes métiers et transformation des réponses JSON.\\
+\hline
+Services métier & \texttt{src/matching/service.py}, \texttt{src/decisioning/decision\_engine.py} & Orchestration de l'évaluation, décision canonique, persistance atomique et métadonnées de reproductibilité.\\
+\hline
+Extraction et modèles & \texttt{src/parsing/parser.py}, \texttt{src/models}, \texttt{src/fusion/hybrid\_scorer.py} & Extraction de texte PDF/DOCX, scores TF--IDF, sémantique et compétences, puis agrégation hybride.\\
+\hline
+Explicabilité & \texttt{src/explainability/explainer.py} & Composantes de score, analyse des écarts, compétences et recommandations cohérentes avec le résultat déterministe.\\
+\hline
+Analyse approfondie & \texttt{src/ai/llm\_reasoning.py}, \texttt{DeepAnalysis.tsx} & Construction du contexte, appel Ollama local, validation JSON, contrôle de cohérence et restitution d'un état contrôlé.\\
+\hline
+Rapport PDF & \texttt{src/reporting/pdf\_generator.py}, \texttt{/report/pdf} & Composition ReportLab du rapport à partir du résultat, de l'explication et des recommandations déjà calculés.\\
+\hline
+Persistance & \texttt{src/models\_db.py}, \texttt{src/database.py} & Modèles SQLAlchemy, relations, transactions et adaptation SQLite/PostgreSQL par configuration.\\
+\hline
+\end{longtable}\par}
+\normalsize
+
+\section{Conception statique -- diagramme de classes global}
+La figure~\ref{fig:classes-globales} privilégie les concepts métier et les attributs nécessaires à la compréhension. Les noms entre parenthèses correspondent aux classes techniques SQLAlchemy. Une analyse LLM n'est pas une table distincte : son enveloppe JSON est conservée dans \texttt{MatchResult.llm\_analysis\_json} uniquement lorsqu'elle est valide. De même, le rapport PDF est généré à la demande et ne possède pas d'entité persistée propre.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.95\textwidth,height=.78\textheight,keepaspectratio]{img/diagrammes/classes.png}
+\caption{Diagramme de classes métier simplifié de JobTest}
+\label{fig:classes-globales}
+\end{figure}
+
+Un utilisateur recruteur possède des offres et des candidats. Un candidat peut regrouper plusieurs CV et plusieurs résultats de correspondance; chaque résultat se rattache au CV et à l'offre qui ont servi à son calcul. Les compétences sont normalisées dans \texttt{Skill} et reliées aux CV et aux offres par les tables d'association \texttt{cv\_skills} et \texttt{job\_skills}. Les chemins actuels d'évaluation conservent également le texte et les informations d'explication dans le résultat pour en permettre la consultation ultérieure.
+
+\section{Conception dynamique -- diagrammes de séquence}
+
+\subsection{Authentification du recruteur}
+La connexion utilise le formulaire OAuth2 de FastAPI. Après vérification du mot de passe haché, l'API émet un JWT bearer. L'interface le stocke localement puis appelle \texttt{/auth/me} afin de charger le profil de session.
+
+La figure~\ref{fig:seq-auth} détaille cet échange, depuis la soumission du formulaire jusqu'au chargement du profil.
+
+\begin{figure}[htbp]
+\centering
+\input{img/architecture/seq_authentification}
+\caption{Séquence d'authentification du recruteur}
+\label{fig:seq-auth}
+\end{figure}
+
+\subsection{Création d'une offre d'emploi}
+L'écran des offres transmet le titre, la description, les compétences requises et l'état demandé. La route \texttt{/ui/job-offers} vérifie la présence du titre et de la description, associe l'offre au recruteur connecté et construit le code \texttt{JOB-AAAA-NNN} avant l'écriture en base.
+
+La figure~\ref{fig:seq-offre} en retrace le déroulement.
+
+\begin{figure}[htbp]
+\centering
+\input{img/architecture/seq_offre}
+\caption{Séquence de création d'une offre d'emploi}
+\label{fig:seq-offre}
+\end{figure}
+
+\subsection{Évaluation d'un CV par rapport à une offre}
+La figure~\ref{fig:seq-evaluation} représente le chemin canonique. Le CV est fourni comme texte ou par téléversement; dans ce dernier cas, le routeur extrait le texte du PDF ou du DOCX avant l'évaluation. L'offre doit appartenir au recruteur. Le service exécute les trois composantes, les agrège, applique les seuils et persiste un \texttt{MatchResult}.
+
+Pour le modèle hybride par défaut, les scores élémentaires sont compris entre 0 et 1 et la formule effective est :
+\[
+S_h = 0{,}2S_{\mathrm{TF\text{-}IDF}} + 0{,}4S_{\mathrm{emb}} + 0{,}4S_{\mathrm{comp}}.
+\]
+Le pourcentage affiché vaut $100S_h$. Avec la configuration par défaut, le \texttt{DecisionEngine} produit \texttt{HIRE} si le score est supérieur ou égal à 75, \texttt{CONSIDER} s'il est compris entre 55 et strictement inférieur à 75, et \texttt{REJECT} en dessous de 55. Les seuils de session peuvent être transmis par l'interface, mais la configuration utilisée est enregistrée avec le résultat. Ce verdict est une recommandation algorithmique et non une décision de recrutement.
+
+\begin{figure}[p]
+\centering
+\input{img/architecture/seq_evaluation}
+\caption{Séquence centrale d'évaluation et de persistance d'un CV}
+\label{fig:seq-evaluation}
+\end{figure}
+\clearpage
+
+\subsection{Analyse approfondie avec Ollama}
+Après le rendu de l'évaluation, le composant \texttt{DeepAnalysis} déclenche automatiquement un appel séparé pour l'identifiant du résultat; il peut aussi être relancé depuis l'interface. L'API reconstruit le contexte à partir du \texttt{MatchResult} sans recalculer la Layer~1. Ollama reçoit ce contexte structuré et doit fournir un JSON conforme. Une analyse réussie est ajoutée au résultat; sinon l'interface reçoit un état \texttt{disabled}, \texttt{unavailable}, \texttt{error} ou \texttt{inconsistent}. Dans tous les cas, le score et la décision de la Layer~1 restent inchangés.
+
+L'enchaînement correspondant apparaît sur la figure~\ref{fig:seq-ollama}, où l'on voit que l'appel part d'un résultat déjà enregistré.
+
+\begin{figure}[htbp]
+\centering
+\input{img/architecture/seq_ollama}
+\caption{Séquence d'analyse approfondie, additive à la Layer~1}
+\label{fig:seq-ollama}
+\end{figure}
+
+\subsection{Génération du rapport PDF}
+Le téléchargement demande au serveur un document à partir du résultat, de l'explication et des recommandations déjà affichés. FastAPI délègue la mise en page au générateur ReportLab et retourne les octets PDF avec une en-tête de pièce jointe. Cette opération ne crée pas de nouvelle évaluation et ne modifie pas le résultat de correspondance.
+
+La figure~\ref{fig:seq-pdf} montre la séquence suivie jusqu'au téléchargement du document.
+
+\begin{figure}[htbp]
+\centering
+\input{img/architecture/seq_pdf}
+\caption{Séquence de génération et téléchargement d'un rapport PDF}
+\label{fig:seq-pdf}
+\end{figure}
+
+\section{Conception des données}
+Le modèle relationnel est porté par SQLAlchemy. \texttt{users.email}, \texttt{skills.name} et \texttt{job\_offers.job\_code} sont déclarés uniques. Les clés étrangères relient candidats et offres au recruteur, les CV aux candidats, puis les résultats à leur candidat, CV et offre. Les suppressions en cascade sont configurées entre candidat et CV, ainsi qu'entre candidat ou offre et résultats de correspondance.
+
+Le résultat de correspondance est l'élément de traçabilité principal : il conserve les scores hybride, sémantique, lexical et compétences, la décision, les seuils utilisés, la version du modèle, la méthode et les poids. L'explication et les recommandations sont sérialisées dans \texttt{explanation\_json}; l'analyse approfondie valide est ajoutée dans \texttt{llm\_analysis\_json}. Les comparaisons de modèles et le benchmark de qualité ne créent pas de résultats persistants.
+
+En développement, la valeur par défaut de \texttt{DATABASE\_URL} pointe vers SQLite et l'application active les clés étrangères SQLite. Dans le déploiement conteneurisé, cette variable cible PostgreSQL~16. Les mêmes modèles SQLAlchemy sont employés; la différence porte sur le moteur de base de données, non sur le modèle métier présenté.
+
+\section{Principes de conception retenus}
+\begin{itemize}
+  \item \textbf{Séparation des responsabilités :} Next.js présente et collecte, FastAPI orchestre, les services calculent, SQLAlchemy persiste et Ollama interprète qualitativement.
+  \item \textbf{Traçabilité et reproductibilité :} le résultat conserve les composantes, poids, version, méthode et seuils actifs lors de son calcul.
+  \item \textbf{Isolation :} la pile Docker place PostgreSQL, FastAPI, Next.js et Ollama sur un réseau interne; seul Nginx expose le port~80.
+  \item \textbf{Dégradation contrôlée :} l'indisponibilité, l'erreur ou l'incohérence de la Layer~2 est représentée par un état explicite, sans bloquer l'évaluation déterministe.
+  \item \textbf{Responsabilité humaine :} la décision \texttt{HIRE}/\texttt{CONSIDER}/\texttt{REJECT} facilite l'examen d'un dossier; le recruteur demeure responsable de la décision finale.
+\end{itemize}
+
+\section*{Conclusion}
+\addcontentsline{toc}{section}{Conclusion}
+La conception de JobTest articule une interface Next.js, une API FastAPI, une persistance relationnelle et deux couches d'intelligence aux rôles distincts. Les diagrammes ont montré la conservation d'un résultat traçable, depuis l'authentification jusqu'au rapport et à l'analyse approfondie. Le chapitre suivant détaillera la conception et l'évaluation du moteur intelligent, notamment ses composantes de correspondance et ses résultats de validation.

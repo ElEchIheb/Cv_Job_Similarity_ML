@@ -1,0 +1,24 @@
+\begin{tikzpicture}[
+  node distance=4mm,
+  phase/.style={
+    rectangle, rounded corners=2pt, draw=isiBlue, very thick,
+    fill=blue!7, minimum width=0.76\textwidth, minimum height=8.5mm,
+    align=center, font=\small\bfseries
+  },
+  arrow/.style={-{Stealth[length=2.2mm]}, very thick, draw=isiBlue}
+]
+  \node[phase] (needs) {1. Recueil et formalisation des besoins};
+  \node[phase, below=of needs] (analysis) {2. Analyse};
+  \node[phase, below=of analysis] (design) {3. Conception};
+  \node[phase, below=of design] (build) {4. Implémentation};
+  \node[phase, below=of build] (validate) {5. Validation et correction};
+  \node[phase, below=of validate] (deploy) {6. Déploiement};
+  \draw[arrow] (needs) -- (analysis);
+  \draw[arrow] (analysis) -- (design);
+  \draw[arrow] (design) -- (build);
+  \draw[arrow] (build) -- (validate);
+  \draw[arrow] (validate) -- (deploy);
+  \draw[-{Stealth[length=2.2mm]}, dashed, thick, draw=gray]
+    (validate.east) to[out=0,in=0,looseness=1.15] node[right, font=\scriptsize, align=left]
+    {retours de\\correction} (build.east);
+\end{tikzpicture}

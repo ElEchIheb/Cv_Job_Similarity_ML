@@ -1,0 +1,110 @@
+
+%========= File containing the main LaTex document ========%
+%                                                          %
+% Copyright (C) ISI - All Rights Reserved                  %
+% Proprietary                                              %
+% Written by Med Hossam <med.hossam@gmail.com>, April 2016 %
+%                                                          %
+% @author: HEDHILI Med Houssemeddine                       %
+% @linkedin: http://tn.linkedin.com/in/medhossam           %
+%==========================================================%
+
+%\documentclass[pfe]{./tpl/isipfe}
+\documentclass[]{./tpl/isipfe}
+\graphicspath{{./img/}}
+
+%\usepackage{hyperref}
+
+\input{./tpl/new_commands}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{ragged2e}
+\usepackage{needspace}
+\usepackage{longtable}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,calc}
+\arrayrulecolor{black!65}
+\setlength{\arrayrulewidth}{0.35pt}
+\renewcommand{\arraystretch}{1.15}
+\dominitoc
+\tikzset{
+  umlcase/.style={draw=isiBlue, fill=blue!5, ellipse, align=center, minimum height=7mm, font=\footnotesize},
+  umlsystem/.style={draw=black!65, rounded corners=2pt, inner sep=5mm},
+  umlrel/.style={line width=.45pt},
+  umlinclude/.style={-{Stealth[length=2mm]}, dashed, line width=.4pt},
+  archbox/.style={draw=isiBlue, rounded corners=2pt, fill=blue!5, align=center, minimum width=2.45cm, minimum height=1.05cm, font=\footnotesize},
+  datastore/.style={draw=black!65, cylinder, shape border rotate=90, aspect=.27, fill=gray!10, align=center, minimum width=2.3cm, minimum height=1.0cm, font=\footnotesize},
+  seqpart/.style={draw=isiBlue, rounded corners=1pt, fill=blue!5, align=center, minimum width=2.0cm, minimum height=.65cm, font=\scriptsize},
+  seqline/.style={densely dashed, gray!70},
+  seqmsg/.style={-{Stealth[length=1.7mm]}, line width=.4pt, font=\scriptsize, align=center},
+  classbox/.style={draw=isiBlue, rounded corners=1pt, fill=blue!3, align=left, font=\scriptsize, inner sep=3pt}
+}
+
+% @author: Stoufa
+% the command `\makeindex` is mandatory to create the index file main.idx
+% https://tex.stackexchange.com/questions/9913/input-index-file-not-found
+\makeindex
+
+\begin{document}
+    \input{global_config}
+    \renewcommand{\contentsname}{Table des matières}
+    \renewcommand{\listfigurename}{Liste des figures}
+    \renewcommand{\listtablename}{Liste des tableaux}
+    \renewcommand{\bibname}{Bibliographie}
+    
+    \frontmatter
+        \input{tpl/cover_page}
+        \include{tpl/cover_page_black}
+        \input{tpl/signatures}
+        \cleardoublepage
+        \input{dedicaces}
+        \cleardoublepage
+        \input{remerciement}
+        \cleardoublepage
+        
+        \setcounter{page}{1}
+        \setcounter{secnumdepth}{3}
+        \setcounter{tocdepth}{2}
+        \tableofcontents
+        \thispagestyle{frontmatter}
+        
+        \cleardoublepage
+        \listoffigures
+        \thispagestyle{frontmatter}
+        \cleardoublepage
+        \listoftables
+        \thispagestyle{frontmatter}
+        \cleardoublepage
+        \input{acronymes}
+        \cleardoublepage
+        % Les quatre chapitres non numérotés précédents ont une entrée dans la table des matières.
+        % Cet ajustement aligne minitoc avec les fichiers de plans générés.
+        \setcounter{mtc}{4}
+        
+    \mainmatter
+        \input{introduction}
+        \clearpage
+        \input{chap_01}
+        \clearpage
+        \input{chap_02}
+        \clearpage
+        \input{chap_03}
+        \clearpage
+        \input{chap_04}
+        \clearpage
+        \input{chap_05}
+        \clearpage
+        \input{chap_06}
+        \clearpage
+        \input{conclusion}
+        \clearpage
+        
+        % @author: Stoufa
+		% the command `\nocite{*}` is mandatory to avoid the “no \citation commands” error
+        % https://tex.stackexchange.com/questions/18045/problem-with-compiling-bibtex-no-citation-commands-error
+        %\nocite{*}
+        \printbibliography[heading=bibintoc]
+        \clearpage
+        \input{resume_jobtest}
+        
+\end{document}

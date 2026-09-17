@@ -1,0 +1,12 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+ \node[umlsystem,minimum width=11.8cm,minimum height=5.4cm] at (6,0) {};
+ \node[anchor=north west,font=\bfseries] at (.25,2.45) {JobTest};
+ \draw[line width=.5pt] (-1,1)--(-1,.1) (-1.3,.65)--(-.7,.65) (-1,.1)--(-1.3,-.5) (-1,.1)--(-.7,-.5);
+ \node[font=\footnotesize\bfseries] at (-1,-.85) {Recruteur};
+ \node[umlcase] (hist) at (3.1,.7) {Consulter l'historique};
+ \node[umlcase] (list) at (8.3,1.6) {Lister les évaluations\\du recruteur};
+ \node[umlcase] (filter) at (8.3,.2) {Filtrer par code, offre\\ou courriel};
+ \node[umlcase] (detail) at (8.3,-1.2) {Consulter le détail\\d'un résultat};
+ \draw[umlrel] (-.65,.65)--(hist.west);
+ \foreach \x in {list,filter,detail} \draw[umlinclude] (hist.east)--(\x.west);
+\end{tikzpicture}

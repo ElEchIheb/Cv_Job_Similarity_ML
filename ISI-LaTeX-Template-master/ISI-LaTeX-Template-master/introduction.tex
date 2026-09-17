@@ -1,0 +1,11 @@
+\chapter*{Introduction générale}
+\addcontentsline{toc}{chapter}{Introduction générale}
+\markboth{Introduction générale}{}
+
+Le recrutement exige d'examiner des CV nombreux et hétérogènes au regard d'offres dont les exigences sont souvent formulées de manière libre. Cette première lecture mobilise du temps, tout en devant rester justifiable et attentive au contexte de chaque candidature. Une assistance logicielle peut organiser les informations utiles, mais elle ne peut pas se substituer au jugement du recruteur ni produire seule une décision d'embauche.
+
+Ce mémoire présente \textit{JobTest}, réalisé dans le cadre du stage de PFE chez CyberCloud Solutions. Le projet répond au besoin d'une aide à la présélection qui rapproche un CV et une offre, rend visibles les éléments de correspondance et conserve les résultats d'évaluation. La plateforme permet au recruteur de gérer ses offres et ses candidats, de lancer des évaluations sur du texte ou des documents, puis de consulter un résultat composé d'un score, de sous-scores, de compétences détectées, d'écarts et de recommandations.
+
+La solution associe une couche déterministe fondée sur TF--IDF, la similarité sémantique et les compétences, à une politique de décision explicite. Une analyse qualitative locale peut compléter la restitution, sans modifier le verdict officiel. L'application s'appuie sur un frontend Next.js, une API FastAPI, une persistance relationnelle et un export PDF. Les validations documentées couvrent les parcours principaux, un benchmark sur données synthétiques et un déploiement de démonstration conteneurisé sur Microsoft Azure.
+
+Le premier chapitre présente le contexte, l'organisme d'accueil, la problématique et la démarche. Le deuxième précise les besoins et les règles de gestion. Le troisième expose la conception fonctionnelle et architecturale. Le quatrième décrit le moteur d'évaluation et son protocole expérimental. Le cinquième présente la réalisation de la plateforme, tandis que le sixième traite des tests, de la sécurité, de l'industrialisation et du déploiement. La conclusion générale synthétise les apports, les limites et les perspectives de JobTest.

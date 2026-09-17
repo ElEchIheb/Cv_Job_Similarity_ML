@@ -1,0 +1,14 @@
+\begin{tikzpicture}[node distance=8mm and 10mm]
+  \node[archbox] (auth) {Authentification\\et session};
+  \node[archbox,right=of auth] (jobs) {Offres d'emploi\\et candidats};
+  \node[archbox,right=of jobs] (eval) {Évaluation\\hybride};
+  \node[archbox,below=of eval] (result) {Résultat explicable\\persistant};
+  \node[archbox,left=of result] (history) {Historique et\\consultation};
+  \node[archbox,right=of result] (deep) {Analyse approfondie\\locale Ollama};
+  \node[archbox,below=of result] (report) {Rapport PDF\\et téléchargement};
+  \draw[-{Stealth[length=2mm]},line width=.5pt] (auth)--(jobs)--(eval)--(result);
+  \draw[-{Stealth[length=2mm]},line width=.5pt] (result)--(history);
+  \draw[-{Stealth[length=2mm]},line width=.5pt] (result)--(deep);
+  \draw[-{Stealth[length=2mm]},line width=.5pt] (result)--(report);
+  \draw[umlinclude] (deep.south west) to[bend right=20] node[below,font=\scriptsize,align=center]{contexte structuré ;\\aucun recalcul} (result.east);
+\end{tikzpicture}

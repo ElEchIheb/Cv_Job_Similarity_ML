@@ -1,0 +1,18 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+  \node[seqpart] at (0,0) {Next.js}; \node[seqpart] at (3.3,0) {FastAPI};
+  \node[seqpart] at (6.6,0) {PostgreSQL}; \node[seqpart] at (9.9,0) {Service LLM};
+  \node[seqpart] at (13.2,0) {Ollama local};
+  \foreach \x in {0,3.3,6.6,9.9,13.2} \draw[seqline] (\x,-.35)--(\x,-6.5);
+  \draw[seqmsg] (0,-.8)--node[above]{POST deep-analysis(match\_id)} (3.3,-.8);
+  \draw[seqmsg] (3.3,-1.4)--node[above]{lire MatchResult possédé} (6.6,-1.4);
+  \draw[seqmsg] (6.6,-2.0)--node[above]{scores, décision, explication} (3.3,-2.0);
+  \draw[seqmsg] (3.3,-2.6)--node[above]{contexte structuré} (9.9,-2.6);
+  \draw[seqmsg] (9.9,-3.2)--node[above]{/api/chat, format JSON} (13.2,-3.2);
+  \draw[seqmsg] (13.2,-3.8)--node[above]{analyse JSON ou erreur} (9.9,-3.8);
+  \draw[dashed,rounded corners=1pt] (2.5,-4.25) rectangle (10.7,-5.2);
+  \node[anchor=west,font=\scriptsize] at (2.6,-4.42) {\textit{alt} statut \texttt{ok}};
+  \draw[seqmsg] (9.9,-4.75)--node[above]{enveloppe valide} (3.3,-4.75);
+  \draw[seqmsg] (3.3,-5.0)--node[below]{persister llm\_analysis\_json} (6.6,-5.0);
+  \draw[seqmsg] (3.3,-5.75)--node[above]{statut contrôlé} (0,-5.75);
+  \node[align=left,font=\scriptsize,anchor=west] at (.1,-6.35) {\textit{Sinon : disabled, unavailable, error ou inconsistent ; score et verdict inchangés.}};
+\end{tikzpicture}
