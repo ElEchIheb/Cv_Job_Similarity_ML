@@ -5,8 +5,14 @@ __pycache__/
 *.pyd
 .git/
 .gitignore
+.env
+.env.*
+!.env.example
 .pytest_cache/
 tests_tmp/
-evaluation/results/
-evaluation/figures/
 pytest-cache-files-*/
+web/
+frontend/
+node_modules/
+web/node_modules/
+web/.next/

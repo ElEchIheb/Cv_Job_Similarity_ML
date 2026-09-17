@@ -103,7 +103,7 @@ Activate the virtual environment:
 powershell
 
 
-.venv\Scripts\Activate.ps1
+.venv\Scripts\Activate
 (If you are using Command Prompt, use .venv\Scripts\activate.bat)
 
 Run the backend server:
