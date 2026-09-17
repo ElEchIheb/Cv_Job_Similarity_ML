@@ -1,6 +1,6 @@
 """
 frontend/components/__init__.py
-NeuralHire components package — re-exports all UI primitives.
+JobTest components package — re-exports all UI primitives.
 """
 from .ui import (
     score_color, decision_from_score, badge_class, badge_icon, score_class,

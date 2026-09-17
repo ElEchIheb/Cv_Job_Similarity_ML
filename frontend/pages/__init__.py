@@ -1,6 +1,6 @@
 """
 frontend/pages/__init__.py
-NeuralHire pages package.
+JobTest pages package.
 """
 from . import dashboard
 from . import single_match

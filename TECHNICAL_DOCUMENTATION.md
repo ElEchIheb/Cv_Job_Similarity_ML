@@ -3,13 +3,13 @@
 ## 1. General Project Presentation
 
 ### Project Name
-**NeuralHire** (also referred to as **JobTest AI Platform**)
+**JobTest** (also referred to as **JobTest AI Platform**)
 
 ### Problem Addressed
 Recruiters and Human Resource (HR) departments process hundreds of Curriculum Vitaes (CVs) for each job opening. Traditional resume screening is highly manual, prone to cognitive bias, and slow. Simple keyword matching often fails to grasp the semantic context of a candidate's experience, resulting in missed talent or poor hires.
 
 ### Context & Objectives
-NeuralHire is developed to solve the resume-filtering problem using modern Natural Language Processing (NLP) and Artificial Intelligence. The system's primary goals are:
+JobTest is developed to solve the resume-filtering problem using modern Natural Language Processing (NLP) and Artificial Intelligence. The system's primary goals are:
 1. **Accelerated Filtering**: Minimize screening time by automatically sorting and ranking candidates.
 2. **Context-Aware Semantic Matching**: Go beyond exact keyword matches to understand synonyms, domains, and thematic similarities.
 3. **Structured Explainability**: Deliver detailed, readable justifications, radar charts, and recommendation paths to explain *why* a candidate fits or does not fit.
@@ -52,7 +52,7 @@ NeuralHire is developed to solve the resume-filtering problem using modern Natur
 
 #### Data Layer (Stateless Storage)
 - **Engine**: Zero-State Storage (Stateless). 
-- **Reasoning**: NeuralHire handles data entirely in memory. It uses local files (`skills_dictionary.json` as a dictionary base) and generates PDFs on-the-fly without database servers, providing structural security and compliance.
+- **Reasoning**: JobTest handles data entirely in memory. It uses local files (`skills_dictionary.json` as a dictionary base) and generates PDFs on-the-fly without database servers, providing structural security and compliance.
 
 #### Deployment Layer (Containerization)
 - **Containers**: Isolated Frontend and Backend Docker containers.
@@ -293,9 +293,9 @@ The platform converts gap analysis into developmental recommendations using a st
 ## 7. Database Documentation
 
 ### Zero-State/Stateless Storage Model
-NeuralHire does not use a persistent database engine (such as PostgreSQL or SQLite).
+JobTest does not use a persistent database engine (such as PostgreSQL or SQLite).
 - **Text Parsing**: CVs uploaded are parsed, scored, and returned in-memory.
-- **GDPR Compliance**: Resumes contain highly sensitive personal data. By not storing files or candidate text databases, NeuralHire guarantees data privacy by design.
+- **GDPR Compliance**: Resumes contain highly sensitive personal data. By not storing files or candidate text databases, JobTest guarantees data privacy by design.
 
 ---
 
@@ -383,7 +383,7 @@ The platform includes a robust test suite powered by `pytest`:
 
 ## 14. Current Version Summary (v5.0)
 
-NeuralHire v5.0 introduces a comprehensive design transformation:
+JobTest v5.0 introduces a comprehensive design transformation:
 - **Dark Glassmorphism UI**: High-contrast, premium interface replacing default admin themes.
 - **Stateful Custom Navigation**: Implements an custom button-driven navigation bar using Material Icons.
 - **Robust Toggle Button**: Fixes the sidebar collapse mechanism using explicit fixed position and ARIA accessibility labels to prevent overlay collisions.

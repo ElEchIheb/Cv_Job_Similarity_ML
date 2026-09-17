@@ -1,6 +1,6 @@
 """
 frontend/pages/candidate_history.py
-NeuralHire — Candidate History Page
+JobTest — Candidate History Page
 """
 from __future__ import annotations
 import streamlit as st

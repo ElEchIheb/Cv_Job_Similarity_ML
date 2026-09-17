@@ -7,7 +7,7 @@
 
 ## 1. Two-layer hybrid architecture
 
-NeuralHire evaluates a candidate in **two complementary layers**:
+JobTest evaluates a candidate in **two complementary layers**:
 
 | | **Layer 1 — Statistical matching** | **Layer 2 — LLM reasoning** |
 |---|---|---|

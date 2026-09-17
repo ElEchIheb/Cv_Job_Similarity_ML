@@ -27,7 +27,7 @@ def generate_pdf(output_path):
 
     # 1. Cover Page
     story.append(Spacer(1, 150))
-    story.append(Paragraph("<b>NeuralHire</b>", title_style))
+    story.append(Paragraph("<b>JobTest</b>", title_style))
     story.append(Spacer(1, 20))
     story.append(Paragraph("Intelligent CV ↔ Job Matching Platform", h2_style))
     story.append(Spacer(1, 20))
@@ -39,7 +39,7 @@ def generate_pdf(output_path):
 
     # 2. Executive Summary
     story.append(Paragraph("Executive Summary", h1_style))
-    story.append(Paragraph("This report presents the definitive, evidence-based master forensic audit of NeuralHire. The audit prioritizes strict scientific integrity, resolving previous reporting discrepancies, and rigorously isolating evaluation pipelines. The system has matured into a mathematically stable recruitment engine.", normal_style))
+    story.append(Paragraph("This report presents the definitive, evidence-based master forensic audit of JobTest. The audit prioritizes strict scientific integrity, resolving previous reporting discrepancies, and rigorously isolating evaluation pipelines. The system has matured into a mathematically stable recruitment engine.", normal_style))
     
     # 3. Project Identity
     story.append(Paragraph("Project Identity", h1_style))
@@ -191,7 +191,7 @@ def generate_pdf(output_path):
 
     # Final Project Status
     story.append(Paragraph("FINAL PROJECT STATUS", h1_style))
-    story.append(Paragraph("<b>Project:</b> NeuralHire", normal_style))
+    story.append(Paragraph("<b>Project:</b> JobTest", normal_style))
     story.append(Paragraph("<b>Scientific Status:</b> 🟢 SCIENTIFICALLY VERIFIED", normal_style))
     story.append(Paragraph("<b>AI Status:</b> 🟢 COMPLETE", normal_style))
     story.append(Paragraph("<b>Backend Status:</b> 🟡 VERIFIED WITH LIMITATIONS", normal_style))
@@ -214,7 +214,7 @@ def generate_pdf(output_path):
     doc.build(story)
 
 if __name__ == "__main__":
-    out_name = "C:/Users/ihebe/.gemini/antigravity/brain/2a219dbd-418d-4685-b8c2-c73871f4db88/MASTER_NEURALHIRE_PROJECT_FORENSIC_REPORT.pdf"
+    out_name = "C:/Users/ihebe/.gemini/antigravity/brain/2a219dbd-418d-4685-b8c2-c73871f4db88/MASTER_JOBTEST_PROJECT_FORENSIC_REPORT.pdf"
     generate_pdf(out_name)
     print(f"Generated {out_name} successfully.")
     print(f"File size: {os.path.getsize(out_name)} bytes")

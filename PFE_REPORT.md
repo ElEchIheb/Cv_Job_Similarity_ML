@@ -8,12 +8,14 @@
 > the discrepancy. Where something is genuinely undocumented or could not be
 > verified, that is stated explicitly rather than guessed.
 >
-> The project has been renamed from **NeuralHire** to **JobTest** (commit
-> `5207195`). The rename is only partial: the string "NeuralHire" still appears in
-> many docstrings, the SQLite database file name (`data/neuralhire.db`), the
-> Postgres service credentials in `docker-compose.yml`, the Settings "About" panel
-> (which still reads "NeuralHire … Enterprise Edition · v4.0"), and several `.md`
-> files. Both names refer to the same platform throughout this report.
+> The project was renamed from **NeuralHire** to **JobTest** (commit `5207195`).
+> The rename was completed afterwards across source comments, the browser storage
+> keys, the development database file name (`data/jobtest.db`), the deprecated
+> Streamlit prototype and the project documentation. Two traces are kept on
+> purpose: the `LEGACY_*` constants in `web/lib` that migrate a returning
+> visitor'''s old localStorage keys once, and the rows already written inside the
+> development SQLite file. Older sections of this report may still use the former
+> name; both refer to the same platform.
 
 ---
 
@@ -261,7 +263,7 @@ Next.js app reaches parity over HTTP.
 | `OLLAMA_TIMEOUT` | `120` (s) | generation timeout |
 | `OLLAMA_CONNECT_TIMEOUT` | `3` (s) | health/connect timeout |
 | `LOG_LEVEL` | `INFO` | logging level |
-| `DATABASE_URL` | `sqlite:///…/data/neuralhire.db` | DB connection (Postgres in docker) |
+| `DATABASE_URL` | `sqlite:///…/data/jobtest.db` | DB connection (Postgres in docker) |
 
 > Note: `config.py`'s default `EMBEDDING_MODEL_EN` is **`all-mpnet-base-v2`**,
 > which overrides the stale docstring in `embedding_model.py` that claims
@@ -309,8 +311,9 @@ Next.js app reaches parity over HTTP.
   is fetched imperatively via `web/lib/api/client.ts` (a thin `fetch` wrapper);
   there is **no mock mode** — the UI talks only to the live backend
   (`web/.env.local` → `NEXT_PUBLIC_API_BASE=http://localhost:8000/api/v1`).
-- Auth token is stored in `localStorage` under `neuralhire-token`; theme under
-  `neuralhire-theme`; decision thresholds under `neuralhire-decision-config`.
+- Auth token is stored in `localStorage` under `jobtest-token`; theme under
+  `jobtest-theme`; decision thresholds under `jobtest-decision-config`. The former
+  `neuralhire-*` keys are migrated once on read, then removed.
 
 ### 4.2 Route inventory (App Router)
 
@@ -866,7 +869,7 @@ VM, Vercel, or Next.js-container configuration. What exists on disk:
 
 - `docker-compose.yml`: `db` (Postgres 16, healthcheck), `api` (uvicorn :8000,
   `env_file: .env`, depends on healthy db), `frontend` (**Streamlit** :8501). Named
-  volume `postgres_data`. Postgres creds default to `neuralhire/neuralhire_password`.
+  volume `postgres_data`. Postgres creds come from `.env` (`.env.example` uses `jobtest`).
 - `Dockerfile.api` and `Dockerfile.frontend`: identical `python:3.11-slim` images
   that install CPU-only Torch (`--index-url https://download.pytorch.org/whl/cpu`)
   + `requirements.txt`; they only `EXPOSE` 8000/8501 and rely on compose for the
@@ -891,7 +894,7 @@ state clearly that deployment was done manually outside version control.
 
 ## 9. Data model (`src/models_db.py`)
 
-SQLAlchemy 2.0 ORM on **SQLite by default** (`data/neuralhire.db`; Postgres under
+SQLAlchemy 2.0 ORM on **SQLite by default** (`data/jobtest.db`; Postgres under
 docker). Foreign keys enforced on SQLite.
 
 - **User** — `id, email (unique, indexed), hashed_password, full_name, role
@@ -1068,7 +1071,7 @@ in git and in a dedicated `*_AUDIT.md`/`*.md` companion document.
   repo, and the shipped compose wires the deprecated Streamlit frontend.
 - **Modelling/quality debt:** global-unique `Candidate.email`; dead explainer/PDF
   fallback branches; 6 stale legacy-API tests failing; corrupted `requirements.txt`
-  trailing line; partial NeuralHire→JobTest rename; substantial root-level dev
+  trailing line; substantial root-level dev
   scatter and 22 DB backups committed.
 
 ---
@@ -1168,7 +1171,7 @@ the thesis should follow the code:
 2. `TECHNICAL_DOCUMENTATION.md` states the critical-skill penalty is **0.10**; the
    code (`skill_matcher.py`) applies **up to 0.20**.
 3. `PROJECT_OVERVIEW.md` and the Settings "About" panel still brand the product
-   **NeuralHire** and version it **v4.0** / "Enterprise SaaS … Streamlit"; the API
+   **NeuralHire** (the superseded prototype, since renamed) and version it **v4.0** / "Enterprise SaaS … Streamlit"; the API
    version string is **2.0.0**; the product is now **JobTest** with a Next.js UI.
 4. `embedding_model.py`'s docstring claims `all-MiniLM-L6-v2` is the default while
    its own code reads the default from config, which is `all-mpnet-base-v2`.

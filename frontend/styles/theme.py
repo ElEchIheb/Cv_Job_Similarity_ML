@@ -1,6 +1,6 @@
 """
 frontend/styles/theme.py
-NeuralHire — Design System v5.0  ("Calm Intelligence")
+JobTest — Design System v5.0  ("Calm Intelligence")
 
 A single, token-driven design system with TWO complete, first-class palettes
 (dark + light) selected at runtime via ``build_css(theme)``. Every colour is a

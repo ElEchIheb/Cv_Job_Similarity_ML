@@ -1,4 +1,4 @@
 """
 frontend/__init__.py
-NeuralHire frontend package.
+JobTest frontend package.
 """

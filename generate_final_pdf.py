@@ -7,12 +7,12 @@ except ImportError:
     print("markdown_pdf not installed yet.", file=sys.stderr)
     sys.exit(1)
 
-OUT_FILE = "MASTER_NEURALHIRE_PROJECT_FORENSIC_REPORT.pdf"
+OUT_FILE = "MASTER_JOBTEST_PROJECT_FORENSIC_REPORT.pdf"
 
-markdown_content = """# NeuralHire - Master Forensic Project Audit
+markdown_content = """# JobTest - Master Forensic Project Audit
 
 ## 1. Executive Summary
-This report presents the definitive, evidence-based master forensic audit of NeuralHire, an intelligent CV ↔ Job Offer Matching platform. The audit prioritizes strict scientific integrity, resolving previous reporting discrepancies and rigorously isolating evaluation pipelines.
+This report presents the definitive, evidence-based master forensic audit of JobTest, an intelligent CV ↔ Job Offer Matching platform. The audit prioritizes strict scientific integrity, resolving previous reporting discrepancies and rigorously isolating evaluation pipelines.
 
 ## 2. Project Identity
 *   **Target Users**: Recruiters and HR professionals.
@@ -125,7 +125,7 @@ The system possesses strict scientific separation, flawless dataset limits, and 
 ---
 # FINAL PROJECT STATUS
 
-*   **Project**: NeuralHire
+*   **Project**: JobTest
 *   **Scientific Status**: 🟢 SCIENTIFICALLY VERIFIED
 *   **AI Status**: 🟢 COMPLETE (High-performance hybrid matching pipeline)
 *   **Backend Status**: 🟡 VERIFIED WITH LIMITATIONS (Requires E2E network tests)
@@ -144,7 +144,7 @@ The system possesses strict scientific separation, flawless dataset limits, and 
 def generate_pdf():
     pdf = MarkdownPdf(toc_level=2)
     pdf.add_section(Section(markdown_content))
-    pdf.meta["title"] = "NeuralHire Master Forensic Project Audit"
+    pdf.meta["title"] = "JobTest Master Forensic Project Audit"
     pdf.meta["author"] = "AI Auditing Engineer"
     pdf.save(OUT_FILE)
     print(f"Generated {OUT_FILE} successfully.")

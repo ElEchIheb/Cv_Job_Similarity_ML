@@ -1,7 +1,7 @@
 """
 scripts/verify_deep_analysis.py
 
-End-to-end verification of NeuralHire's Layer 2 (LLM deep analysis) against a
+End-to-end verification of JobTest's Layer 2 (LLM deep analysis) against a
 REAL local Ollama server. Run this on a machine where Ollama is installed:
 
     ollama serve            # (if not already running)
@@ -94,7 +94,7 @@ def main() -> int:
     from src.ai import llm_reasoning as L
 
     print("=" * 74)
-    print(f"NeuralHire — Layer 2 verification  (model={settings.OLLAMA_MODEL}, "
+    print(f"JobTest — Layer 2 verification  (model={settings.OLLAMA_MODEL}, "
           f"url={settings.OLLAMA_BASE_URL})")
     print("=" * 74)
 

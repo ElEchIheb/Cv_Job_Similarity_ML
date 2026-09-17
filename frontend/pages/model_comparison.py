@@ -1,6 +1,6 @@
 """
 frontend/pages/model_comparison.py
-NeuralHire — AI Model Comparison Page v4.0
+JobTest — AI Model Comparison Page v4.0
 No emojis. Recruiter language. Technical names hidden behind friendly labels.
 """
 from __future__ import annotations

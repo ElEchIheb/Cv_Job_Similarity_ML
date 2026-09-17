@@ -2,7 +2,7 @@
 
 ## 1. Project Overview
 
-NeuralHire is an enterprise-grade AI Recruitment and Talent Intelligence Platform designed to automate the screening, analysis, and ranking of candidates. The platform serves HR professionals and recruiters by removing the subjectivity of manual screening and accelerating the recruitment pipeline.
+JobTest is an enterprise-grade AI Recruitment and Talent Intelligence Platform designed to automate the screening, analysis, and ranking of candidates. The platform serves HR professionals and recruiters by removing the subjectivity of manual screening and accelerating the recruitment pipeline.
 
 **Core Workflow:**
 1. A recruiter uploads a candidate's CV (PDF/DOCX) or pastes its text, and selects an existing job offer.
@@ -27,11 +27,11 @@ NeuralHire is an enterprise-grade AI Recruitment and Talent Intelligence Platfor
 
 ## 2. AI / Matching Engine
 
-This is the core evaluation pipeline of NeuralHire. It orchestrates three independent scoring models which are then fused into a hybrid result.
+This is the core evaluation pipeline of JobTest. It orchestrates three independent scoring models which are then fused into a hybrid result.
 
 ### a) Keyword Relevance (`TFIDFMatcher`)
 - **Algorithm/Library**: Term Frequency-Inverse Document Frequency (TF-IDF) via `sklearn.feature_extraction.text.TfidfVectorizer` (scikit-learn).
-- **Text Preprocessing**: The inputs to `TFIDFMatcher.predict` are raw text strings (the raw CV and job description). While NeuralHire has a `clean_text` utility in `src/parsing/parser.py`, the `TFIDFMatcher` in `src/models/tfidf_model.py` operates directly on raw text. It configures the vectorizer with `ngram_range=(1, 3)`, `max_features=10000`, `min_df=2`, and `sublinear_tf=True`. It does not explicitly strip stopwords or handle languages internally; it relies on scikit-learn's default tokenization.
+- **Text Preprocessing**: The inputs to `TFIDFMatcher.predict` are raw text strings (the raw CV and job description). While JobTest has a `clean_text` utility in `src/parsing/parser.py`, the `TFIDFMatcher` in `src/models/tfidf_model.py` operates directly on raw text. It configures the vectorizer with `ngram_range=(1, 3)`, `max_features=10000`, `min_df=2`, and `sublinear_tf=True`. It does not explicitly strip stopwords or handle languages internally; it relies on scikit-learn's default tokenization.
 - **Comparison Metric**: The vectorized CV and job description are compared using **cosine similarity** (`sklearn.metrics.pairwise.cosine_similarity`).
 - **Output**: The raw cosine similarity score is a float clipped to the `[0.0, 1.0]` range. It is translated to a percentage by multiplying by 100.
 

@@ -1,6 +1,6 @@
 """
 frontend/pages/ranking.py
-NeuralHire — Talent Ranking Page v4.0
+JobTest — Talent Ranking Page v4.0
 No emojis. Recruiter language. SVG icons.
 """
 from __future__ import annotations
@@ -30,7 +30,7 @@ def render(run_match_fn, extract_pdf_fn, extract_docx_fn):
         highlight="Leaderboard",
         subtitle=(
             "Upload multiple CVs and a single job description. "
-            "NeuralHire ranks every candidate by AI compatibility score "
+            "JobTest ranks every candidate by AI compatibility score "
             "with a full skill breakdown and hire decision for each."
         ),
     )
@@ -240,7 +240,7 @@ def render(run_match_fn, extract_pdf_fn, extract_docx_fn):
         st.download_button(
             label="Download CSV",
             data=df_export.to_csv(index=False),
-            file_name="neuralhire_ranking.csv",
+            file_name="jobtest_ranking.csv",
             mime="text/csv",
             key="csv_download",
         )

@@ -26,7 +26,7 @@ def generate_pdf(output_path):
 
     # Title Page
     story.append(Spacer(1, 150))
-    story.append(Paragraph("<b>NeuralHire</b>", title_style))
+    story.append(Paragraph("<b>JobTest</b>", title_style))
     story.append(Spacer(1, 20))
     story.append(Paragraph("Intelligent CV ↔ Job Matching Platform", h2_style))
     story.append(Spacer(1, 20))
@@ -37,7 +37,7 @@ def generate_pdf(output_path):
 
     # Executive Summary
     story.append(Paragraph("Executive Summary", h1_style))
-    story.append(Paragraph("This report presents the definitive, evidence-based master forensic audit of NeuralHire. The audit prioritizes strict scientific integrity, resolving previous reporting discrepancies and rigorously isolating evaluation pipelines.", normal_style))
+    story.append(Paragraph("This report presents the definitive, evidence-based master forensic audit of JobTest. The audit prioritizes strict scientific integrity, resolving previous reporting discrepancies and rigorously isolating evaluation pipelines.", normal_style))
     
     # Technology Stack
     story.append(Paragraph("Technology Stack", h1_style))
@@ -110,7 +110,7 @@ def generate_pdf(output_path):
 
     # Final Verdict
     story.append(Paragraph("FINAL PROJECT STATUS", h1_style))
-    story.append(Paragraph("<b>Project:</b> NeuralHire", normal_style))
+    story.append(Paragraph("<b>Project:</b> JobTest", normal_style))
     story.append(Paragraph("<b>Scientific Status:</b> VERIFIED", normal_style))
     story.append(Paragraph("<b>AI Status:</b> COMPLETE", normal_style))
     story.append(Paragraph("<b>Backend Status:</b> VERIFIED WITH LIMITATIONS", normal_style))
@@ -122,7 +122,7 @@ def generate_pdf(output_path):
     doc.build(story)
 
 if __name__ == "__main__":
-    out_name = "MASTER_NEURALHIRE_PROJECT_FORENSIC_REPORT.pdf"
+    out_name = "MASTER_JOBTEST_PROJECT_FORENSIC_REPORT.pdf"
     generate_pdf(out_name)
     print(f"Generated {out_name} successfully.")
     print(f"File size: {os.path.getsize(out_name)} bytes")

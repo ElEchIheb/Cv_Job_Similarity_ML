@@ -1,6 +1,6 @@
 """
 frontend/pages/evaluation_metrics.py
-NeuralHire — Performance Metrics Page v4.0
+JobTest — Performance Metrics Page v4.0
 No emojis. Recruiter/analyst language. SVG icons.
 Technical model names hidden; only human labels shown.
 """

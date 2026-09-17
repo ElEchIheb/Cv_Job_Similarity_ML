@@ -1,6 +1,6 @@
 """
 frontend/pages/job_offers.py
-NeuralHire — Job Offers Page
+JobTest — Job Offers Page
 """
 from __future__ import annotations
 import streamlit as st

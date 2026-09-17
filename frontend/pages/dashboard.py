@@ -1,6 +1,6 @@
 """
 frontend/pages/dashboard.py
-NeuralHire — Overview Dashboard v4.0
+JobTest — Overview Dashboard v4.0
 No emojis. Recruiter language. SVG icons only.
 """
 from __future__ import annotations
@@ -25,7 +25,7 @@ def render():
         <span class="glow">Hire with confidence.</span>
       </div>
       <div class="nh-hero-sub">
-        NeuralHire combines deep semantic understanding, multi-dimensional skill analysis,
+        JobTest combines deep semantic understanding, multi-dimensional skill analysis,
         and instant gap profiling to deliver objective, actionable candidate decisions.
       </div>
     </div>
@@ -175,7 +175,7 @@ def render():
     # ── FOOTER ────────────────────────────────────────────────────────────────
     st.markdown("""
     <div class="nh-footer">
-      NeuralHire AI Platform v4.0 &nbsp;&middot;&nbsp;
+      JobTest AI Platform v4.0 &nbsp;&middot;&nbsp;
       Enterprise Recruitment Intelligence &nbsp;&middot;&nbsp;
       Powered by AI
     </div>

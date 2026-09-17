@@ -12,7 +12,7 @@ evaluation methodology were **not** altered._
 - **Frontend:** Streamlit single-page app (`frontend/app.py`) with custom routing. It loads the AI models **in-process** via `src.models.model_loader.load_production_models()` and evaluates through a local `run_match()` — it uses the FastAPI backend **only for auth**.
 - **Backend API:** FastAPI (`src/api/main.py`) exposes `/match`, `/rank`, `/batch`, `/report/pdf`, CRUD for candidates/jobs/matches. Same model loader (lazy, cached). Endpoints are auth-gated.
 - **AI engine:** `HybridMatcher` (`src/fusion/hybrid_scorer.py`) = weighted blend of `TFIDFMatcher`, `EmbeddingMatcher`, `SkillMatcher`. Explainability in `src/explainability/explainer.py`.
-- **Persistence:** SQLAlchemy models in `src/models_db.py` on SQLite (`data/neuralhire.db`). Entities: User, Candidate, CV, JobOffer, MatchResult, Skill.
+- **Persistence:** SQLAlchemy models in `src/models_db.py` on SQLite (`data/jobtest.db`). Entities: User, Candidate, CV, JobOffer, MatchResult, Skill.
 - **Checkpoint:** `models/checkpoints/hybrid.pkl` (only the fitted TF-IDF is persisted; embedding/skill re-instantiated at load).
 
 ## 2–8. Flows (candidate / job / evaluation / ranking / bulk / report / threshold / persistence / model-loading)

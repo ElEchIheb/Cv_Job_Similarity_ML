@@ -25,7 +25,7 @@ def _auth_brand(title: str, subtitle: str):
 
 
 def login_page():
-    _auth_brand("Welcome back", "Sign in to your NeuralHire account")
+    _auth_brand("Welcome back", "Sign in to your JobTest account")
 
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
@@ -60,7 +60,7 @@ def login_page():
 
 
 def register_page():
-    _auth_brand("Create an account", "Join NeuralHire to evaluate candidates with AI")
+    _auth_brand("Create an account", "Join JobTest to evaluate candidates with AI")
 
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:

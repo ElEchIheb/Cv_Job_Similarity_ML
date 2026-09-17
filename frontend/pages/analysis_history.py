@@ -1,6 +1,6 @@
 """
 frontend/pages/analysis_history.py
-NeuralHire — Analysis History Page
+JobTest — Analysis History Page
 """
 from __future__ import annotations
 import json

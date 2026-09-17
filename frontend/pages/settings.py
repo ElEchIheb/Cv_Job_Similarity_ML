@@ -1,6 +1,6 @@
 """
 frontend/pages/settings.py
-NeuralHire — Platform Settings v4.0
+JobTest — Platform Settings v4.0
 No emojis. Recruiter language. Technical internals hidden.
 SVG icons throughout.
 """
@@ -237,7 +237,7 @@ def render(models: Dict, project_root: Path):
             </div>
           </div>
           <div style="font-size:0.95rem;color:var(--text-secondary)!important;line-height:1.85;max-width:520px;">
-            NeuralHire is an AI-powered recruitment evaluation platform designed to help HR professionals
+            JobTest is an AI-powered recruitment evaluation platform designed to help HR professionals
             screen, compare, and rank candidates objectively and efficiently.<br><br>
             Built with three complementary evaluation engines — keyword analysis, semantic understanding,
             and skills detection — combined into a single explainable compatibility score.<br><br>

@@ -1,6 +1,6 @@
 """
 frontend/components/ui.py
-NeuralHire — Enterprise UI Components v4.0
+JobTest — Enterprise UI Components v4.0
 
 All emojis removed. All technical jargon hidden behind recruiter-friendly language.
 SVG icons from the ICONS dict in theme.py used throughout.

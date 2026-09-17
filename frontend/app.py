@@ -1,6 +1,6 @@
 """
 frontend/app.py
-NeuralHire AI Platform — Enterprise Entry Point v4.0
+JobTest AI Platform — Enterprise Entry Point v4.0
 
 ============================================================================
 DEPRECATED — superseded by the Next.js app in web/. Kept for reference only,
@@ -34,14 +34,14 @@ import streamlit as st
 
 # ── Page config — FIRST st call ─────────────────────────────────────────────
 st.set_page_config(
-    page_title="NeuralHire — AI Recruitment Platform",
+    page_title="JobTest — AI Recruitment Platform",
     page_icon="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2' fill='%2300BFFF'/></svg>",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
         "Get help":     None,
         "Report a bug": None,
-        "About":        "NeuralHire v4.0 — AI-powered recruitment evaluation.",
+        "About":        "JobTest v4.0 — AI-powered recruitment evaluation.",
     },
 )
 
@@ -273,7 +273,7 @@ with st.sidebar:
         <div class="nh-status-dot"></div>
         <div class="nh-status-label">All systems online</div>
       </div>
-      <div class="nh-sidebar-version">NeuralHire v4.0 · Enterprise</div>
+      <div class="nh-sidebar-version">JobTest v4.0 · Enterprise</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -283,7 +283,7 @@ with st.sidebar:
 # ══════════════════════════════════════════════════════════════════════════
 
 # ── Executive Top Bar ──────────────────────────────────────────────────
-current_page_label = next((label for label, route, _ in _NAV if route == current_route), "NeuralHire")
+current_page_label = next((label for label, route, _ in _NAV if route == current_route), "JobTest")
 user_name = st.session_state.get("user_full_name", "HR")
 initials = "".join([n[0] for n in user_name.split() if n]).upper()[:2] if user_name else "HR"
 
@@ -291,7 +291,7 @@ st.markdown(f"""
 <div class="nh-topbar">
   <div class="nh-topbar-left">
     <div class="nh-topbar-breadcrumb">
-      <span class="root">NeuralHire</span>
+      <span class="root">JobTest</span>
       <span class="sep">/</span>
       <span class="current">{current_page_label}</span>
     </div>

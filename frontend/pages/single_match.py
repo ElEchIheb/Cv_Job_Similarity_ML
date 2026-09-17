@@ -1,6 +1,6 @@
 """
 frontend/pages/single_match.py
-NeuralHire — Candidate Analysis Page v4.0
+JobTest — Candidate Analysis Page v4.0
 No emojis. Recruiter language. SVG icons.
 """
 from __future__ import annotations
@@ -168,7 +168,7 @@ def _display_result(payload: Dict, candidate_name: str, job_title: str,
                         candidate_name=candidate_name or "Candidate",
                         job_title=job_title or "Position",
                     )
-                    fname = f"NeuralHire_{(candidate_name or 'report').replace(' ', '_')}.pdf"
+                    fname = f"JobTest_{(candidate_name or 'report').replace(' ', '_')}.pdf"
                     st.download_button(
                         label="Download PDF Report",
                         data=pdf_bytes, file_name=fname,
@@ -189,7 +189,7 @@ def render(run_match_fn, extract_pdf_fn, extract_docx_fn,
         highlight="Analysis",
         subtitle=(
             "Evaluate a candidate's profile against a job description using the "
-            "NeuralHire AI engine — receive a compatibility score, skill breakdown, "
+            "JobTest AI engine — receive a compatibility score, skill breakdown, "
             "and a clear hire recommendation."
         ),
     )
