@@ -172,6 +172,29 @@ def _rate_limit(host: str) -> None:
     window.append(now)
 
 
+# ── Access control ──────────────────────────────────────────────────────────
+def _assert_owned(db: Session, current_user, *, candidate_id=None, job_offer_id=None) -> None:
+    """Reject cross-recruiter references (IDOR) before persisting/reading a match.
+
+    Any candidate_id / job_offer_id supplied by the client must belong to the
+    authenticated recruiter, otherwise we 404 (same as a non-existent id).
+    """
+    if candidate_id is not None:
+        owned = db.query(models_db.Candidate).filter(
+            models_db.Candidate.id == candidate_id,
+            models_db.Candidate.recruiter_id == current_user.id,
+        ).first()
+        if not owned:
+            raise HTTPException(status_code=404, detail="Candidate not found")
+    if job_offer_id is not None:
+        owned = db.query(models_db.JobOffer).filter(
+            models_db.JobOffer.id == job_offer_id,
+            models_db.JobOffer.recruiter_id == current_user.id,
+        ).first()
+        if not owned:
+            raise HTTPException(status_code=404, detail="Job offer not found")
+
+
 # ── Core matching logic ───────────────────────────────────────────────────────
 def _model_result(
     model_name: str,
@@ -378,9 +401,17 @@ def create_app():
         """Match a single CV against a job description and save to database."""
         _USAGE_STATS["match_requests"] += 1
         try:
+            # IDOR guard: the referenced job (and candidate, if linking a result)
+            # must belong to this recruiter.
+            _assert_owned(db, current_user,
+                          candidate_id=request.candidate_id,
+                          job_offer_id=request.job_offer_id)
             job_text = request.job_text
             if not job_text:
-                job = db.query(models_db.JobOffer).filter(models_db.JobOffer.id == request.job_offer_id).first()
+                job = db.query(models_db.JobOffer).filter(
+                    models_db.JobOffer.id == request.job_offer_id,
+                    models_db.JobOffer.recruiter_id == current_user.id,
+                ).first()
                 if not job:
                     raise HTTPException(status_code=404, detail="Job offer not found")
                 job_text = f"{job.title}\n\n{job.description}\n\nRequired Skills: {job.required_skills_raw}"
@@ -408,7 +439,7 @@ def create_app():
                     decision_config=json.dumps(result.get("explanation", {}).get("decision_config", {})),
                     metadata_flags=json.dumps({
                         "model": request.model,
-                        "time": processing_time
+                        "time": result.get("processing_time")
                     }),
                     explanation_json=json.dumps({
                         "explanation": result.get("explanation"),
@@ -500,6 +531,9 @@ def create_app():
             
             # Save MatchResult if candidate and job offer are provided
             if candidate_id and job_offer_id:
+                # IDOR guard: only persist links to this recruiter's own records.
+                _assert_owned(db, current_user,
+                              candidate_id=candidate_id, job_offer_id=job_offer_id)
                 import json
                 db_result = models_db.MatchResult(
                     candidate_id=candidate_id,
@@ -544,8 +578,12 @@ def create_app():
         Returns candidates sorted by match score (best first).
         """
         _USAGE_STATS["rank_requests"] += 1
-        
-        job = db.query(models_db.JobOffer).filter(models_db.JobOffer.id == request.job_offer_id).first()
+
+        # IDOR guard: recruiter can only rank against their own job offers.
+        job = db.query(models_db.JobOffer).filter(
+            models_db.JobOffer.id == request.job_offer_id,
+            models_db.JobOffer.recruiter_id == current_user.id,
+        ).first()
         if not job:
             raise HTTPException(status_code=404, detail=f"JobOffer {request.job_offer_id} not found.")
             

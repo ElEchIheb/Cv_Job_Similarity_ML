@@ -66,7 +66,7 @@ export default function LoginPage() {
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse-glow" />
               Precision Intelligence for hiring
             </motion.div>
-            <motion.h1 variants={fadeUp} className="font-display text-display font-bold leading-[1.02] text-ink">
+            <motion.h1 variants={fadeUp} className="font-display text-[clamp(2.5rem,4.5vw,4rem)] font-bold leading-[1.02] text-ink">
               Evaluate talent with a <span className="text-gradient">diagnostic&nbsp;instrument</span>, not a spreadsheet.
             </motion.h1>
             <motion.p variants={fadeUp} className="mt-5 text-body-lg text-ink-secondary">

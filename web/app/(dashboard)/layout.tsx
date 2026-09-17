@@ -46,7 +46,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <Sidebar onSignOut={signOut} />
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar userName={user.full_name} />
-        <main className="mx-auto w-full max-w-container flex-1 px-5 py-7 md:px-7">
+        <main className="mx-auto w-full max-w-container flex-1 px-4 py-5 md:px-7 md:py-7">
           <PageTransition>{children}</PageTransition>
         </main>
       </div>

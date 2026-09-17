@@ -62,12 +62,12 @@ export default function OverviewPage() {
               objective, explainable candidate decisions.
             </p>
           </div>
-          <div className="flex gap-3">
-            <Link href="/analysis">
-              <Button size="lg" icon={<Target className="h-4 w-4" />}>Run Evaluation</Button>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link href="/analysis" className="w-full sm:w-auto">
+              <Button size="lg" icon={<Target className="h-4 w-4" />} className="w-full sm:w-auto">Run Evaluation</Button>
             </Link>
-            <Link href="/leaderboard">
-              <Button size="lg" variant="secondary" icon={<Users className="h-4 w-4" />}>Rank Candidates</Button>
+            <Link href="/leaderboard" className="w-full sm:w-auto">
+              <Button size="lg" variant="secondary" icon={<Users className="h-4 w-4" />} className="w-full sm:w-auto">Rank Candidates</Button>
             </Link>
           </div>
         </div>
@@ -84,7 +84,7 @@ export default function OverviewPage() {
         <StatCard label="Avg. Compatibility" value={avgPct} suffix="%" decimals={1} icon={<Award className="h-5 w-5" />} tone="success" />
         <StatCard label="HIRE Rate" value={ov?.hire_pct ?? 0} suffix="%" decimals={1} icon={<Shield className="h-5 w-5" />} tone="cyan" />
         <StatCard label="Active Job Offers" value={ov?.total_jobs ?? 0} icon={<Zap className="h-5 w-5" />} tone="warning" />
-        <StatCard label="Total Match Reports" value={ov?.total_matches ?? 0} icon={<FileText className="h-5 w-5" />} tone="accent" />
+        <StatCard label="Total Match Reports" value={ov?.total_matches ?? 0} icon={<FileText className="h-5 w-5" />} tone="accent" className="col-span-2 lg:col-span-1" />
       </motion.div>
 
       {/* ── Recent + distribution ────────────────────────────── */}
