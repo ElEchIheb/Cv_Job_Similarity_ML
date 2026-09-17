@@ -40,3 +40,6 @@ debug*.txt
 Thumbs.db
 .idea/
 .vscode/
+
+# Archives de rendu du mémoire (volumineuses, régénérables)
+ISI-LaTeX-Template-master/*.zip

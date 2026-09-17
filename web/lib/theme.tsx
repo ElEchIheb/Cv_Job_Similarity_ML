@@ -12,12 +12,18 @@ interface ThemeCtx {
 
 const Ctx = createContext<ThemeCtx | null>(null);
 
-const STORAGE_KEY = "neuralhire-theme";
+const STORAGE_KEY = "jobtest-theme";
+/** Pre-rename key, migrated on first read so a returning visitor keeps their theme. */
+const LEGACY_STORAGE_KEY = "neuralhire-theme";
 
 /** Inline script (injected in <head>) that sets data-theme before paint. */
 export const themeInitScript = `
 (function(){try{
   var t = localStorage.getItem('${STORAGE_KEY}');
+  if(!t){
+    var legacy = localStorage.getItem('${LEGACY_STORAGE_KEY}');
+    if(legacy){ t = legacy; localStorage.setItem('${STORAGE_KEY}', legacy); localStorage.removeItem('${LEGACY_STORAGE_KEY}'); }
+  }
   if(!t){ t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'; }
   document.documentElement.setAttribute('data-theme', t);
 }catch(e){ document.documentElement.setAttribute('data-theme','dark'); }})();

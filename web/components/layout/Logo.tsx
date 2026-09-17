@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-/** NeuralHire logo lockup — a neural node glyph + wordmark. */
+/** JobTest logo lockup — a neural node glyph + wordmark. */
 export function Logo({ compact = false, className }: { compact?: boolean; className?: string }) {
   return (
     <div className={cn("flex items-center gap-2.5", className)}>

@@ -1,6 +1,6 @@
 """
 src/decisioning/decision_engine.py
-NeuralHire — Canonical Decision Engine (single source of truth).
+JobTest — Canonical Decision Engine (single source of truth).
 
 This module is the ONLY place in the platform that maps a compatibility score
 to a recruiter-facing decision. Every surface — Candidate Analysis, Talent

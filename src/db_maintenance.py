@@ -1,6 +1,6 @@
 """
 src/db_maintenance.py
-Safe, idempotent database maintenance for NeuralHire.
+Safe, idempotent database maintenance for JobTest.
 
 Responsibilities
 ----------------

@@ -14,7 +14,7 @@ def print_header(title):
 
 # 1. DATABASE FORENSICS
 print_header("1. DATABASE FORENSICS (SQLite Direct)")
-conn = sqlite3.connect("d:/education/pfe/pfe_ai/data/neuralhire.db")
+conn = sqlite3.connect("d:/education/pfe/pfe_ai/data/jobtest.db")
 c = conn.cursor()
 
 # Job Offers
@@ -75,7 +75,7 @@ conn.close()
 # 2. CONSTRAINTS CHECK
 print_header("2. DATABASE CONSTRAINTS")
 # We can check SQLite sqlite_master for table definitions
-conn = sqlite3.connect("d:/education/pfe/pfe_ai/data/neuralhire.db")
+conn = sqlite3.connect("d:/education/pfe/pfe_ai/data/jobtest.db")
 df_jo = pd.read_sql("SELECT sql FROM sqlite_master WHERE type='table' AND name='job_offers'", conn)
 df_cand = pd.read_sql("SELECT sql FROM sqlite_master WHERE type='table' AND name='candidates'", conn)
 print("Job Offers Table SQL:")
@@ -87,9 +87,9 @@ conn.close()
 # 3. MIGRATION SAFETY
 print_header("3. MIGRATION SAFETY (Idempotency)")
 # Make a copy of the DB
-shutil.copy2("d:/education/pfe/pfe_ai/data/neuralhire.db", "d:/education/pfe/pfe_ai/data/neuralhire_copy.db")
+shutil.copy2("d:/education/pfe/pfe_ai/data/jobtest.db", "d:/education/pfe/pfe_ai/data/jobtest_copy.db")
 from sqlalchemy import create_engine
-engine_copy = create_engine("sqlite:///d:/education/pfe/pfe_ai/data/neuralhire_copy.db")
+engine_copy = create_engine("sqlite:///d:/education/pfe/pfe_ai/data/jobtest_copy.db")
 print("Running migration again on copy...")
 stats = run_data_redesign_migration(engine_copy)
 print("Migration Stats (should be all 0):", stats)

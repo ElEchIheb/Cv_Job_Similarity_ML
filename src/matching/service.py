@@ -1,6 +1,6 @@
 """
 src/matching/service.py
-Canonical evaluation + persistence service for NeuralHire.
+Canonical evaluation + persistence service for JobTest.
 
 This is the ONE place that:
   1. runs the AI models for a CV/Job pair,

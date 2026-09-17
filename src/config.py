@@ -5,7 +5,9 @@ Values are read from environment variables (with .env support).
 """
 from __future__ import annotations
 
+import logging
 import os
+import secrets
 from pathlib import Path
 
 try:
@@ -37,7 +39,12 @@ class Settings(BaseSettings):
     REQUEST_LIMIT_PER_MINUTE: int = int(os.environ.get("REQUEST_LIMIT_PER_MINUTE", "60"))
 
     # Security & JWT
-    JWT_SECRET_KEY: str = os.environ.get("JWT_SECRET_KEY", "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7")
+    # SECURITY: never ship a usable default secret. A hardcoded/known value would
+    # let anyone forge valid JWTs (full auth bypass). When JWT_SECRET_KEY is unset
+    # we fall back to a random per-process secret (tokens then invalidate on
+    # restart) and warn — set JWT_SECRET_KEY in the environment/.env for stable
+    # sessions in any non-throwaway deployment.
+    JWT_SECRET_KEY: str = os.environ.get("JWT_SECRET_KEY") or secrets.token_hex(32)
     JWT_ALGORITHM: str = os.environ.get("JWT_ALGORITHM", "HS256")
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.environ.get("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
 
@@ -73,7 +80,14 @@ class Settings(BaseSettings):
     EVALUATION_DIR: Path = PROJECT_ROOT / "evaluation"
     
     # Database
-    DATABASE_URL: str = os.environ.get("DATABASE_URL", f"sqlite:///{DATA_DIR.as_posix()}/neuralhire.db")
+    DATABASE_URL: str = os.environ.get("DATABASE_URL", f"sqlite:///{DATA_DIR.as_posix()}/jobtest.db")
 
 
 settings = Settings()
+
+if not os.environ.get("JWT_SECRET_KEY"):
+    logging.getLogger("jobtest.config").warning(
+        "JWT_SECRET_KEY is not set — using a random ephemeral secret. Existing "
+        "sessions will not survive a restart. Set JWT_SECRET_KEY in your .env "
+        "before any real/shared deployment."
+    )

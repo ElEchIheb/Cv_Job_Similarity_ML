@@ -1,6 +1,6 @@
 """
 src/decisioning
-Canonical decision layer for NeuralHire.
+Canonical decision layer for JobTest.
 
 Exposes the single source of truth for turning a compatibility score into a
 recruiter-facing decision (HIRE / CONSIDER / REJECT), together with an

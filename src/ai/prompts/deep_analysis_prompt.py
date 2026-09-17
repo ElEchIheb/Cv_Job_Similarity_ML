@@ -1,7 +1,7 @@
 """
 src/ai/prompts/deep_analysis_prompt.py
 
-Prompt template for Layer 2 (LLM qualitative reasoning) of NeuralHire.
+Prompt template for Layer 2 (LLM qualitative reasoning) of JobTest.
 
 Kept deliberately separate from application/service code so it is a reviewable
 artifact for the thesis defense and can be iterated on without touching the

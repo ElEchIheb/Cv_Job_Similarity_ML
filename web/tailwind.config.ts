@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 /**
- * NeuralHire — "Precision Intelligence" design tokens.
+ * JobTest — "Precision Intelligence" design tokens.
  *
  * Theme-varying tokens (surfaces, borders, text, status-soft backgrounds) are
  * driven by CSS variables defined in app/globals.css, so light/dark are two

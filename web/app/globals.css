@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /*
- * NeuralHire theme variables.
+ * JobTest theme variables.
  * Values are space-separated RGB channels so Tailwind's /<alpha-value> works.
  * Dark is the default (bare :root); light is a first-class, hand-tuned theme.
  */
@@ -96,6 +96,14 @@
 html {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* Desktop density tuned for standard 100% browser zoom. Mobile keeps the
+   native 16px scale for touch readability. */
+@media (min-width: 1024px) {
+  html {
+    font-size: 90%;
+  }
 }
 
 body {

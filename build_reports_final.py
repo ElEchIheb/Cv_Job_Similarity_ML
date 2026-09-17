@@ -5,12 +5,12 @@ from pathlib import Path
 OUT_DIR = "C:/Users/ihebe/.gemini/antigravity/brain/13f2b22b-261c-4dd6-a361-68cc3f715210"
 
 def write_files():
-    # 1. MASTER_NEURALHIRE_FORENSIC_REPORT.md
-    with open(f"{OUT_DIR}/MASTER_NEURALHIRE_FORENSIC_REPORT.md", "w", encoding="utf-8") as f:
-        f.write("""# NEURALHIRE MASTER PROJECT FORENSIC REPORT
+    # 1. MASTER_JOBTEST_FORENSIC_REPORT.md
+    with open(f"{OUT_DIR}/MASTER_JOBTEST_FORENSIC_REPORT.md", "w", encoding="utf-8") as f:
+        f.write("""# JOBTEST MASTER PROJECT FORENSIC REPORT
 
 ## 1. Project Identity
-NeuralHire is an intelligent CV ↔ Job Offer matching and recruitment platform designed for automated initial screening and ranking of candidates.
+JobTest is an intelligent CV ↔ Job Offer matching and recruitment platform designed for automated initial screening and ranking of candidates.
 
 ## 2. Technology Stack
 - **Frontend**: Streamlit, Python
@@ -49,7 +49,7 @@ CV/Job Upload -> Text Extraction -> TF-IDF Vectorization -> MPNet Embedding -> B
 - **Note**: The previous hallucinated report of N=18 was definitively debunked. True N=1800, 1670 correct predictions = 92.77%.
 
 ## FINAL PROJECT SNAPSHOT
-Project: NeuralHire / JobTest
+Project: JobTest
 Architecture: FastAPI / Streamlit / SQLite
 Dataset: 12000
 Train: 8400

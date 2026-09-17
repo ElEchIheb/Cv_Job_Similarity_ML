@@ -18,7 +18,9 @@ interface Ctx extends Config {
   reset: () => void;
 }
 
-const KEY = "neuralhire-decision-config";
+const KEY = "jobtest-decision-config";
+/** Pre-rename key, read once so saved thresholds are not lost by the rename. */
+const LEGACY_KEY = "neuralhire-decision-config";
 const DEFAULTS: Config = { strong: DEFAULT_STRONG_FIT, potential: DEFAULT_POTENTIAL_FIT };
 
 const DecisionCtx = createContext<Ctx | null>(null);
@@ -28,7 +30,15 @@ export function DecisionConfigProvider({ children }: { children: React.ReactNode
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(KEY);
+      let raw = localStorage.getItem(KEY);
+      if (!raw) {
+        const legacy = localStorage.getItem(LEGACY_KEY);
+        if (legacy) {
+          localStorage.setItem(KEY, legacy);
+          localStorage.removeItem(LEGACY_KEY);
+          raw = legacy;
+        }
+      }
       if (raw) setCfg({ ...DEFAULTS, ...JSON.parse(raw) });
     } catch {
       /* ignore */

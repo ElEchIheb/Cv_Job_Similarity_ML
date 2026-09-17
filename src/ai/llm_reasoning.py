@@ -1,7 +1,7 @@
 """
 src/ai/llm_reasoning.py
 
-Layer 2 of NeuralHire's two-layer hybrid architecture: LLM-based *qualitative*
+Layer 2 of JobTest's two-layer hybrid architecture: LLM-based *qualitative*
 reasoning over the output of the (unchanged) statistical matching engine.
 
 This module is strictly ADDITIVE and NON-BLOCKING for the core pipeline:

@@ -1,5 +1,5 @@
 /**
- * NeuralHire API client — talks to the live FastAPI backend only.
+ * JobTest API client — talks to the live FastAPI backend only.
  * Auth uses the OAuth2 bearer contract; all data/CRUD/evaluation calls hit the
  * additive /ui parity router which wraps the same logic the Streamlit app runs.
  */
@@ -21,13 +21,25 @@ import type {
   User,
 } from "./types";
 
-const BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000/api/v1";
-const TOKEN_KEY = "neuralhire-token";
+// Production uses Nginx to proxy the API on the same public origin. Local
+// development may still override this in web/.env.local.
+const BASE = process.env.NEXT_PUBLIC_API_BASE ?? "/api/v1";
+const TOKEN_KEY = "jobtest-token";
+/** Pre-rename key. Read once so sessions opened before the rename survive. */
+const LEGACY_TOKEN_KEY = "neuralhire-token";
 
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;
   try {
-    return localStorage.getItem(TOKEN_KEY);
+    const current = localStorage.getItem(TOKEN_KEY);
+    if (current) return current;
+    const legacy = localStorage.getItem(LEGACY_TOKEN_KEY);
+    if (legacy) {
+      localStorage.setItem(TOKEN_KEY, legacy);
+      localStorage.removeItem(LEGACY_TOKEN_KEY);
+      return legacy;
+    }
+    return null;
   } catch {
     return null;
   }

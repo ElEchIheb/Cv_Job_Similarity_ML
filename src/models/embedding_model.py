@@ -6,11 +6,12 @@ Backend hierarchy:
   1. SentenceTransformer (best quality — requires sentence-transformers package)
   2. _LocalEmbeddingBackend (HashingVectorizer fallback — no sentence-transformers)
 
-Default English model: all-MiniLM-L6-v2
-  * Stable on Python 3.13 + Windows
-  * Already cached on disk from first install
-  * Upgrade to all-mpnet-base-v2 via EMBEDDING_MODEL_EN in .env
-    (requires model download; may require Python ≤3.12 for threaded loading)
+Default English model: all-mpnet-base-v2 (set by EMBEDDING_MODEL_EN in src/config.py)
+  * Highest accuracy of the sentence-transformers English models used here
+  * Must be downloaded/cached once; the loader falls back to the local
+    HashingVectorizer backend if it cannot be loaded
+  * Override with EMBEDDING_MODEL_EN in .env — all-MiniLM-L6-v2 is the lighter
+    alternative if memory or load time is a constraint
 
 Multilingual: paraphrase-multilingual-mpnet-base-v2 (unchanged — best in class).
 """
@@ -45,13 +46,13 @@ except ImportError:  # pragma: no cover - optional dependency
     SentenceTransformer = None
     _ST_AVAILABLE = False
 
-# Read model names from config if available, else use safe defaults.
-# Default is all-MiniLM-L6-v2 — stable on Python 3.13 + Windows.
-# Set EMBEDDING_MODEL_EN=all-mpnet-base-v2 in .env for the higher-accuracy model
-# (requires model to be pre-downloaded and Python ≤3.12 recommended).
+# Read model names from config if available, else use a lighter offline default.
+# src/config.py sets EMBEDDING_MODEL_EN=all-mpnet-base-v2; the literal below is
+# only the last-resort value used when the config module cannot be imported at
+# all, where the smaller MiniLM model is the safer thing to reach for.
 try:
     from src.config import settings as _cfg
-    _MODEL_EN = _cfg.EMBEDDING_MODEL_EN   # default: "all-MiniLM-L6-v2"
+    _MODEL_EN = _cfg.EMBEDDING_MODEL_EN   # default from config: "all-mpnet-base-v2"
     _MODEL_ML = _cfg.EMBEDDING_MODEL_ML   # default: "paraphrase-multilingual-mpnet-base-v2"
 except Exception:
     _MODEL_EN = "all-MiniLM-L6-v2"
@@ -107,7 +108,6 @@ class _SentenceTransformerBackend:
 
     def __init__(self, model_name: str) -> None:
         logger.info("Loading SentenceTransformer model: %s", model_name)
-        print(f"DEBUG SentenceTransformer is {type(SentenceTransformer)}")
         self.model_name = model_name
         # low_cpu_mem_usage=False disables the transformers 4.47+ threaded model
         # materialiser (core_model_loading.py) which crashes on Python 3.13 + Windows.

@@ -87,10 +87,10 @@ def write_evidence_matrix():
         f.write(content)
 
 def write_master_audit():
-    content = """# NEURALHIRE MASTER PROJECT AUDIT
+    content = """# JOBTEST MASTER PROJECT AUDIT
 
 ## 1. Executive Summary
-NeuralHire is a highly stable, scientifically robust PFE recruitment matching pipeline. Previous mathematical leakage and reporting inconsistencies have been permanently resolved, resulting in a defensible, production-ready AI classification engine.
+JobTest is a highly stable, scientifically robust PFE recruitment matching pipeline. Previous mathematical leakage and reporting inconsistencies have been permanently resolved, resulting in a defensible, production-ready AI classification engine.
 
 ## 2. Project Purpose
 An intelligent CV ↔ Job Offer matching and recruitment platform.
@@ -145,7 +145,7 @@ AI: 4/5, Backend: 4/5, Evaluation: 5/5, Database: 3/5.
 **PFE Readiness:** READY
 **Scientific Verdict:** 🟢 SCIENTIFICALLY VERIFIED
 """
-    with open(f"{OUT_DIR}/NEURALHIRE_MASTER_PROJECT_AUDIT.md", "w", encoding="utf-8") as f:
+    with open(f"{OUT_DIR}/JOBTEST_MASTER_PROJECT_AUDIT.md", "w", encoding="utf-8") as f:
         f.write(content)
 
 def write_json_results():
