@@ -124,6 +124,33 @@ Ce garde-fou joue également un rôle de sécurité. Le texte d'un CV est fourni
 
 L'évaluation utilise \texttt{cv\_job\_dataset.csv}, généré localement avec la graine 42. Il contient 12\,000 paires CV--offre synthétiques, plusieurs domaines et niveaux d'expérience, des textes français et anglais, des abréviations, fautes de frappe, compétences obsolètes et offres contradictoires. Les étiquettes positives regroupent les cas de forte et de transférable adéquation générés ; elles ne sont pas des décisions de recrutement observées.
 
+\subsection{Pourquoi un corpus synthétique}
+
+Le choix d'évaluer le moteur sur des documents générés plutôt que sur de vraies candidatures mérite d'être justifié, car il conditionne la portée de tous les chiffres qui suivent. Cinq raisons l'ont motivé.
+
+La première est l'absence de corpus disponible. Aucun ensemble de CV réels appariés à des offres, en nombre suffisant et en accès autorisé, n'a pu être réuni dans le cadre de ce stage. Les quelques dossiers accessibles se comptaient en dizaines, ce qui n'aurait permis ni un partitionnement en trois sous-ensembles, ni une mesure stable : sur un échantillon aussi réduit, un écart de quelques paires suffit à déplacer un F1 de plusieurs points, et la comparaison entre quatre méthodes n'aurait plus été interprétable.
+
+La deuxième raison est juridique et éthique. Un CV réel est une donnée à caractère personnel, et son usage dans un travail académique suppose une base légale, une information des personnes et une durée de conservation définie, comme le rappelle la section consacrée à ce sujet au chapitre~\ref{chap:tests-securite}. Construire un corpus de test à partir de candidatures authentiques aurait demandé des démarches que le calendrier du projet ne permettait pas, et aurait introduit dans le dépôt des données qu'il aurait fallu ensuite protéger, anonymiser puis supprimer.
+
+La troisième tient à la qualité d'extraction. Les CV réels circulent dans des formats hétérogènes, parfois exportés depuis un traitement de texte, parfois scannés, souvent mis en page sur plusieurs colonnes ou dans des tableaux. L'extraction de texte y échoue partiellement : ordre de lecture inversé, colonnes fusionnées, caractères manquants, sections illisibles. Un échec de ce type se répercute sur les trois composantes du score. En travaillant sur des documents dont le contenu textuel est maîtrisé, l'évaluation mesure le rapprochement lui-même et non la qualité variable d'une chaîne d'extraction, dont le comportement est vérifié séparément par les tests de \texttt{parsing}.
+
+La quatrième raison est l'absence de vérité de terrain exploitable. Même avec des CV réels, il aurait fallu disposer, pour chaque paire, d'un jugement fiable indiquant si le profil convient à l'offre. Ce jugement n'existe pas dans un dossier de candidature : une embauche dépend d'entretiens, de disponibilités et d'arbitrages qui ne figurent nulle part dans le document. Il aurait donc fallu faire annoter des milliers de paires par des recruteurs, ce qui dépassait largement le périmètre du stage. Le générateur, lui, connaît par construction la raison pour laquelle une paire est compatible ou non, ce qui fournit une étiquette cohérente avec le critère évalué.
+
+La cinquième est la reproductibilité. Le corpus est produit par un script du dépôt avec une graine fixée à 42 : n'importe quel lecteur peut le régénérer à l'identique, relancer le banc d'essai et retrouver les valeurs du Tableau~\ref{tab:chap4-resultats}. Un jeu de CV réels, même anonymisé, n'aurait pas pu être distribué avec le code.
+
+Le générateur a été écrit pour ne pas produire des documents trop faciles. Chaque CV est assemblé à partir du dictionnaire de compétences du projet, avec un domaine et un niveau d'expérience, puis dégradé volontairement : abréviations, fautes de frappe, technologies obsolètes, formulations en français ou en anglais. Des paires contradictoires sont également générées, où le vocabulaire se recoupe alors que le profil ne correspond pas, précisément pour empêcher qu'un simple recouvrement de mots suffise. La figure~\ref{fig:chap4-exemple-cv} montre l'un de ces documents.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.55\textwidth]{img/ai/example_cv.png}
+  \caption{Exemple de CV synthétique produit par le générateur du projet}
+  \label{fig:chap4-exemple-cv}
+\end{figure}
+
+Il faut néanmoins nommer ce que ce choix coûte, et le chapitre y revient dans sa section consacrée aux limites. Un document généré reste plus régulier qu'une candidature authentique : la longueur varie peu, la structure est constante, le vocabulaire provient d'un dictionnaire fini et aucune trajectoire atypique n'y figure. C'est d'ailleurs cette régularité qui explique la plage de scores étroite relevée plus loin, lorsque le même score est lu aux bornes du produit. Les résultats obtenus mesurent donc la capacité du moteur à distinguer des profils sur un matériau contrôlé ; ils ne préjugent pas de son comportement sur des CV réels, dont la validation reste la première étape à mener avant tout usage opérationnel.
+
+\subsection{Partitionnement et métriques}
+
 La séparation est stratifiée par étiquette et domaine, puis vérifiée par groupe de paire CV--offre normalisée : 8\,400 paires pour l'apprentissage, 1\,800 pour la validation et 1\,800 pour le test final. Les seuils de chaque méthode sont sélectionnés sur validation en maximisant le F1, puis les métriques sont calculées sur le test isolé. Cette précaution réduit la fuite de paires identiques, sans remplacer une validation externe réelle.
 
 Les métriques sont l'exactitude, la précision, le rappel, le F1, l'AUC-ROC, l'aire précision--rappel, le kappa de Cohen et la matrice de confusion, selon les définitions de scikit-learn \cite{scikit_metrics}. Le F1 équilibre précision et rappel :
