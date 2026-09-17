@@ -2,6 +2,10 @@
 \addcontentsline{toc}{chapter}{Liste des abréviations}
 \markboth{Liste des abréviations}{}
 
+% Les trois minipages de \sortitem occupent 1,00\columnwidth et sont placees
+% dans un itemize : la somme deborde de la valeur du retrait de liste. On reduit
+% localement la largeur de reference pour que chaque ligne tienne dans la marge.
+{\setlength{\columnwidth}{\dimexpr\columnwidth-40pt\relax}
 \begin{acronyms}
   \sortitem[API]{Interface de programmation applicative}
   \sortitem[ASGI]{Interface asynchrone entre un serveur Web et une application Python}
@@ -46,3 +50,4 @@
   \sortitem[XML]{Langage de balisage extensible}
   \sortitem[XSS]{Injection de script dans une page Web}
 \end{acronyms}
+}
