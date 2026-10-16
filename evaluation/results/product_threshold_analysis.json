@@ -1,0 +1,142 @@
+{
+  "source": "evaluation/results/evaluation_results.json",
+  "test_size": 1800,
+  "positives": 1264,
+  "negatives": 536,
+  "weights": {
+    "tfidf": 0.2,
+    "embedding": 0.4,
+    "skill": 0.4
+  },
+  "formula_check": {
+    "max_abs_gap_stored_vs_recomposed": 5e-05,
+    "consistent": true
+  },
+  "readings": {
+    "experimental_validation_threshold": {
+      "threshold": 0.2636,
+      "predicted_positive": 1251,
+      "accuracy": 0.9083,
+      "precision": 0.9392,
+      "recall": 0.9296,
+      "f1": 0.9344
+    },
+    "product_consider": {
+      "threshold": 0.55,
+      "predicted_positive": 23,
+      "accuracy": 0.3106,
+      "precision": 1.0,
+      "recall": 0.0182,
+      "f1": 0.0357
+    },
+    "product_hire": {
+      "threshold": 0.75,
+      "predicted_positive": 0,
+      "accuracy": 0.2978,
+      "precision": null,
+      "recall": 0.0,
+      "f1": 0.0
+    }
+  },
+  "interface_verdicts_on_test": {
+    "HIRE": 0,
+    "CONSIDER": 23,
+    "REJECT": 1777
+  },
+  "distribution": {
+    "hybrid": {
+      "label_0": {
+        "count": 536,
+        "min": 0.1224,
+        "p10": 0.1883,
+        "median": 0.2288,
+        "p90": 0.2717,
+        "max": 0.3467,
+        "share_zero": 0.0
+      },
+      "label_1": {
+        "count": 1264,
+        "min": 0.1782,
+        "p10": 0.2745,
+        "median": 0.376,
+        "p90": 0.4797,
+        "max": 0.6093,
+        "share_zero": 0.0
+      }
+    },
+    "components": {
+      "tfidf": {
+        "label_0": {
+          "min": 0.0,
+          "p10": 0.0066,
+          "median": 0.0162,
+          "p90": 0.0508,
+          "max": 0.1045,
+          "share_zero": 0.0093
+        },
+        "label_1": {
+          "min": 0.0026,
+          "p10": 0.0591,
+          "median": 0.1191,
+          "p90": 0.21,
+          "max": 0.4491,
+          "share_zero": 0.0
+        }
+      },
+      "embedding": {
+        "label_0": {
+          "min": 0.3025,
+          "p10": 0.4538,
+          "median": 0.5351,
+          "p90": 0.6182,
+          "max": 0.709,
+          "share_zero": 0.0
+        },
+        "label_1": {
+          "min": 0.3411,
+          "p10": 0.5335,
+          "median": 0.6178,
+          "p90": 0.7051,
+          "max": 0.8321,
+          "share_zero": 0.0
+        }
+      },
+      "skill": {
+        "label_0": {
+          "min": 0.0,
+          "p10": 0.0,
+          "median": 0.0,
+          "p90": 0.075,
+          "max": 0.2773,
+          "share_zero": 0.7239
+        },
+        "label_1": {
+          "min": 0.0,
+          "p10": 0.0691,
+          "median": 0.2614,
+          "p90": 0.4432,
+          "max": 0.6667,
+          "share_zero": 0.0332
+        }
+      }
+    }
+  },
+  "weighted_p90_of_positive_components": 0.5013,
+  "mcnemar_tfidf_vs_hybrid": {
+    "a_right_b_wrong": 108,
+    "a_wrong_b_right": 73,
+    "statistic": 6.3867,
+    "p_value": 0.01149759745821423
+  },
+  "bootstrap_f1_ci": {
+    "tfidf": [
+      0.940774748893093,
+      0.9586917968775124
+    ],
+    "hybrid": [
+      0.9239949897398436,
+      0.9444019757704575
+    ]
+  },
+  "note": "Descriptive re-reading of stored test scores; no weight or threshold is selected here."
+}

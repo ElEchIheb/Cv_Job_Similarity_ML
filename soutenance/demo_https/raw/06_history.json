@@ -1,0 +1,26 @@
+[
+ {
+  "t": 3.34,
+  "label": "loaded"
+ },
+ {
+  "t": 3.57,
+  "label": "shot:analysis_history"
+ },
+ {
+  "t": 8.19,
+  "label": "shot:analysis_history_filtered"
+ },
+ {
+  "t": 16.02,
+  "label": "shot:analysis_history_detail"
+ },
+ {
+  "t": 19.22,
+  "label": "nav"
+ },
+ {
+  "t": 22.89,
+  "label": "OK"
+ }
+]

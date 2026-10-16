@@ -1,0 +1,5 @@
+Rank,Candidate,Calibrated score,Raw score,Decision,Potential Fit threshold,Strong Fit threshold,Calibration,Matched Skills,Priority Gaps
+1,"Amira Khelifi",100.0,0.7787,HIRE,55,75,"synthetic-v1-2026-10-11-hybrid-documented","aws, docker, fastapi, kubernetes, machine learning",""
+2,"Mehdi Gharbi",82.4,0.4375,CONSIDER,55,75,"synthetic-v1-2026-10-11-hybrid-documented","docker, postgresql, python, tensorflow, communication","aws, fastapi, kubernetes"
+3,"Lina Mansour",77.6,0.3893,HIRE,55,75,"synthetic-v1-2026-10-11-hybrid-documented","docker, fastapi, postgresql, python, communication","aws, kubernetes, mlflow"
+4,"Karim Jaziri",28.6,0.1368,REJECT,55,75,"synthetic-v1-2026-10-11-hybrid-documented","communication","aws, docker, fastapi"

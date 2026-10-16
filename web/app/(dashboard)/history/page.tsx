@@ -50,7 +50,15 @@ export default function HistoryPage() {
     { key: "candidate_email", header: "Email", render: (m) => <span className="text-caption text-ink-muted">{m.candidate_email ?? "N/A"}</span> },
     { key: "job_title", header: "Job Offer", sortable: true, sortValue: (m) => m.job_title.toLowerCase(), render: (m) => m.job_title },
     { key: "job_code", header: "Code", render: (m) => <span className="font-mono text-caption text-ink-muted">{m.job_code ?? "N/A"}</span> },
-    { key: "final_score", header: "Compatibility", sortable: true, sortValue: (m) => m.final_score ?? -1, render: (m) => <ProgressMini value={m.final_score ?? 0} /> },
+    { key: "final_score", header: "Score (/100)", sortable: true,
+      // Legacy (pre-calibration) scores are not comparable: sort them last.
+      sortValue: (m) => (m.legacy_scale ? -1 : m.final_score ?? -1),
+      render: (m) => m.legacy_scale ? (
+        <span className="flex items-center gap-2" title="Scored before the score calibration (old raw scale). Kept as recorded; not comparable with calibrated scores.">
+          <span className="tnum text-caption text-ink-muted">{Math.round((m.final_score ?? 0) * 100)}</span>
+          <Badge status="neutral">Legacy scale</Badge>
+        </span>
+      ) : <ProgressMini value={m.final_score ?? 0} /> },
     { key: "decision", header: "Decision", align: "center", render: (m) => m.decision ? <Badge status={DECISION_STATUS[m.decision]}>{BAND_LABEL[m.decision]}</Badge> : <Badge status="neutral">N/A</Badge> },
     { key: "created_at", header: "Date", sortable: true, sortValue: (m) => m.created_at ?? "", render: (m) => <span className="text-caption text-ink-muted">{m.created_at ? new Date(m.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : "N/A"}</span> },
   ];
@@ -84,6 +92,15 @@ export default function HistoryPage() {
               </Select>
             </CardHeader>
             <CardBody>
+              {detail && (
+                <p className="mb-3 text-caption text-ink-secondary">
+                  {detail.legacy_scale
+                    ? "Legacy result: scored before the score calibration, on the old raw scale. Its score and decision are shown as recorded and are not comparable with calibrated results."
+                    : `Calibrated score (calibration ${detail.calibration_version}); method raw score ${detail.score_raw != null ? detail.score_raw.toFixed(3) : "n/a"}.`}
+                  {detail.potential_fit_threshold != null && detail.strong_fit_threshold != null &&
+                    ` Thresholds applied: Potential Fit ≥ ${detail.potential_fit_threshold}, Strong Fit ≥ ${detail.strong_fit_threshold}.`}
+                </p>
+              )}
               <p className="mb-3 text-caption text-ink-muted">Raw JSON explanation payload from the AI for the selected evaluation.</p>
               <pre className="max-h-[420px] overflow-auto rounded-lg bg-surface-raised/60 p-4 font-mono text-caption text-ink-secondary">
                 {detail ? JSON.stringify(detail.raw, null, 2) : "Loading…"}

@@ -158,8 +158,9 @@ def _render_score_bar(label: str, score: float, max_score: float = 100.0) -> io.
 
     names  = [c[0] for c in components]
     values = [min(float(c[1]), max_score) for c in components]
-    colors_list = ["#2563EB" if v >= 75 else ("#F59E0B" if v >= 55 else "#EF4444")
-                   for v in values]
+    # Component scores are raw similarities on different native scales: they
+    # are drawn in a neutral colour, never against the decision bands.
+    colors_list = ["#64748B"] * len(values)
 
     bars = ax.barh(names, values, color=colors_list, height=0.5,
                    edgecolor="white", linewidth=1)
@@ -168,7 +169,8 @@ def _render_score_bar(label: str, score: float, max_score: float = 100.0) -> io.
                 f"{val:.1f}", va="center", fontsize=8, color="#1E293B")
 
     ax.set_xlim(0, max_score)
-    ax.set_xlabel("Score (%)", fontsize=8, color="#64748B")
+    ax.set_xlabel("Raw component similarity (%), not comparable to the decision bands",
+                  fontsize=7, color="#64748B")
     ax.tick_params(labelsize=8, colors="#1E293B")
     ax.spines[["top", "right", "left"]].set_visible(False)
     ax.spines["bottom"].set_color("#E2E8F0")
@@ -709,40 +711,37 @@ class MatchReportPDF:
         verdict = explanation.get("verdict", "N/A")
         color   = explanation.get("color", "orange")
 
-        # Determine recommendation
+        # Determine recommendation — always the canonical DecisionEngine output.
         hiring_rec = explanation.get("hiring_recommendation", {})
+        cfg = explanation.get("decision_config") or {}
+        strong = float(cfg.get("strong_fit_threshold", 75.0))
+        potential = float(cfg.get("potential_fit_threshold", 55.0))
         if hiring_rec:
             decision      = hiring_rec.get("decision", "CONSIDER")
             justification = hiring_rec.get("justification", "")
             confidence    = hiring_rec.get("confidence", 0.0)
         else:
-            if pct >= 75:
-                decision = "HIRE"
-                justification = (
-                    f"The candidate scores {pct:.0f}% overall, demonstrating strong alignment "
-                    "with the job requirements in terms of technical skills and experience."
-                )
-                confidence = 0.85
-            elif pct >= 55:
-                decision = "CONSIDER"
-                justification = (
-                    f"The candidate scores {pct:.0f}%, showing partial fit. "
-                    "A technical interview is recommended to validate the identified gaps."
-                )
-                confidence = 0.65
-            else:
-                decision = "REJECT"
-                justification = (
-                    f"The candidate scores {pct:.0f}%, indicating insufficient match. "
-                    "Critical skill gaps exist that would require substantial training."
-                )
-                confidence = 0.75
+            from src.decisioning import DecisionConfig, DecisionEngine
+            dec = DecisionEngine(DecisionConfig.make(potential=potential, strong=strong)).evaluate(pct)
+            decision, justification, confidence = dec.decision, dec.reason, dec.confidence
+
+        scale = result.get("calibration_version") or "legacy (uncalibrated raw scale)"
+        raw = result.get("raw_score")
+        raw_txt = f"{float(raw):.3f}" if raw is not None else "n/a"
+        scale_note = (
+            f"Displayed score {pct:.0f}/100 on the calibrated scale (version: {scale}); "
+            f"method raw score: {raw_txt}. Bands applied: Potential Fit &ge; {potential:.0f}, "
+            f"Strong Fit &ge; {strong:.0f}. The calibration was fitted on synthetic data and is "
+            "not a validated hiring policy; the recruiter takes the final decision."
+        )
 
         # Badge + justification side by side
         badge    = _ScoreBadge(decision, width=4 * cm)
         just_para = Paragraph(
             f"<b>Recommendation:</b> {justification}<br/>"
-            f"<font color='#64748B'>Confidence: {confidence*100:.0f}%</font>",
+            f"<font color='#64748B'>Distance to nearest threshold: {confidence*100:.0f}/100 "
+            f"(not a probability).</font><br/>"
+            f"<font color='#64748B' size='7'>{scale_note}</font>",
             st["recommendation"],
         )
         dec_layout = Table(

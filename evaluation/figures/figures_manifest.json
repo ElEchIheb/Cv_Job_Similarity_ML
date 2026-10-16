@@ -1,0 +1,14 @@
+{
+  "calibration_version": "synthetic-v1-2026-10-11-hybrid-documented",
+  "source": [
+    "evaluation/results/calibration_report.json",
+    "evaluation/cache/components_test.csv"
+  ],
+  "n_test_pairs": 1800,
+  "figures": {
+    "cm": "verdict_confusion_matrix.png",
+    "dist": "verdict_distribution.png",
+    "roc": "raw_score_roc.png",
+    "box": "hybrid_raw_score_by_class.png"
+  }
+}

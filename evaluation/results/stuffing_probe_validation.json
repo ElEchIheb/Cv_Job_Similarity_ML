@@ -1,0 +1,55 @@
+{
+  "n_unrelated_pairs": 540,
+  "methods": {
+    "hybrid_documented": {
+      "weights": {
+        "tfidf": 0.2,
+        "embedding": 0.4,
+        "skill": 0.4
+      },
+      "promoted_before_stuffing": 0.137,
+      "consider_or_better_after": 1.0,
+      "hire_after": 0.9944
+    },
+    "fusion_learned": {
+      "weights": {
+        "tfidf": 0.75,
+        "embedding": 0.05,
+        "skill": 0.2
+      },
+      "promoted_before_stuffing": 0.0852,
+      "consider_or_better_after": 1.0,
+      "hire_after": 0.9963
+    },
+    "tfidf": {
+      "weights": {
+        "tfidf": 1.0,
+        "embedding": 0.0,
+        "skill": 0.0
+      },
+      "promoted_before_stuffing": 0.1833,
+      "consider_or_better_after": 1.0,
+      "hire_after": 0.9741
+    },
+    "embedding": {
+      "weights": {
+        "tfidf": 0.0,
+        "embedding": 1.0,
+        "skill": 0.0
+      },
+      "promoted_before_stuffing": 0.4037,
+      "consider_or_better_after": 0.5481,
+      "hire_after": 0.0574
+    },
+    "skill": {
+      "weights": {
+        "tfidf": 0.0,
+        "embedding": 0.0,
+        "skill": 1.0
+      },
+      "promoted_before_stuffing": 0.0907,
+      "consider_or_better_after": 1.0,
+      "hire_after": 1.0
+    }
+  }
+}

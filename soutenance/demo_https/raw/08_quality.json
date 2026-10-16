@@ -1,0 +1,26 @@
+[
+ {
+  "t": 4.61,
+  "label": "loaded"
+ },
+ {
+  "t": 4.82,
+  "label": "shot:quality"
+ },
+ {
+  "t": 12.85,
+  "label": "shot:quality_2"
+ },
+ {
+  "t": 20.85,
+  "label": "shot:quality_3"
+ },
+ {
+  "t": 23.3,
+  "label": "nav"
+ },
+ {
+  "t": 27.12,
+  "label": "OK"
+ }
+]

@@ -1,116 +1,80 @@
+%===== Page de garde (modèle officiel ISI Kef, version française) =====%
+% Reproduction du modèle Word fourni (page_garde.docx) : logos, filets et  %
+% tailles de police du modèle, police Times. Les informations proviennent  %
+% de global_config.tex (\@title, \@author, \@diplomaName, \@speciality,    %
+% encadrants).                                                             %
+%==========================================================================%
 
-%===== File containing the main cover of the document =====%
-%                                                          %
-% Copyright (C) ISI - All Rights Reserved                  %
-% Proprietary                                              %
-% Written by Med Hossam <med.hossam@gmail.com>, April 2016 %
-%                                                          %
-% @author: HEDHILI Med Houssemeddine                       %
-% @linkedin: http://tn.linkedin.com/in/medhossam           %
-%==========================================================%
+\thispagestyle{empty}%
+\newgeometry{bottom=18mm,left=20mm,top=15mm,right=20mm}
+{\fontfamily{ptm}\selectfont\setstretch{1}
 
-%== It's advised to not modify the content of this file ===%
-% To set your information, go to global_config.tex file    %
-%==========================================================%
+% ---- En-tête : logos et tutelles ----
+\noindent
+\begin{minipage}[c]{0.17\textwidth}
+  \includegraphics[width=2.4cm]{garde/logo_uj}
+\end{minipage}%
+\begin{minipage}[c]{0.58\textwidth}
+  \centering\fontsize{9}{11}\selectfont\bfseries
+  République Tunisienne\\
+  Ministère de l'Enseignement Supérieur et de la Recherche Scientifique\\
+  Université de Jendouba\\
+  Institut Supérieur d'Informatique du Kef
+\end{minipage}%
+\begin{minipage}[c]{0.25\textwidth}
+  \raggedleft\includegraphics[width=4.1cm]{garde/logo_isi}
+\end{minipage}
 
-\thispagestyle{cover}%
-\newgeometry{bottom=25mm,left=20mm,top=15mm,right=20mm}
-\hspace{-47pt}
-\begin{minipage}[l]{0.2\columnwidth}
-\vspace{6mm}
-\includegraphics[width=1.1\columnwidth]{Logo_ISI_Kef}\\
-\end{minipage}
-\hfill
-\begin{minipage}[l]{0.6\columnwidth}
-\centering
-\footnotesize
-\textbf{{République Tunisienne}}\\
-\vspace{1.5mm}
-\textbf{{Ministère de l'Enseignement Supérieur\\
-et de la Recherche Scientifique}}\\
-\vspace{1.5mm}
-\textbf{{Université de Jendouba}}\\
-\vspace{1.5mm}
-\textbf{{Institut Supérieur d'Informatique du Kef}}
-\end{minipage}
-\hfill
-\begin{minipage}[l]{0.02\columnwidth}
-\end{minipage}
-\hfill
-\begin{minipage}[l]{0.18\columnwidth}
-\vspace{6mm}
-\includegraphics[width=0.9\columnwidth]{Logo_UJ}\\
-\end{minipage}
-\vskip1.5cm
+\vspace{3mm}
+\noindent\includegraphics[width=\textwidth,height=1.3mm]{garde/filet_bleu}
 
+\vspace{16mm}
 \begin{center}
-{\LARGE{\textbf{\textsc{Rapport de Projet de Fin d'\'Etudes}}}}\\
-\vskip0.5cm
-\large
+  {\fontsize{25}{30}\selectfont Rapport de Projet de Fin d'Études}
 
-{\textbf{Présenté en vue de l'obtention du}}\\
-\vskip2mm
-{\textbf{\@diplomaName}}\\
-{\textbf{Spécialité : \@speciality}}\\
-{}
+  \vspace{10mm}
+  {\fontsize{11}{13}\selectfont\bfseries\itshape Présenté à}\\[2mm]
+  {\fontsize{12}{14}\selectfont\bfseries Institut Supérieur d'Informatique du Kef}
+
+  \vspace{8mm}
+  {\fontsize{11}{13}\selectfont\bfseries\itshape En vue de l'obtention du}\\[2mm]
+  {\fontsize{12}{14}\selectfont\bfseries Diplôme de \@diplomaName}
+
+  \vspace{8mm}
+  {\fontsize{11}{13}\selectfont\bfseries\itshape Option :}\\[2mm]
+  {\fontsize{12}{14}\selectfont\bfseries \@speciality}
+
+  \vspace{10mm}
+  {\fontsize{10}{12}\selectfont\bfseries\itshape Par}\\[2mm]
+  {\ifthenelse{\boolean{isBinomal}}
+    {\fontsize{18}{22}\selectfont\bfseries \@author\ et \@secondAuthor}
+    {\fontsize{18}{22}\selectfont\bfseries \@author}}
+
+  \vspace{3mm}
+  \includegraphics[width=0.48\textwidth,height=1.2mm]{garde/filet_noir}\\[4mm]
+  \begin{minipage}{0.86\textwidth}
+    \centering\fontsize{20}{24}\selectfont\bfseries \@title
+  \end{minipage}\\[4mm]
+  \includegraphics[width=0.48\textwidth,height=1.2mm]{garde/filet_noir}
+
+  \vspace{14mm}
+  {\fontsize{11}{13}\selectfont\bfseries Soutenue le : 17/10/2026}\\[2mm]
+  {\fontsize{11}{13}\selectfont\bfseries Devant le jury composé de :}
+
+  \vspace{6mm}
+  {\fontsize{12}{14}\selectfont\bfseries
+  \begin{tabular}{@{}l@{\hspace{2mm}}l@{}}
+    Président : & Dr. Emna Khanfir\\[2mm]
+    Rapporteur : & Dr. Ahmed Dridi\\[2mm]
+    Encadrant académique : & \@academicFramerName\\[2mm]
+    Encadrante professionnelle : & \@proFramerName
+  \end{tabular}}
+
+  \vfill
+  {\fontsize{11}{13}\selectfont\bfseries Année Universitaire : 2025-2026}
 \end{center}
-
-\begin{center}
-\textrm{Par}\\
-\vskip0.3cm
-{\ifthenelse{\boolean{isBinomal}}
-    {% IF TRUE
-        \begin{center}
-            \large\textbf{\@author}~~~~~ et ~~~~~
-            \large\textbf{\@secondAuthor}
-        \end{center}
-    }
-    {\Large\textbf{\@author}}% FALSE
 }
-\vskip6mm
 
-\definecolor{isiBlue}{RGB}{31, 78, 121}
-
-\begin{changemargin}{-9mm}{0cm}
-\begin{minipage}[l]{1.1\columnwidth}
-\begin{tcolorbox}[colframe=isiBlue,colback=white,boxrule=0pt,toprule=3pt,bottomrule=3pt,arc=0pt,top=0mm,right=0mm,left=0mm,bottom=0mm,boxsep=0.5mm]{
-    \begin{tcolorbox}[colframe=isiBlue,colback=white, boxrule=0pt,toprule=1pt,bottomrule=1pt,arc=0pt,enlarge bottom by=-0.9mm, auto outer arc]
-        \centering
-        {\huge\textbf{\@title}}
-    \end{tcolorbox}
-}
-\end{tcolorbox}
-\end{minipage}
-\end{changemargin}
-
-\end{center}
-\vskip5mm%
-
-\begin{center}
-\large
-\begin{tabular}{r@{\hspace{12mm}}l}
-Encadrante professionnelle : & \textbf{\@proFramerName}\\[2mm]
-Encadrant académique : & \textbf{\@academicFramerName}
-\end{tabular}
-\end{center}
-\vskip4mm
-
-\begin{center}
-\large
-Réalisé au sein de \@companyName\\
-\vskip0.15cm
-{\color{isiBlue}{\fboxrule=1.5pt\fbox{\includegraphics[width=0.12\columnwidth]{Logo_CyberCloud}}}}\par
-\end{center}
-
-\vskip2mm
-\begin{center}
-\begin{minipage}{0.84\textwidth}
-\normalsize
-Soutenu le : \dotfill\\[1mm]
-devant le jury composé de :\\[-1mm]
-Président : \dotfill\\[-1mm]
-Rapporteur : \dotfill
-\end{minipage}
-\end{center}
-
-\afterpage{\blankpage}
+% The blank verso only matters for the printed copy (colour cover followed by
+% the black-and-white cover); see \printversiontrue in main.tex.
+\ifprintversion\afterpage{\blankpage}\fi

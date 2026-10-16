@@ -1,0 +1,131 @@
+{
+  "n_per_probe": 200,
+  "weights": {
+    "tfidf": 0.2,
+    "embedding": 0.4,
+    "skill": 0.4
+  },
+  "calibration_version": "synthetic-v1-2026-10-11-hybrid-documented",
+  "probes": {
+    "P1_verbatim_list_in_skills_section": {
+      "n": 200,
+      "evidence_cap_rate": 1.0,
+      "before": {
+        "REJECT": 0,
+        "CONSIDER": 0,
+        "HIRE": 200
+      },
+      "after": {
+        "REJECT": 133,
+        "CONSIDER": 67,
+        "HIRE": 0
+      }
+    },
+    "P2_reordered_list_in_skills_section": {
+      "n": 200,
+      "evidence_cap_rate": 1.0,
+      "before": {
+        "REJECT": 0,
+        "CONSIDER": 0,
+        "HIRE": 200
+      },
+      "after": {
+        "REJECT": 0,
+        "CONSIDER": 200,
+        "HIRE": 0
+      }
+    },
+    "P3_skills_in_experience_sentence": {
+      "n": 200,
+      "evidence_cap_rate": 0.0,
+      "before": {
+        "REJECT": 0,
+        "CONSIDER": 0,
+        "HIRE": 200
+      },
+      "after": {
+        "REJECT": 0,
+        "CONSIDER": 0,
+        "HIRE": 200
+      }
+    },
+    "P4_whole_offer_pasted": {
+      "n": 200,
+      "evidence_cap_rate": 1.0,
+      "before": {
+        "REJECT": 0,
+        "CONSIDER": 0,
+        "HIRE": 200
+      },
+      "after": {
+        "REJECT": 174,
+        "CONSIDER": 26,
+        "HIRE": 0
+      }
+    },
+    "P5_negated_mention": {
+      "n": 200,
+      "evidence_cap_rate": 0.0,
+      "before": {
+        "REJECT": 0,
+        "CONSIDER": 0,
+        "HIRE": 200
+      },
+      "after": {
+        "REJECT": 175,
+        "CONSIDER": 24,
+        "HIRE": 1
+      }
+    },
+    "P6_partial_profile": {
+      "n": 200,
+      "evidence_cap_rate": 0.0,
+      "before": {
+        "REJECT": 15,
+        "CONSIDER": 129,
+        "HIRE": 56
+      },
+      "after": {
+        "REJECT": 15,
+        "CONSIDER": 129,
+        "HIRE": 56
+      }
+    },
+    "P7_long_cv": {
+      "n": 200,
+      "evidence_cap_rate": 0.0,
+      "before": {
+        "REJECT": 0,
+        "CONSIDER": 16,
+        "HIRE": 184
+      },
+      "after": {
+        "REJECT": 0,
+        "CONSIDER": 16,
+        "HIRE": 184
+      }
+    }
+  },
+  "unrelated_reference": {
+    "REJECT": 174,
+    "CONSIDER": 25,
+    "HIRE": 1
+  },
+  "strong_reference": {
+    "before": {
+      "REJECT": 1,
+      "CONSIDER": 33,
+      "HIRE": 166
+    },
+    "after": {
+      "REJECT": 1,
+      "CONSIDER": 33,
+      "HIRE": 166
+    }
+  },
+  "genuine_validation": {
+    "n": 1800,
+    "evidence_cap_rate": 0.0,
+    "verdicts_changed": 0
+  }
+}

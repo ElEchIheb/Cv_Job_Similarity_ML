@@ -1,0 +1,6063 @@
+{
+  "calibration_version": "synthetic-v1-2026-10-11-hybrid-documented",
+  "paired_bootstrap_macro_f1_differences": {
+    "fusion_learned_minus_hybrid_documented": {
+      "mean": 0.0398,
+      "ci95": [
+        0.0218,
+        0.0576
+      ],
+      "share_le_0": 0.0
+    },
+    "fusion_learned_minus_tfidf": {
+      "mean": 0.034,
+      "ci95": [
+        0.0171,
+        0.0506
+      ],
+      "share_le_0": 0.0
+    },
+    "hybrid_documented_minus_tfidf": {
+      "mean": -0.0058,
+      "ci95": [
+        -0.0284,
+        0.0159
+      ],
+      "share_le_0": 0.684
+    }
+  },
+  "calibration_sha256_16": "3fce37d019788a33",
+  "note": "Frozen parameters; complementary read of the isolated test split, nothing fitted.",
+  "rows": {
+    "BEFORE_product_documented_hybrid_raw_x100": {
+      "weights": {
+        "tfidf": 0.2,
+        "embedding": 0.4,
+        "skill": 0.4
+      },
+      "three_class": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            536,
+            0,
+            0
+          ],
+          [
+            545,
+            0,
+            0
+          ],
+          [
+            696,
+            23,
+            0
+          ]
+        ],
+        "labels": [
+          "REJECT",
+          "CONSIDER",
+          "HIRE"
+        ],
+        "macro_f1": 0.1545,
+        "per_class": {
+          "REJECT": {
+            "precision": 0.3016,
+            "recall": 1.0,
+            "f1": 0.4635,
+            "support": 536
+          },
+          "CONSIDER": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 545
+          },
+          "HIRE": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 719
+          }
+        },
+        "quadratic_kappa": 0.0122,
+        "verdict_counts": {
+          "REJECT": 1777,
+          "CONSIDER": 23,
+          "HIRE": 0
+        }
+      },
+      "binary_consider_or_better": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            536,
+            0
+          ],
+          [
+            1241,
+            23
+          ]
+        ],
+        "accuracy": 0.3106,
+        "precision": 1.0,
+        "recall": 0.0182,
+        "f1": 0.0357,
+        "predicted_positive": 23
+      },
+      "binary_hire_vs_strong": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            1081,
+            0
+          ],
+          [
+            719,
+            0
+          ]
+        ],
+        "accuracy": 0.6006,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive": 0
+      },
+      "ranking": {
+        "roc_auc": 0.9644,
+        "pr_auc": 0.986
+      },
+      "bootstrap": {
+        "macro_f1_95ci": [
+          0.1463,
+          0.1629
+        ],
+        "binary_f1_95ci": [
+          0.0218,
+          0.0507
+        ]
+      },
+      "subgroups": {
+        "language": {
+          "cross_lingual": {
+            "n": 120,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 35,
+              "HIRE": 52
+            },
+            "accuracy": 0.275,
+            "macro_f1": 0.1438,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 120,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "fr": {
+            "n": 1680,
+            "class_counts": {
+              "REJECT": 503,
+              "CONSIDER": 510,
+              "HIRE": 667
+            },
+            "accuracy": 0.2994,
+            "macro_f1": 0.1552,
+            "binary_f1": 0.0383,
+            "verdict_counts": {
+              "REJECT": 1657,
+              "CONSIDER": 23,
+              "HIRE": 0
+            }
+          }
+        },
+        "difficulty": {
+          "easy": {
+            "n": 613,
+            "class_counts": {
+              "REJECT": 0,
+              "CONSIDER": 0,
+              "HIRE": 613
+            },
+            "accuracy": 0.0,
+            "macro_f1": 0.0,
+            "binary_f1": 0.0571,
+            "verdict_counts": {
+              "REJECT": 595,
+              "CONSIDER": 18,
+              "HIRE": 0
+            }
+          },
+          "hard": {
+            "n": 723,
+            "class_counts": {
+              "REJECT": 72,
+              "CONSIDER": 545,
+              "HIRE": 106
+            },
+            "accuracy": 0.0996,
+            "macro_f1": 0.0608,
+            "binary_f1": 0.0152,
+            "verdict_counts": {
+              "REJECT": 718,
+              "CONSIDER": 5,
+              "HIRE": 0
+            }
+          },
+          "medium": {
+            "n": 464,
+            "class_counts": {
+              "REJECT": 464,
+              "CONSIDER": 0,
+              "HIRE": 0
+            },
+            "accuracy": 1.0,
+            "macro_f1": 0.3333,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 464,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          }
+        },
+        "domain": {
+          "AI / NLP / LLM Engineering": {
+            "n": 65,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 6,
+              "HIRE": 25
+            },
+            "accuracy": 0.5231,
+            "macro_f1": 0.2361,
+            "binary_f1": 0.1765,
+            "verdict_counts": {
+              "REJECT": 62,
+              "CONSIDER": 3,
+              "HIRE": 0
+            }
+          },
+          "BI / Analytics / Visualization": {
+            "n": 106,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 38,
+              "HIRE": 45
+            },
+            "accuracy": 0.217,
+            "macro_f1": 0.1189,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 106,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Backend Development": {
+            "n": 152,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 57,
+              "HIRE": 72
+            },
+            "accuracy": 0.1513,
+            "macro_f1": 0.0876,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 152,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Blockchain / Web3": {
+            "n": 42,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 0,
+              "HIRE": 8
+            },
+            "accuracy": 0.8095,
+            "macro_f1": 0.3022,
+            "binary_f1": 0.2222,
+            "verdict_counts": {
+              "REJECT": 41,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          },
+          "Cybersecurity / AppSec": {
+            "n": 133,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 48,
+              "HIRE": 56
+            },
+            "accuracy": 0.218,
+            "macro_f1": 0.1216,
+            "binary_f1": 0.0561,
+            "verdict_counts": {
+              "REJECT": 130,
+              "CONSIDER": 3,
+              "HIRE": 0
+            }
+          },
+          "Data Engineering / Analytics Engineering": {
+            "n": 99,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 34,
+              "HIRE": 36
+            },
+            "accuracy": 0.2929,
+            "macro_f1": 0.1547,
+            "binary_f1": 0.0822,
+            "verdict_counts": {
+              "REJECT": 96,
+              "CONSIDER": 3,
+              "HIRE": 0
+            }
+          },
+          "Data Science / ML Engineering": {
+            "n": 96,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 33,
+              "HIRE": 34
+            },
+            "accuracy": 0.3021,
+            "macro_f1": 0.1572,
+            "binary_f1": 0.058,
+            "verdict_counts": {
+              "REJECT": 94,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "DevOps / Cloud Engineering": {
+            "n": 138,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 65,
+              "HIRE": 52
+            },
+            "accuracy": 0.1522,
+            "macro_f1": 0.0881,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 138,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "ERP / CRM / Enterprise Apps": {
+            "n": 63,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 8,
+              "HIRE": 22
+            },
+            "accuracy": 0.5238,
+            "macro_f1": 0.234,
+            "binary_f1": 0.125,
+            "verdict_counts": {
+              "REJECT": 61,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "Embedded / IoT / Robotics": {
+            "n": 56,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 11,
+              "HIRE": 16
+            },
+            "accuracy": 0.5179,
+            "macro_f1": 0.2302,
+            "binary_f1": 0.0714,
+            "verdict_counts": {
+              "REJECT": 55,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          },
+          "Frontend Development": {
+            "n": 130,
+            "class_counts": {
+              "REJECT": 24,
+              "CONSIDER": 49,
+              "HIRE": 57
+            },
+            "accuracy": 0.1846,
+            "macro_f1": 0.1046,
+            "binary_f1": 0.0187,
+            "verdict_counts": {
+              "REJECT": 129,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          },
+          "Full Stack Web Development": {
+            "n": 107,
+            "class_counts": {
+              "REJECT": 27,
+              "CONSIDER": 37,
+              "HIRE": 43
+            },
+            "accuracy": 0.2523,
+            "macro_f1": 0.1343,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 107,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Game Development / AR / VR": {
+            "n": 92,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 25,
+              "HIRE": 38
+            },
+            "accuracy": 0.3152,
+            "macro_f1": 0.1625,
+            "binary_f1": 0.0615,
+            "verdict_counts": {
+              "REJECT": 90,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "Mobile Development": {
+            "n": 78,
+            "class_counts": {
+              "REJECT": 30,
+              "CONSIDER": 21,
+              "HIRE": 27
+            },
+            "accuracy": 0.3846,
+            "macro_f1": 0.1869,
+            "binary_f1": 0.0408,
+            "verdict_counts": {
+              "REJECT": 77,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          },
+          "Networking / Systems Administration": {
+            "n": 77,
+            "class_counts": {
+              "REJECT": 28,
+              "CONSIDER": 14,
+              "HIRE": 35
+            },
+            "accuracy": 0.3636,
+            "macro_f1": 0.1795,
+            "binary_f1": 0.04,
+            "verdict_counts": {
+              "REJECT": 76,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          },
+          "Platform / SRE / Observability": {
+            "n": 127,
+            "class_counts": {
+              "REJECT": 25,
+              "CONSIDER": 51,
+              "HIRE": 51
+            },
+            "accuracy": 0.1969,
+            "macro_f1": 0.1096,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 127,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Product / UX Engineering": {
+            "n": 61,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 9,
+              "HIRE": 19
+            },
+            "accuracy": 0.541,
+            "macro_f1": 0.234,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 61,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "QA / Test Automation": {
+            "n": 46,
+            "class_counts": {
+              "REJECT": 35,
+              "CONSIDER": 0,
+              "HIRE": 11
+            },
+            "accuracy": 0.7609,
+            "macro_f1": 0.2954,
+            "binary_f1": 0.3077,
+            "verdict_counts": {
+              "REJECT": 44,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "Software Architecture / Technical Leadership": {
+            "n": 132,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 39,
+              "HIRE": 72
+            },
+            "accuracy": 0.1591,
+            "macro_f1": 0.0921,
+            "binary_f1": 0.0179,
+            "verdict_counts": {
+              "REJECT": 131,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          }
+        }
+      }
+    },
+    "AFTER_product_shipped_calibrated": {
+      "weights": {
+        "tfidf": 0.2,
+        "embedding": 0.4,
+        "skill": 0.4
+      },
+      "cuts": [
+        0.263299,
+        0.363754
+      ],
+      "three_class": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            459,
+            77,
+            0
+          ],
+          [
+            78,
+            325,
+            142
+          ],
+          [
+            11,
+            155,
+            553
+          ]
+        ],
+        "labels": [
+          "REJECT",
+          "CONSIDER",
+          "HIRE"
+        ],
+        "macro_f1": 0.7396,
+        "per_class": {
+          "REJECT": {
+            "precision": 0.8376,
+            "recall": 0.8563,
+            "f1": 0.8469,
+            "support": 536
+          },
+          "CONSIDER": {
+            "precision": 0.5835,
+            "recall": 0.5963,
+            "f1": 0.5898,
+            "support": 545
+          },
+          "HIRE": {
+            "precision": 0.7957,
+            "recall": 0.7691,
+            "f1": 0.7822,
+            "support": 719
+          }
+        },
+        "quadratic_kappa": 0.799,
+        "verdict_counts": {
+          "REJECT": 548,
+          "CONSIDER": 557,
+          "HIRE": 695
+        }
+      },
+      "binary_consider_or_better": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            459,
+            77
+          ],
+          [
+            89,
+            1175
+          ]
+        ],
+        "accuracy": 0.9078,
+        "precision": 0.9385,
+        "recall": 0.9296,
+        "f1": 0.934,
+        "predicted_positive": 1252
+      },
+      "binary_hire_vs_strong": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            939,
+            142
+          ],
+          [
+            166,
+            553
+          ]
+        ],
+        "accuracy": 0.8289,
+        "precision": 0.7957,
+        "recall": 0.7691,
+        "f1": 0.7822,
+        "predicted_positive": 695
+      },
+      "ranking": {
+        "roc_auc": 0.9644,
+        "pr_auc": 0.986
+      },
+      "bootstrap": {
+        "macro_f1_95ci": [
+          0.7201,
+          0.7603
+        ],
+        "binary_f1_95ci": [
+          0.9235,
+          0.9441
+        ]
+      },
+      "subgroups": {
+        "language": {
+          "cross_lingual": {
+            "n": 120,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 35,
+              "HIRE": 52
+            },
+            "accuracy": 0.65,
+            "macro_f1": 0.6432,
+            "binary_f1": 0.8987,
+            "verdict_counts": {
+              "REJECT": 49,
+              "CONSIDER": 38,
+              "HIRE": 33
+            }
+          },
+          "fr": {
+            "n": 1680,
+            "class_counts": {
+              "REJECT": 503,
+              "CONSIDER": 510,
+              "HIRE": 667
+            },
+            "accuracy": 0.7494,
+            "macro_f1": 0.7463,
+            "binary_f1": 0.9364,
+            "verdict_counts": {
+              "REJECT": 499,
+              "CONSIDER": 519,
+              "HIRE": 662
+            }
+          }
+        },
+        "difficulty": {
+          "easy": {
+            "n": 613,
+            "class_counts": {
+              "REJECT": 0,
+              "CONSIDER": 0,
+              "HIRE": 613
+            },
+            "accuracy": 0.7716,
+            "macro_f1": 0.2904,
+            "binary_f1": 0.9926,
+            "verdict_counts": {
+              "REJECT": 9,
+              "CONSIDER": 131,
+              "HIRE": 473
+            }
+          },
+          "hard": {
+            "n": 723,
+            "class_counts": {
+              "REJECT": 72,
+              "CONSIDER": 545,
+              "HIRE": 106
+            },
+            "accuracy": 0.6473,
+            "macro_f1": 0.5979,
+            "binary_f1": 0.9277,
+            "verdict_counts": {
+              "REJECT": 143,
+              "CONSIDER": 358,
+              "HIRE": 222
+            }
+          },
+          "medium": {
+            "n": 464,
+            "class_counts": {
+              "REJECT": 464,
+              "CONSIDER": 0,
+              "HIRE": 0
+            },
+            "accuracy": 0.8534,
+            "macro_f1": 0.307,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 396,
+              "CONSIDER": 68,
+              "HIRE": 0
+            }
+          }
+        },
+        "domain": {
+          "AI / NLP / LLM Engineering": {
+            "n": 65,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 6,
+              "HIRE": 25
+            },
+            "accuracy": 0.9077,
+            "macro_f1": 0.8218,
+            "binary_f1": 0.9524,
+            "verdict_counts": {
+              "REJECT": 33,
+              "CONSIDER": 8,
+              "HIRE": 24
+            }
+          },
+          "BI / Analytics / Visualization": {
+            "n": 106,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 38,
+              "HIRE": 45
+            },
+            "accuracy": 0.6981,
+            "macro_f1": 0.6988,
+            "binary_f1": 0.9182,
+            "verdict_counts": {
+              "REJECT": 30,
+              "CONSIDER": 33,
+              "HIRE": 43
+            }
+          },
+          "Backend Development": {
+            "n": 152,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 57,
+              "HIRE": 72
+            },
+            "accuracy": 0.6908,
+            "macro_f1": 0.6897,
+            "binary_f1": 0.9365,
+            "verdict_counts": {
+              "REJECT": 29,
+              "CONSIDER": 65,
+              "HIRE": 58
+            }
+          },
+          "Blockchain / Web3": {
+            "n": 42,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 0,
+              "HIRE": 8
+            },
+            "accuracy": 0.8333,
+            "macro_f1": 0.6284,
+            "binary_f1": 0.6957,
+            "verdict_counts": {
+              "REJECT": 27,
+              "CONSIDER": 7,
+              "HIRE": 8
+            }
+          },
+          "Cybersecurity / AppSec": {
+            "n": 133,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 48,
+              "HIRE": 56
+            },
+            "accuracy": 0.7143,
+            "macro_f1": 0.7217,
+            "binary_f1": 0.9423,
+            "verdict_counts": {
+              "REJECT": 29,
+              "CONSIDER": 48,
+              "HIRE": 56
+            }
+          },
+          "Data Engineering / Analytics Engineering": {
+            "n": 99,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 34,
+              "HIRE": 36
+            },
+            "accuracy": 0.7071,
+            "macro_f1": 0.712,
+            "binary_f1": 0.9143,
+            "verdict_counts": {
+              "REJECT": 29,
+              "CONSIDER": 36,
+              "HIRE": 34
+            }
+          },
+          "Data Science / ML Engineering": {
+            "n": 96,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 33,
+              "HIRE": 34
+            },
+            "accuracy": 0.8021,
+            "macro_f1": 0.8,
+            "binary_f1": 0.9403,
+            "verdict_counts": {
+              "REJECT": 29,
+              "CONSIDER": 28,
+              "HIRE": 39
+            }
+          },
+          "DevOps / Cloud Engineering": {
+            "n": 138,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 65,
+              "HIRE": 52
+            },
+            "accuracy": 0.6884,
+            "macro_f1": 0.7077,
+            "binary_f1": 0.9565,
+            "verdict_counts": {
+              "REJECT": 25,
+              "CONSIDER": 52,
+              "HIRE": 61
+            }
+          },
+          "ERP / CRM / Enterprise Apps": {
+            "n": 63,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 8,
+              "HIRE": 22
+            },
+            "accuracy": 0.873,
+            "macro_f1": 0.8138,
+            "binary_f1": 0.9836,
+            "verdict_counts": {
+              "REJECT": 32,
+              "CONSIDER": 14,
+              "HIRE": 17
+            }
+          },
+          "Embedded / IoT / Robotics": {
+            "n": 56,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 11,
+              "HIRE": 16
+            },
+            "accuracy": 0.875,
+            "macro_f1": 0.8552,
+            "binary_f1": 0.9091,
+            "verdict_counts": {
+              "REJECT": 28,
+              "CONSIDER": 14,
+              "HIRE": 14
+            }
+          },
+          "Frontend Development": {
+            "n": 130,
+            "class_counts": {
+              "REJECT": 24,
+              "CONSIDER": 49,
+              "HIRE": 57
+            },
+            "accuracy": 0.6846,
+            "macro_f1": 0.6963,
+            "binary_f1": 0.9524,
+            "verdict_counts": {
+              "REJECT": 26,
+              "CONSIDER": 41,
+              "HIRE": 63
+            }
+          },
+          "Full Stack Web Development": {
+            "n": 107,
+            "class_counts": {
+              "REJECT": 27,
+              "CONSIDER": 37,
+              "HIRE": 43
+            },
+            "accuracy": 0.6542,
+            "macro_f1": 0.6659,
+            "binary_f1": 0.9518,
+            "verdict_counts": {
+              "REJECT": 21,
+              "CONSIDER": 31,
+              "HIRE": 55
+            }
+          },
+          "Game Development / AR / VR": {
+            "n": 92,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 25,
+              "HIRE": 38
+            },
+            "accuracy": 0.6522,
+            "macro_f1": 0.6356,
+            "binary_f1": 0.8522,
+            "verdict_counts": {
+              "REJECT": 40,
+              "CONSIDER": 27,
+              "HIRE": 25
+            }
+          },
+          "Mobile Development": {
+            "n": 78,
+            "class_counts": {
+              "REJECT": 30,
+              "CONSIDER": 21,
+              "HIRE": 27
+            },
+            "accuracy": 0.8718,
+            "macro_f1": 0.86,
+            "binary_f1": 0.9474,
+            "verdict_counts": {
+              "REJECT": 31,
+              "CONSIDER": 18,
+              "HIRE": 29
+            }
+          },
+          "Networking / Systems Administration": {
+            "n": 77,
+            "class_counts": {
+              "REJECT": 28,
+              "CONSIDER": 14,
+              "HIRE": 35
+            },
+            "accuracy": 0.8312,
+            "macro_f1": 0.8029,
+            "binary_f1": 0.9412,
+            "verdict_counts": {
+              "REJECT": 24,
+              "CONSIDER": 21,
+              "HIRE": 32
+            }
+          },
+          "Platform / SRE / Observability": {
+            "n": 127,
+            "class_counts": {
+              "REJECT": 25,
+              "CONSIDER": 51,
+              "HIRE": 51
+            },
+            "accuracy": 0.7402,
+            "macro_f1": 0.7446,
+            "binary_f1": 0.9394,
+            "verdict_counts": {
+              "REJECT": 31,
+              "CONSIDER": 43,
+              "HIRE": 53
+            }
+          },
+          "Product / UX Engineering": {
+            "n": 61,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 9,
+              "HIRE": 19
+            },
+            "accuracy": 0.8361,
+            "macro_f1": 0.7784,
+            "binary_f1": 0.918,
+            "verdict_counts": {
+              "REJECT": 28,
+              "CONSIDER": 13,
+              "HIRE": 20
+            }
+          },
+          "QA / Test Automation": {
+            "n": 46,
+            "class_counts": {
+              "REJECT": 35,
+              "CONSIDER": 0,
+              "HIRE": 11
+            },
+            "accuracy": 0.9348,
+            "macro_f1": 0.6517,
+            "binary_f1": 0.88,
+            "verdict_counts": {
+              "REJECT": 32,
+              "CONSIDER": 3,
+              "HIRE": 11
+            }
+          },
+          "Software Architecture / Technical Leadership": {
+            "n": 132,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 39,
+              "HIRE": 72
+            },
+            "accuracy": 0.6364,
+            "macro_f1": 0.6402,
+            "binary_f1": 0.9406,
+            "verdict_counts": {
+              "REJECT": 24,
+              "CONSIDER": 55,
+              "HIRE": 53
+            }
+          }
+        }
+      },
+      "alias_robustness_test": {
+        "n": 624,
+        "downgrade_rate": 0.008,
+        "upgrade_rate": 0.0016
+      }
+    },
+    "candidate_hybrid_documented_validation_cuts": {
+      "weights": {
+        "tfidf": 0.2,
+        "embedding": 0.4,
+        "skill": 0.4
+      },
+      "cuts": [
+        0.2633,
+        0.3638
+      ],
+      "three_class": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            459,
+            77,
+            0
+          ],
+          [
+            78,
+            326,
+            141
+          ],
+          [
+            11,
+            155,
+            553
+          ]
+        ],
+        "labels": [
+          "REJECT",
+          "CONSIDER",
+          "HIRE"
+        ],
+        "macro_f1": 0.7402,
+        "per_class": {
+          "REJECT": {
+            "precision": 0.8376,
+            "recall": 0.8563,
+            "f1": 0.8469,
+            "support": 536
+          },
+          "CONSIDER": {
+            "precision": 0.5842,
+            "recall": 0.5982,
+            "f1": 0.5911,
+            "support": 545
+          },
+          "HIRE": {
+            "precision": 0.7968,
+            "recall": 0.7691,
+            "f1": 0.7827,
+            "support": 719
+          }
+        },
+        "quadratic_kappa": 0.7994,
+        "verdict_counts": {
+          "REJECT": 548,
+          "CONSIDER": 558,
+          "HIRE": 694
+        }
+      },
+      "binary_consider_or_better": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            459,
+            77
+          ],
+          [
+            89,
+            1175
+          ]
+        ],
+        "accuracy": 0.9078,
+        "precision": 0.9385,
+        "recall": 0.9296,
+        "f1": 0.934,
+        "predicted_positive": 1252
+      },
+      "binary_hire_vs_strong": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            940,
+            141
+          ],
+          [
+            166,
+            553
+          ]
+        ],
+        "accuracy": 0.8294,
+        "precision": 0.7968,
+        "recall": 0.7691,
+        "f1": 0.7827,
+        "predicted_positive": 694
+      },
+      "ranking": {
+        "roc_auc": 0.9644,
+        "pr_auc": 0.986
+      },
+      "bootstrap": {
+        "macro_f1_95ci": [
+          0.7208,
+          0.7606
+        ],
+        "binary_f1_95ci": [
+          0.9235,
+          0.9441
+        ]
+      },
+      "subgroups": {
+        "language": {
+          "cross_lingual": {
+            "n": 120,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 35,
+              "HIRE": 52
+            },
+            "accuracy": 0.65,
+            "macro_f1": 0.6432,
+            "binary_f1": 0.8987,
+            "verdict_counts": {
+              "REJECT": 49,
+              "CONSIDER": 38,
+              "HIRE": 33
+            }
+          },
+          "fr": {
+            "n": 1680,
+            "class_counts": {
+              "REJECT": 503,
+              "CONSIDER": 510,
+              "HIRE": 667
+            },
+            "accuracy": 0.75,
+            "macro_f1": 0.747,
+            "binary_f1": 0.9364,
+            "verdict_counts": {
+              "REJECT": 499,
+              "CONSIDER": 520,
+              "HIRE": 661
+            }
+          }
+        },
+        "difficulty": {
+          "easy": {
+            "n": 613,
+            "class_counts": {
+              "REJECT": 0,
+              "CONSIDER": 0,
+              "HIRE": 613
+            },
+            "accuracy": 0.7716,
+            "macro_f1": 0.2904,
+            "binary_f1": 0.9926,
+            "verdict_counts": {
+              "REJECT": 9,
+              "CONSIDER": 131,
+              "HIRE": 473
+            }
+          },
+          "hard": {
+            "n": 723,
+            "class_counts": {
+              "REJECT": 72,
+              "CONSIDER": 545,
+              "HIRE": 106
+            },
+            "accuracy": 0.6487,
+            "macro_f1": 0.5989,
+            "binary_f1": 0.9277,
+            "verdict_counts": {
+              "REJECT": 143,
+              "CONSIDER": 359,
+              "HIRE": 221
+            }
+          },
+          "medium": {
+            "n": 464,
+            "class_counts": {
+              "REJECT": 464,
+              "CONSIDER": 0,
+              "HIRE": 0
+            },
+            "accuracy": 0.8534,
+            "macro_f1": 0.307,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 396,
+              "CONSIDER": 68,
+              "HIRE": 0
+            }
+          }
+        },
+        "domain": {
+          "AI / NLP / LLM Engineering": {
+            "n": 65,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 6,
+              "HIRE": 25
+            },
+            "accuracy": 0.9077,
+            "macro_f1": 0.8218,
+            "binary_f1": 0.9524,
+            "verdict_counts": {
+              "REJECT": 33,
+              "CONSIDER": 8,
+              "HIRE": 24
+            }
+          },
+          "BI / Analytics / Visualization": {
+            "n": 106,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 38,
+              "HIRE": 45
+            },
+            "accuracy": 0.6981,
+            "macro_f1": 0.6988,
+            "binary_f1": 0.9182,
+            "verdict_counts": {
+              "REJECT": 30,
+              "CONSIDER": 33,
+              "HIRE": 43
+            }
+          },
+          "Backend Development": {
+            "n": 152,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 57,
+              "HIRE": 72
+            },
+            "accuracy": 0.6908,
+            "macro_f1": 0.6897,
+            "binary_f1": 0.9365,
+            "verdict_counts": {
+              "REJECT": 29,
+              "CONSIDER": 65,
+              "HIRE": 58
+            }
+          },
+          "Blockchain / Web3": {
+            "n": 42,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 0,
+              "HIRE": 8
+            },
+            "accuracy": 0.8333,
+            "macro_f1": 0.6284,
+            "binary_f1": 0.6957,
+            "verdict_counts": {
+              "REJECT": 27,
+              "CONSIDER": 7,
+              "HIRE": 8
+            }
+          },
+          "Cybersecurity / AppSec": {
+            "n": 133,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 48,
+              "HIRE": 56
+            },
+            "accuracy": 0.7218,
+            "macro_f1": 0.7288,
+            "binary_f1": 0.9423,
+            "verdict_counts": {
+              "REJECT": 29,
+              "CONSIDER": 49,
+              "HIRE": 55
+            }
+          },
+          "Data Engineering / Analytics Engineering": {
+            "n": 99,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 34,
+              "HIRE": 36
+            },
+            "accuracy": 0.7071,
+            "macro_f1": 0.712,
+            "binary_f1": 0.9143,
+            "verdict_counts": {
+              "REJECT": 29,
+              "CONSIDER": 36,
+              "HIRE": 34
+            }
+          },
+          "Data Science / ML Engineering": {
+            "n": 96,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 33,
+              "HIRE": 34
+            },
+            "accuracy": 0.8021,
+            "macro_f1": 0.8,
+            "binary_f1": 0.9403,
+            "verdict_counts": {
+              "REJECT": 29,
+              "CONSIDER": 28,
+              "HIRE": 39
+            }
+          },
+          "DevOps / Cloud Engineering": {
+            "n": 138,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 65,
+              "HIRE": 52
+            },
+            "accuracy": 0.6884,
+            "macro_f1": 0.7077,
+            "binary_f1": 0.9565,
+            "verdict_counts": {
+              "REJECT": 25,
+              "CONSIDER": 52,
+              "HIRE": 61
+            }
+          },
+          "ERP / CRM / Enterprise Apps": {
+            "n": 63,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 8,
+              "HIRE": 22
+            },
+            "accuracy": 0.873,
+            "macro_f1": 0.8138,
+            "binary_f1": 0.9836,
+            "verdict_counts": {
+              "REJECT": 32,
+              "CONSIDER": 14,
+              "HIRE": 17
+            }
+          },
+          "Embedded / IoT / Robotics": {
+            "n": 56,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 11,
+              "HIRE": 16
+            },
+            "accuracy": 0.875,
+            "macro_f1": 0.8552,
+            "binary_f1": 0.9091,
+            "verdict_counts": {
+              "REJECT": 28,
+              "CONSIDER": 14,
+              "HIRE": 14
+            }
+          },
+          "Frontend Development": {
+            "n": 130,
+            "class_counts": {
+              "REJECT": 24,
+              "CONSIDER": 49,
+              "HIRE": 57
+            },
+            "accuracy": 0.6846,
+            "macro_f1": 0.6963,
+            "binary_f1": 0.9524,
+            "verdict_counts": {
+              "REJECT": 26,
+              "CONSIDER": 41,
+              "HIRE": 63
+            }
+          },
+          "Full Stack Web Development": {
+            "n": 107,
+            "class_counts": {
+              "REJECT": 27,
+              "CONSIDER": 37,
+              "HIRE": 43
+            },
+            "accuracy": 0.6542,
+            "macro_f1": 0.6659,
+            "binary_f1": 0.9518,
+            "verdict_counts": {
+              "REJECT": 21,
+              "CONSIDER": 31,
+              "HIRE": 55
+            }
+          },
+          "Game Development / AR / VR": {
+            "n": 92,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 25,
+              "HIRE": 38
+            },
+            "accuracy": 0.6522,
+            "macro_f1": 0.6356,
+            "binary_f1": 0.8522,
+            "verdict_counts": {
+              "REJECT": 40,
+              "CONSIDER": 27,
+              "HIRE": 25
+            }
+          },
+          "Mobile Development": {
+            "n": 78,
+            "class_counts": {
+              "REJECT": 30,
+              "CONSIDER": 21,
+              "HIRE": 27
+            },
+            "accuracy": 0.8718,
+            "macro_f1": 0.86,
+            "binary_f1": 0.9474,
+            "verdict_counts": {
+              "REJECT": 31,
+              "CONSIDER": 18,
+              "HIRE": 29
+            }
+          },
+          "Networking / Systems Administration": {
+            "n": 77,
+            "class_counts": {
+              "REJECT": 28,
+              "CONSIDER": 14,
+              "HIRE": 35
+            },
+            "accuracy": 0.8312,
+            "macro_f1": 0.8029,
+            "binary_f1": 0.9412,
+            "verdict_counts": {
+              "REJECT": 24,
+              "CONSIDER": 21,
+              "HIRE": 32
+            }
+          },
+          "Platform / SRE / Observability": {
+            "n": 127,
+            "class_counts": {
+              "REJECT": 25,
+              "CONSIDER": 51,
+              "HIRE": 51
+            },
+            "accuracy": 0.7402,
+            "macro_f1": 0.7446,
+            "binary_f1": 0.9394,
+            "verdict_counts": {
+              "REJECT": 31,
+              "CONSIDER": 43,
+              "HIRE": 53
+            }
+          },
+          "Product / UX Engineering": {
+            "n": 61,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 9,
+              "HIRE": 19
+            },
+            "accuracy": 0.8361,
+            "macro_f1": 0.7784,
+            "binary_f1": 0.918,
+            "verdict_counts": {
+              "REJECT": 28,
+              "CONSIDER": 13,
+              "HIRE": 20
+            }
+          },
+          "QA / Test Automation": {
+            "n": 46,
+            "class_counts": {
+              "REJECT": 35,
+              "CONSIDER": 0,
+              "HIRE": 11
+            },
+            "accuracy": 0.9348,
+            "macro_f1": 0.6517,
+            "binary_f1": 0.88,
+            "verdict_counts": {
+              "REJECT": 32,
+              "CONSIDER": 3,
+              "HIRE": 11
+            }
+          },
+          "Software Architecture / Technical Leadership": {
+            "n": 132,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 39,
+              "HIRE": 72
+            },
+            "accuracy": 0.6364,
+            "macro_f1": 0.6402,
+            "binary_f1": 0.9406,
+            "verdict_counts": {
+              "REJECT": 24,
+              "CONSIDER": 55,
+              "HIRE": 53
+            }
+          }
+        }
+      },
+      "alias_robustness_test": {
+        "n": 624,
+        "downgrade_rate": 0.008,
+        "upgrade_rate": 0.0016
+      }
+    },
+    "candidate_hybrid_documented_before_raw_x100": {
+      "weights": {
+        "tfidf": 0.2,
+        "embedding": 0.4,
+        "skill": 0.4
+      },
+      "three_class": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            536,
+            0,
+            0
+          ],
+          [
+            545,
+            0,
+            0
+          ],
+          [
+            696,
+            23,
+            0
+          ]
+        ],
+        "labels": [
+          "REJECT",
+          "CONSIDER",
+          "HIRE"
+        ],
+        "macro_f1": 0.1545,
+        "per_class": {
+          "REJECT": {
+            "precision": 0.3016,
+            "recall": 1.0,
+            "f1": 0.4635,
+            "support": 536
+          },
+          "CONSIDER": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 545
+          },
+          "HIRE": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 719
+          }
+        },
+        "quadratic_kappa": 0.0122,
+        "verdict_counts": {
+          "REJECT": 1777,
+          "CONSIDER": 23,
+          "HIRE": 0
+        }
+      },
+      "binary_consider_or_better": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            536,
+            0
+          ],
+          [
+            1241,
+            23
+          ]
+        ],
+        "accuracy": 0.3106,
+        "precision": 1.0,
+        "recall": 0.0182,
+        "f1": 0.0357,
+        "predicted_positive": 23
+      },
+      "binary_hire_vs_strong": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            1081,
+            0
+          ],
+          [
+            719,
+            0
+          ]
+        ],
+        "accuracy": 0.6006,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive": 0
+      },
+      "ranking": {
+        "roc_auc": 0.9644,
+        "pr_auc": 0.986
+      },
+      "bootstrap": {
+        "macro_f1_95ci": [
+          0.1463,
+          0.1629
+        ],
+        "binary_f1_95ci": [
+          0.0218,
+          0.0507
+        ]
+      },
+      "subgroups": {
+        "language": {
+          "cross_lingual": {
+            "n": 120,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 35,
+              "HIRE": 52
+            },
+            "accuracy": 0.275,
+            "macro_f1": 0.1438,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 120,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "fr": {
+            "n": 1680,
+            "class_counts": {
+              "REJECT": 503,
+              "CONSIDER": 510,
+              "HIRE": 667
+            },
+            "accuracy": 0.2994,
+            "macro_f1": 0.1552,
+            "binary_f1": 0.0383,
+            "verdict_counts": {
+              "REJECT": 1657,
+              "CONSIDER": 23,
+              "HIRE": 0
+            }
+          }
+        },
+        "difficulty": {
+          "easy": {
+            "n": 613,
+            "class_counts": {
+              "REJECT": 0,
+              "CONSIDER": 0,
+              "HIRE": 613
+            },
+            "accuracy": 0.0,
+            "macro_f1": 0.0,
+            "binary_f1": 0.0571,
+            "verdict_counts": {
+              "REJECT": 595,
+              "CONSIDER": 18,
+              "HIRE": 0
+            }
+          },
+          "hard": {
+            "n": 723,
+            "class_counts": {
+              "REJECT": 72,
+              "CONSIDER": 545,
+              "HIRE": 106
+            },
+            "accuracy": 0.0996,
+            "macro_f1": 0.0608,
+            "binary_f1": 0.0152,
+            "verdict_counts": {
+              "REJECT": 718,
+              "CONSIDER": 5,
+              "HIRE": 0
+            }
+          },
+          "medium": {
+            "n": 464,
+            "class_counts": {
+              "REJECT": 464,
+              "CONSIDER": 0,
+              "HIRE": 0
+            },
+            "accuracy": 1.0,
+            "macro_f1": 0.3333,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 464,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          }
+        },
+        "domain": {
+          "AI / NLP / LLM Engineering": {
+            "n": 65,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 6,
+              "HIRE": 25
+            },
+            "accuracy": 0.5231,
+            "macro_f1": 0.2361,
+            "binary_f1": 0.1765,
+            "verdict_counts": {
+              "REJECT": 62,
+              "CONSIDER": 3,
+              "HIRE": 0
+            }
+          },
+          "BI / Analytics / Visualization": {
+            "n": 106,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 38,
+              "HIRE": 45
+            },
+            "accuracy": 0.217,
+            "macro_f1": 0.1189,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 106,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Backend Development": {
+            "n": 152,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 57,
+              "HIRE": 72
+            },
+            "accuracy": 0.1513,
+            "macro_f1": 0.0876,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 152,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Blockchain / Web3": {
+            "n": 42,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 0,
+              "HIRE": 8
+            },
+            "accuracy": 0.8095,
+            "macro_f1": 0.3022,
+            "binary_f1": 0.2222,
+            "verdict_counts": {
+              "REJECT": 41,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          },
+          "Cybersecurity / AppSec": {
+            "n": 133,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 48,
+              "HIRE": 56
+            },
+            "accuracy": 0.218,
+            "macro_f1": 0.1216,
+            "binary_f1": 0.0561,
+            "verdict_counts": {
+              "REJECT": 130,
+              "CONSIDER": 3,
+              "HIRE": 0
+            }
+          },
+          "Data Engineering / Analytics Engineering": {
+            "n": 99,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 34,
+              "HIRE": 36
+            },
+            "accuracy": 0.2929,
+            "macro_f1": 0.1547,
+            "binary_f1": 0.0822,
+            "verdict_counts": {
+              "REJECT": 96,
+              "CONSIDER": 3,
+              "HIRE": 0
+            }
+          },
+          "Data Science / ML Engineering": {
+            "n": 96,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 33,
+              "HIRE": 34
+            },
+            "accuracy": 0.3021,
+            "macro_f1": 0.1572,
+            "binary_f1": 0.058,
+            "verdict_counts": {
+              "REJECT": 94,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "DevOps / Cloud Engineering": {
+            "n": 138,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 65,
+              "HIRE": 52
+            },
+            "accuracy": 0.1522,
+            "macro_f1": 0.0881,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 138,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "ERP / CRM / Enterprise Apps": {
+            "n": 63,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 8,
+              "HIRE": 22
+            },
+            "accuracy": 0.5238,
+            "macro_f1": 0.234,
+            "binary_f1": 0.125,
+            "verdict_counts": {
+              "REJECT": 61,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "Embedded / IoT / Robotics": {
+            "n": 56,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 11,
+              "HIRE": 16
+            },
+            "accuracy": 0.5179,
+            "macro_f1": 0.2302,
+            "binary_f1": 0.0714,
+            "verdict_counts": {
+              "REJECT": 55,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          },
+          "Frontend Development": {
+            "n": 130,
+            "class_counts": {
+              "REJECT": 24,
+              "CONSIDER": 49,
+              "HIRE": 57
+            },
+            "accuracy": 0.1846,
+            "macro_f1": 0.1046,
+            "binary_f1": 0.0187,
+            "verdict_counts": {
+              "REJECT": 129,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          },
+          "Full Stack Web Development": {
+            "n": 107,
+            "class_counts": {
+              "REJECT": 27,
+              "CONSIDER": 37,
+              "HIRE": 43
+            },
+            "accuracy": 0.2523,
+            "macro_f1": 0.1343,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 107,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Game Development / AR / VR": {
+            "n": 92,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 25,
+              "HIRE": 38
+            },
+            "accuracy": 0.3152,
+            "macro_f1": 0.1625,
+            "binary_f1": 0.0615,
+            "verdict_counts": {
+              "REJECT": 90,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "Mobile Development": {
+            "n": 78,
+            "class_counts": {
+              "REJECT": 30,
+              "CONSIDER": 21,
+              "HIRE": 27
+            },
+            "accuracy": 0.3846,
+            "macro_f1": 0.1869,
+            "binary_f1": 0.0408,
+            "verdict_counts": {
+              "REJECT": 77,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          },
+          "Networking / Systems Administration": {
+            "n": 77,
+            "class_counts": {
+              "REJECT": 28,
+              "CONSIDER": 14,
+              "HIRE": 35
+            },
+            "accuracy": 0.3636,
+            "macro_f1": 0.1795,
+            "binary_f1": 0.04,
+            "verdict_counts": {
+              "REJECT": 76,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          },
+          "Platform / SRE / Observability": {
+            "n": 127,
+            "class_counts": {
+              "REJECT": 25,
+              "CONSIDER": 51,
+              "HIRE": 51
+            },
+            "accuracy": 0.1969,
+            "macro_f1": 0.1096,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 127,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Product / UX Engineering": {
+            "n": 61,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 9,
+              "HIRE": 19
+            },
+            "accuracy": 0.541,
+            "macro_f1": 0.234,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 61,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "QA / Test Automation": {
+            "n": 46,
+            "class_counts": {
+              "REJECT": 35,
+              "CONSIDER": 0,
+              "HIRE": 11
+            },
+            "accuracy": 0.7609,
+            "macro_f1": 0.2954,
+            "binary_f1": 0.3077,
+            "verdict_counts": {
+              "REJECT": 44,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "Software Architecture / Technical Leadership": {
+            "n": 132,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 39,
+              "HIRE": 72
+            },
+            "accuracy": 0.1591,
+            "macro_f1": 0.0921,
+            "binary_f1": 0.0179,
+            "verdict_counts": {
+              "REJECT": 131,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          }
+        }
+      }
+    },
+    "candidate_fusion_learned_validation_cuts": {
+      "weights": {
+        "tfidf": 0.75,
+        "embedding": 0.05,
+        "skill": 0.2
+      },
+      "cuts": [
+        0.0787,
+        0.1655
+      ],
+      "three_class": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            490,
+            46,
+            0
+          ],
+          [
+            56,
+            358,
+            131
+          ],
+          [
+            6,
+            156,
+            557
+          ]
+        ],
+        "labels": [
+          "REJECT",
+          "CONSIDER",
+          "HIRE"
+        ],
+        "macro_f1": 0.7802,
+        "per_class": {
+          "REJECT": {
+            "precision": 0.8877,
+            "recall": 0.9142,
+            "f1": 0.9007,
+            "support": 536
+          },
+          "CONSIDER": {
+            "precision": 0.6393,
+            "recall": 0.6569,
+            "f1": 0.648,
+            "support": 545
+          },
+          "HIRE": {
+            "precision": 0.8096,
+            "recall": 0.7747,
+            "f1": 0.7918,
+            "support": 719
+          }
+        },
+        "quadratic_kappa": 0.8326,
+        "verdict_counts": {
+          "REJECT": 552,
+          "CONSIDER": 560,
+          "HIRE": 688
+        }
+      },
+      "binary_consider_or_better": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            490,
+            46
+          ],
+          [
+            62,
+            1202
+          ]
+        ],
+        "accuracy": 0.94,
+        "precision": 0.9631,
+        "recall": 0.9509,
+        "f1": 0.957,
+        "predicted_positive": 1248
+      },
+      "binary_hire_vs_strong": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            950,
+            131
+          ],
+          [
+            162,
+            557
+          ]
+        ],
+        "accuracy": 0.8372,
+        "precision": 0.8096,
+        "recall": 0.7747,
+        "f1": 0.7918,
+        "predicted_positive": 688
+      },
+      "ranking": {
+        "roc_auc": 0.9831,
+        "pr_auc": 0.9932
+      },
+      "bootstrap": {
+        "macro_f1_95ci": [
+          0.7615,
+          0.7991
+        ],
+        "binary_f1_95ci": [
+          0.9485,
+          0.9646
+        ]
+      },
+      "subgroups": {
+        "language": {
+          "cross_lingual": {
+            "n": 120,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 35,
+              "HIRE": 52
+            },
+            "accuracy": 0.8,
+            "macro_f1": 0.8018,
+            "binary_f1": 0.9704,
+            "verdict_counts": {
+              "REJECT": 38,
+              "CONSIDER": 39,
+              "HIRE": 43
+            }
+          },
+          "fr": {
+            "n": 1680,
+            "class_counts": {
+              "REJECT": 503,
+              "CONSIDER": 510,
+              "HIRE": 667
+            },
+            "accuracy": 0.7792,
+            "macro_f1": 0.7786,
+            "binary_f1": 0.956,
+            "verdict_counts": {
+              "REJECT": 514,
+              "CONSIDER": 521,
+              "HIRE": 645
+            }
+          }
+        },
+        "difficulty": {
+          "easy": {
+            "n": 613,
+            "class_counts": {
+              "REJECT": 0,
+              "CONSIDER": 0,
+              "HIRE": 613
+            },
+            "accuracy": 0.7749,
+            "macro_f1": 0.2911,
+            "binary_f1": 0.9959,
+            "verdict_counts": {
+              "REJECT": 5,
+              "CONSIDER": 133,
+              "HIRE": 475
+            }
+          },
+          "hard": {
+            "n": 723,
+            "class_counts": {
+              "REJECT": 72,
+              "CONSIDER": 545,
+              "HIRE": 106
+            },
+            "accuracy": 0.7012,
+            "macro_f1": 0.6556,
+            "binary_f1": 0.9504,
+            "verdict_counts": {
+              "REJECT": 124,
+              "CONSIDER": 386,
+              "HIRE": 213
+            }
+          },
+          "medium": {
+            "n": 464,
+            "class_counts": {
+              "REJECT": 464,
+              "CONSIDER": 0,
+              "HIRE": 0
+            },
+            "accuracy": 0.9116,
+            "macro_f1": 0.3179,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 423,
+              "CONSIDER": 41,
+              "HIRE": 0
+            }
+          }
+        },
+        "domain": {
+          "AI / NLP / LLM Engineering": {
+            "n": 65,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 6,
+              "HIRE": 25
+            },
+            "accuracy": 0.8462,
+            "macro_f1": 0.7677,
+            "binary_f1": 0.9375,
+            "verdict_counts": {
+              "REJECT": 32,
+              "CONSIDER": 14,
+              "HIRE": 19
+            }
+          },
+          "BI / Analytics / Visualization": {
+            "n": 106,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 38,
+              "HIRE": 45
+            },
+            "accuracy": 0.7642,
+            "macro_f1": 0.7823,
+            "binary_f1": 0.9697,
+            "verdict_counts": {
+              "REJECT": 24,
+              "CONSIDER": 43,
+              "HIRE": 39
+            }
+          },
+          "Backend Development": {
+            "n": 152,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 57,
+              "HIRE": 72
+            },
+            "accuracy": 0.7566,
+            "macro_f1": 0.7485,
+            "binary_f1": 0.944,
+            "verdict_counts": {
+              "REJECT": 31,
+              "CONSIDER": 55,
+              "HIRE": 66
+            }
+          },
+          "Blockchain / Web3": {
+            "n": 42,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 0,
+              "HIRE": 8
+            },
+            "accuracy": 0.881,
+            "macro_f1": 0.6402,
+            "binary_f1": 0.7619,
+            "verdict_counts": {
+              "REJECT": 29,
+              "CONSIDER": 5,
+              "HIRE": 8
+            }
+          },
+          "Cybersecurity / AppSec": {
+            "n": 133,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 48,
+              "HIRE": 56
+            },
+            "accuracy": 0.7143,
+            "macro_f1": 0.7285,
+            "binary_f1": 0.9608,
+            "verdict_counts": {
+              "REJECT": 33,
+              "CONSIDER": 42,
+              "HIRE": 58
+            }
+          },
+          "Data Engineering / Analytics Engineering": {
+            "n": 99,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 34,
+              "HIRE": 36
+            },
+            "accuracy": 0.7879,
+            "macro_f1": 0.7887,
+            "binary_f1": 0.9403,
+            "verdict_counts": {
+              "REJECT": 35,
+              "CONSIDER": 32,
+              "HIRE": 32
+            }
+          },
+          "Data Science / ML Engineering": {
+            "n": 96,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 33,
+              "HIRE": 34
+            },
+            "accuracy": 0.7917,
+            "macro_f1": 0.7939,
+            "binary_f1": 0.9618,
+            "verdict_counts": {
+              "REJECT": 32,
+              "CONSIDER": 31,
+              "HIRE": 33
+            }
+          },
+          "DevOps / Cloud Engineering": {
+            "n": 138,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 65,
+              "HIRE": 52
+            },
+            "accuracy": 0.7029,
+            "macro_f1": 0.7227,
+            "binary_f1": 0.9607,
+            "verdict_counts": {
+              "REJECT": 26,
+              "CONSIDER": 46,
+              "HIRE": 66
+            }
+          },
+          "ERP / CRM / Enterprise Apps": {
+            "n": 63,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 8,
+              "HIRE": 22
+            },
+            "accuracy": 0.8889,
+            "macro_f1": 0.8122,
+            "binary_f1": 0.9836,
+            "verdict_counts": {
+              "REJECT": 32,
+              "CONSIDER": 9,
+              "HIRE": 22
+            }
+          },
+          "Embedded / IoT / Robotics": {
+            "n": 56,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 11,
+              "HIRE": 16
+            },
+            "accuracy": 0.8036,
+            "macro_f1": 0.7791,
+            "binary_f1": 0.8966,
+            "verdict_counts": {
+              "REJECT": 25,
+              "CONSIDER": 18,
+              "HIRE": 13
+            }
+          },
+          "Frontend Development": {
+            "n": 130,
+            "class_counts": {
+              "REJECT": 24,
+              "CONSIDER": 49,
+              "HIRE": 57
+            },
+            "accuracy": 0.7308,
+            "macro_f1": 0.7563,
+            "binary_f1": 0.9717,
+            "verdict_counts": {
+              "REJECT": 24,
+              "CONSIDER": 53,
+              "HIRE": 53
+            }
+          },
+          "Full Stack Web Development": {
+            "n": 107,
+            "class_counts": {
+              "REJECT": 27,
+              "CONSIDER": 37,
+              "HIRE": 43
+            },
+            "accuracy": 0.7664,
+            "macro_f1": 0.7836,
+            "binary_f1": 0.9756,
+            "verdict_counts": {
+              "REJECT": 23,
+              "CONSIDER": 38,
+              "HIRE": 46
+            }
+          },
+          "Game Development / AR / VR": {
+            "n": 92,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 25,
+              "HIRE": 38
+            },
+            "accuracy": 0.7826,
+            "macro_f1": 0.7755,
+            "binary_f1": 0.9431,
+            "verdict_counts": {
+              "REJECT": 32,
+              "CONSIDER": 29,
+              "HIRE": 31
+            }
+          },
+          "Mobile Development": {
+            "n": 78,
+            "class_counts": {
+              "REJECT": 30,
+              "CONSIDER": 21,
+              "HIRE": 27
+            },
+            "accuracy": 0.8718,
+            "macro_f1": 0.8596,
+            "binary_f1": 0.9462,
+            "verdict_counts": {
+              "REJECT": 33,
+              "CONSIDER": 18,
+              "HIRE": 27
+            }
+          },
+          "Networking / Systems Administration": {
+            "n": 77,
+            "class_counts": {
+              "REJECT": 28,
+              "CONSIDER": 14,
+              "HIRE": 35
+            },
+            "accuracy": 0.8442,
+            "macro_f1": 0.8131,
+            "binary_f1": 0.9592,
+            "verdict_counts": {
+              "REJECT": 28,
+              "CONSIDER": 17,
+              "HIRE": 32
+            }
+          },
+          "Platform / SRE / Observability": {
+            "n": 127,
+            "class_counts": {
+              "REJECT": 25,
+              "CONSIDER": 51,
+              "HIRE": 51
+            },
+            "accuracy": 0.8031,
+            "macro_f1": 0.8143,
+            "binary_f1": 0.97,
+            "verdict_counts": {
+              "REJECT": 29,
+              "CONSIDER": 41,
+              "HIRE": 57
+            }
+          },
+          "Product / UX Engineering": {
+            "n": 61,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 9,
+              "HIRE": 19
+            },
+            "accuracy": 0.8197,
+            "macro_f1": 0.7705,
+            "binary_f1": 0.918,
+            "verdict_counts": {
+              "REJECT": 28,
+              "CONSIDER": 16,
+              "HIRE": 17
+            }
+          },
+          "QA / Test Automation": {
+            "n": 46,
+            "class_counts": {
+              "REJECT": 35,
+              "CONSIDER": 0,
+              "HIRE": 11
+            },
+            "accuracy": 0.9565,
+            "macro_f1": 0.6569,
+            "binary_f1": 0.9167,
+            "verdict_counts": {
+              "REJECT": 33,
+              "CONSIDER": 2,
+              "HIRE": 11
+            }
+          },
+          "Software Architecture / Technical Leadership": {
+            "n": 132,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 39,
+              "HIRE": 72
+            },
+            "accuracy": 0.697,
+            "macro_f1": 0.7292,
+            "binary_f1": 0.9818,
+            "verdict_counts": {
+              "REJECT": 23,
+              "CONSIDER": 51,
+              "HIRE": 58
+            }
+          }
+        }
+      },
+      "alias_robustness_test": {
+        "n": 624,
+        "downgrade_rate": 0.0272,
+        "upgrade_rate": 0.0064
+      }
+    },
+    "candidate_fusion_learned_before_raw_x100": {
+      "weights": {
+        "tfidf": 0.75,
+        "embedding": 0.05,
+        "skill": 0.2
+      },
+      "three_class": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            536,
+            0,
+            0
+          ],
+          [
+            545,
+            0,
+            0
+          ],
+          [
+            719,
+            0,
+            0
+          ]
+        ],
+        "labels": [
+          "REJECT",
+          "CONSIDER",
+          "HIRE"
+        ],
+        "macro_f1": 0.153,
+        "per_class": {
+          "REJECT": {
+            "precision": 0.2978,
+            "recall": 1.0,
+            "f1": 0.4589,
+            "support": 536
+          },
+          "CONSIDER": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 545
+          },
+          "HIRE": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 719
+          }
+        },
+        "quadratic_kappa": 0.0,
+        "verdict_counts": {
+          "REJECT": 1800,
+          "CONSIDER": 0,
+          "HIRE": 0
+        }
+      },
+      "binary_consider_or_better": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            536,
+            0
+          ],
+          [
+            1264,
+            0
+          ]
+        ],
+        "accuracy": 0.2978,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive": 0
+      },
+      "binary_hire_vs_strong": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            1081,
+            0
+          ],
+          [
+            719,
+            0
+          ]
+        ],
+        "accuracy": 0.6006,
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive": 0
+      },
+      "ranking": {
+        "roc_auc": 0.9831,
+        "pr_auc": 0.9932
+      },
+      "bootstrap": {
+        "macro_f1_95ci": [
+          0.1447,
+          0.1614
+        ],
+        "binary_f1_95ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "subgroups": {
+        "language": {
+          "cross_lingual": {
+            "n": 120,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 35,
+              "HIRE": 52
+            },
+            "accuracy": 0.275,
+            "macro_f1": 0.1438,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 120,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "fr": {
+            "n": 1680,
+            "class_counts": {
+              "REJECT": 503,
+              "CONSIDER": 510,
+              "HIRE": 667
+            },
+            "accuracy": 0.2994,
+            "macro_f1": 0.1536,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 1680,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          }
+        },
+        "difficulty": {
+          "easy": {
+            "n": 613,
+            "class_counts": {
+              "REJECT": 0,
+              "CONSIDER": 0,
+              "HIRE": 613
+            },
+            "accuracy": 0.0,
+            "macro_f1": 0.0,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 613,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "hard": {
+            "n": 723,
+            "class_counts": {
+              "REJECT": 72,
+              "CONSIDER": 545,
+              "HIRE": 106
+            },
+            "accuracy": 0.0996,
+            "macro_f1": 0.0604,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 723,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "medium": {
+            "n": 464,
+            "class_counts": {
+              "REJECT": 464,
+              "CONSIDER": 0,
+              "HIRE": 0
+            },
+            "accuracy": 1.0,
+            "macro_f1": 0.3333,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 464,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          }
+        },
+        "domain": {
+          "AI / NLP / LLM Engineering": {
+            "n": 65,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 6,
+              "HIRE": 25
+            },
+            "accuracy": 0.5231,
+            "macro_f1": 0.229,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 65,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "BI / Analytics / Visualization": {
+            "n": 106,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 38,
+              "HIRE": 45
+            },
+            "accuracy": 0.217,
+            "macro_f1": 0.1189,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 106,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Backend Development": {
+            "n": 152,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 57,
+              "HIRE": 72
+            },
+            "accuracy": 0.1513,
+            "macro_f1": 0.0876,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 152,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Blockchain / Web3": {
+            "n": 42,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 0,
+              "HIRE": 8
+            },
+            "accuracy": 0.8095,
+            "macro_f1": 0.2982,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 42,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Cybersecurity / AppSec": {
+            "n": 133,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 48,
+              "HIRE": 56
+            },
+            "accuracy": 0.218,
+            "macro_f1": 0.1193,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 133,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Data Engineering / Analytics Engineering": {
+            "n": 99,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 34,
+              "HIRE": 36
+            },
+            "accuracy": 0.2929,
+            "macro_f1": 0.151,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 99,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Data Science / ML Engineering": {
+            "n": 96,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 33,
+              "HIRE": 34
+            },
+            "accuracy": 0.3021,
+            "macro_f1": 0.1547,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 96,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "DevOps / Cloud Engineering": {
+            "n": 138,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 65,
+              "HIRE": 52
+            },
+            "accuracy": 0.1522,
+            "macro_f1": 0.0881,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 138,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "ERP / CRM / Enterprise Apps": {
+            "n": 63,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 8,
+              "HIRE": 22
+            },
+            "accuracy": 0.5238,
+            "macro_f1": 0.2292,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 63,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Embedded / IoT / Robotics": {
+            "n": 56,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 11,
+              "HIRE": 16
+            },
+            "accuracy": 0.5179,
+            "macro_f1": 0.2275,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 56,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Frontend Development": {
+            "n": 130,
+            "class_counts": {
+              "REJECT": 24,
+              "CONSIDER": 49,
+              "HIRE": 57
+            },
+            "accuracy": 0.1846,
+            "macro_f1": 0.1039,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 130,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Full Stack Web Development": {
+            "n": 107,
+            "class_counts": {
+              "REJECT": 27,
+              "CONSIDER": 37,
+              "HIRE": 43
+            },
+            "accuracy": 0.2523,
+            "macro_f1": 0.1343,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 107,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Game Development / AR / VR": {
+            "n": 92,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 25,
+              "HIRE": 38
+            },
+            "accuracy": 0.3152,
+            "macro_f1": 0.1598,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 92,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Mobile Development": {
+            "n": 78,
+            "class_counts": {
+              "REJECT": 30,
+              "CONSIDER": 21,
+              "HIRE": 27
+            },
+            "accuracy": 0.3846,
+            "macro_f1": 0.1852,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 78,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Networking / Systems Administration": {
+            "n": 77,
+            "class_counts": {
+              "REJECT": 28,
+              "CONSIDER": 14,
+              "HIRE": 35
+            },
+            "accuracy": 0.3636,
+            "macro_f1": 0.1778,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 77,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Platform / SRE / Observability": {
+            "n": 127,
+            "class_counts": {
+              "REJECT": 25,
+              "CONSIDER": 51,
+              "HIRE": 51
+            },
+            "accuracy": 0.1969,
+            "macro_f1": 0.1096,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 127,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Product / UX Engineering": {
+            "n": 61,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 9,
+              "HIRE": 19
+            },
+            "accuracy": 0.541,
+            "macro_f1": 0.234,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 61,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "QA / Test Automation": {
+            "n": 46,
+            "class_counts": {
+              "REJECT": 35,
+              "CONSIDER": 0,
+              "HIRE": 11
+            },
+            "accuracy": 0.7609,
+            "macro_f1": 0.2881,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 46,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Software Architecture / Technical Leadership": {
+            "n": 132,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 39,
+              "HIRE": 72
+            },
+            "accuracy": 0.1591,
+            "macro_f1": 0.0915,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 132,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          }
+        }
+      }
+    },
+    "candidate_tfidf_validation_cuts": {
+      "weights": {
+        "tfidf": 1.0,
+        "embedding": 0.0,
+        "skill": 0.0
+      },
+      "cuts": [
+        0.0387,
+        0.1125
+      ],
+      "three_class": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            438,
+            98,
+            0
+          ],
+          [
+            28,
+            362,
+            155
+          ],
+          [
+            5,
+            181,
+            533
+          ]
+        ],
+        "labels": [
+          "REJECT",
+          "CONSIDER",
+          "HIRE"
+        ],
+        "macro_f1": 0.746,
+        "per_class": {
+          "REJECT": {
+            "precision": 0.9299,
+            "recall": 0.8172,
+            "f1": 0.8699,
+            "support": 536
+          },
+          "CONSIDER": {
+            "precision": 0.5647,
+            "recall": 0.6642,
+            "f1": 0.6105,
+            "support": 545
+          },
+          "HIRE": {
+            "precision": 0.7747,
+            "recall": 0.7413,
+            "f1": 0.7576,
+            "support": 719
+          }
+        },
+        "quadratic_kappa": 0.7966,
+        "verdict_counts": {
+          "REJECT": 471,
+          "CONSIDER": 641,
+          "HIRE": 688
+        }
+      },
+      "binary_consider_or_better": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            438,
+            98
+          ],
+          [
+            33,
+            1231
+          ]
+        ],
+        "accuracy": 0.9272,
+        "precision": 0.9263,
+        "recall": 0.9739,
+        "f1": 0.9495,
+        "predicted_positive": 1329
+      },
+      "binary_hire_vs_strong": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            926,
+            155
+          ],
+          [
+            186,
+            533
+          ]
+        ],
+        "accuracy": 0.8106,
+        "precision": 0.7747,
+        "recall": 0.7413,
+        "f1": 0.7576,
+        "predicted_positive": 688
+      },
+      "ranking": {
+        "roc_auc": 0.9787,
+        "pr_auc": 0.991
+      },
+      "bootstrap": {
+        "macro_f1_95ci": [
+          0.7264,
+          0.7654
+        ],
+        "binary_f1_95ci": [
+          0.9406,
+          0.9583
+        ]
+      },
+      "subgroups": {
+        "language": {
+          "cross_lingual": {
+            "n": 120,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 35,
+              "HIRE": 52
+            },
+            "accuracy": 0.825,
+            "macro_f1": 0.8289,
+            "binary_f1": 0.9884,
+            "verdict_counts": {
+              "REJECT": 35,
+              "CONSIDER": 36,
+              "HIRE": 49
+            }
+          },
+          "fr": {
+            "n": 1680,
+            "class_counts": {
+              "REJECT": 503,
+              "CONSIDER": 510,
+              "HIRE": 667
+            },
+            "accuracy": 0.7345,
+            "macro_f1": 0.7402,
+            "binary_f1": 0.9467,
+            "verdict_counts": {
+              "REJECT": 436,
+              "CONSIDER": 605,
+              "HIRE": 639
+            }
+          }
+        },
+        "difficulty": {
+          "easy": {
+            "n": 613,
+            "class_counts": {
+              "REJECT": 0,
+              "CONSIDER": 0,
+              "HIRE": 613
+            },
+            "accuracy": 0.7259,
+            "macro_f1": 0.2804,
+            "binary_f1": 0.9967,
+            "verdict_counts": {
+              "REJECT": 4,
+              "CONSIDER": 164,
+              "HIRE": 445
+            }
+          },
+          "hard": {
+            "n": 723,
+            "class_counts": {
+              "REJECT": 72,
+              "CONSIDER": 545,
+              "HIRE": 106
+            },
+            "accuracy": 0.7012,
+            "macro_f1": 0.6656,
+            "binary_f1": 0.9658,
+            "verdict_counts": {
+              "REJECT": 86,
+              "CONSIDER": 394,
+              "HIRE": 243
+            }
+          },
+          "medium": {
+            "n": 464,
+            "class_counts": {
+              "REJECT": 464,
+              "CONSIDER": 0,
+              "HIRE": 0
+            },
+            "accuracy": 0.8211,
+            "macro_f1": 0.3006,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 381,
+              "CONSIDER": 83,
+              "HIRE": 0
+            }
+          }
+        },
+        "domain": {
+          "AI / NLP / LLM Engineering": {
+            "n": 65,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 6,
+              "HIRE": 25
+            },
+            "accuracy": 0.7385,
+            "macro_f1": 0.6245,
+            "binary_f1": 0.8857,
+            "verdict_counts": {
+              "REJECT": 26,
+              "CONSIDER": 15,
+              "HIRE": 24
+            }
+          },
+          "BI / Analytics / Visualization": {
+            "n": 106,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 38,
+              "HIRE": 45
+            },
+            "accuracy": 0.717,
+            "macro_f1": 0.7426,
+            "binary_f1": 0.9697,
+            "verdict_counts": {
+              "REJECT": 24,
+              "CONSIDER": 46,
+              "HIRE": 36
+            }
+          },
+          "Backend Development": {
+            "n": 152,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 57,
+              "HIRE": 72
+            },
+            "accuracy": 0.7566,
+            "macro_f1": 0.7755,
+            "binary_f1": 0.9728,
+            "verdict_counts": {
+              "REJECT": 24,
+              "CONSIDER": 65,
+              "HIRE": 63
+            }
+          },
+          "Blockchain / Web3": {
+            "n": 42,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 0,
+              "HIRE": 8
+            },
+            "accuracy": 0.7857,
+            "macro_f1": 0.6158,
+            "binary_f1": 0.64,
+            "verdict_counts": {
+              "REJECT": 25,
+              "CONSIDER": 9,
+              "HIRE": 8
+            }
+          },
+          "Cybersecurity / AppSec": {
+            "n": 133,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 48,
+              "HIRE": 56
+            },
+            "accuracy": 0.7519,
+            "macro_f1": 0.7658,
+            "binary_f1": 0.9668,
+            "verdict_counts": {
+              "REJECT": 26,
+              "CONSIDER": 45,
+              "HIRE": 62
+            }
+          },
+          "Data Engineering / Analytics Engineering": {
+            "n": 99,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 34,
+              "HIRE": 36
+            },
+            "accuracy": 0.7778,
+            "macro_f1": 0.786,
+            "binary_f1": 0.951,
+            "verdict_counts": {
+              "REJECT": 26,
+              "CONSIDER": 40,
+              "HIRE": 33
+            }
+          },
+          "Data Science / ML Engineering": {
+            "n": 96,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 33,
+              "HIRE": 34
+            },
+            "accuracy": 0.7812,
+            "macro_f1": 0.7869,
+            "binary_f1": 0.963,
+            "verdict_counts": {
+              "REJECT": 28,
+              "CONSIDER": 32,
+              "HIRE": 36
+            }
+          },
+          "DevOps / Cloud Engineering": {
+            "n": 138,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 65,
+              "HIRE": 52
+            },
+            "accuracy": 0.6667,
+            "macro_f1": 0.6901,
+            "binary_f1": 0.962,
+            "verdict_counts": {
+              "REJECT": 18,
+              "CONSIDER": 57,
+              "HIRE": 63
+            }
+          },
+          "ERP / CRM / Enterprise Apps": {
+            "n": 63,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 8,
+              "HIRE": 22
+            },
+            "accuracy": 0.7302,
+            "macro_f1": 0.6763,
+            "binary_f1": 0.8571,
+            "verdict_counts": {
+              "REJECT": 23,
+              "CONSIDER": 19,
+              "HIRE": 21
+            }
+          },
+          "Embedded / IoT / Robotics": {
+            "n": 56,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 11,
+              "HIRE": 16
+            },
+            "accuracy": 0.7321,
+            "macro_f1": 0.7041,
+            "binary_f1": 0.8852,
+            "verdict_counts": {
+              "REJECT": 22,
+              "CONSIDER": 20,
+              "HIRE": 14
+            }
+          },
+          "Frontend Development": {
+            "n": 130,
+            "class_counts": {
+              "REJECT": 24,
+              "CONSIDER": 49,
+              "HIRE": 57
+            },
+            "accuracy": 0.6846,
+            "macro_f1": 0.7065,
+            "binary_f1": 0.9585,
+            "verdict_counts": {
+              "REJECT": 19,
+              "CONSIDER": 65,
+              "HIRE": 46
+            }
+          },
+          "Full Stack Web Development": {
+            "n": 107,
+            "class_counts": {
+              "REJECT": 27,
+              "CONSIDER": 37,
+              "HIRE": 43
+            },
+            "accuracy": 0.7477,
+            "macro_f1": 0.7645,
+            "binary_f1": 0.9697,
+            "verdict_counts": {
+              "REJECT": 22,
+              "CONSIDER": 38,
+              "HIRE": 47
+            }
+          },
+          "Game Development / AR / VR": {
+            "n": 92,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 25,
+              "HIRE": 38
+            },
+            "accuracy": 0.75,
+            "macro_f1": 0.7484,
+            "binary_f1": 0.9449,
+            "verdict_counts": {
+              "REJECT": 28,
+              "CONSIDER": 32,
+              "HIRE": 32
+            }
+          },
+          "Mobile Development": {
+            "n": 78,
+            "class_counts": {
+              "REJECT": 30,
+              "CONSIDER": 21,
+              "HIRE": 27
+            },
+            "accuracy": 0.8718,
+            "macro_f1": 0.8611,
+            "binary_f1": 0.9684,
+            "verdict_counts": {
+              "REJECT": 31,
+              "CONSIDER": 20,
+              "HIRE": 27
+            }
+          },
+          "Networking / Systems Administration": {
+            "n": 77,
+            "class_counts": {
+              "REJECT": 28,
+              "CONSIDER": 14,
+              "HIRE": 35
+            },
+            "accuracy": 0.7922,
+            "macro_f1": 0.7556,
+            "binary_f1": 0.9293,
+            "verdict_counts": {
+              "REJECT": 27,
+              "CONSIDER": 19,
+              "HIRE": 31
+            }
+          },
+          "Platform / SRE / Observability": {
+            "n": 127,
+            "class_counts": {
+              "REJECT": 25,
+              "CONSIDER": 51,
+              "HIRE": 51
+            },
+            "accuracy": 0.7244,
+            "macro_f1": 0.7484,
+            "binary_f1": 0.9703,
+            "verdict_counts": {
+              "REJECT": 27,
+              "CONSIDER": 43,
+              "HIRE": 57
+            }
+          },
+          "Product / UX Engineering": {
+            "n": 61,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 9,
+              "HIRE": 19
+            },
+            "accuracy": 0.8689,
+            "macro_f1": 0.8258,
+            "binary_f1": 0.918,
+            "verdict_counts": {
+              "REJECT": 28,
+              "CONSIDER": 13,
+              "HIRE": 20
+            }
+          },
+          "QA / Test Automation": {
+            "n": 46,
+            "class_counts": {
+              "REJECT": 35,
+              "CONSIDER": 0,
+              "HIRE": 11
+            },
+            "accuracy": 0.7826,
+            "macro_f1": 0.6016,
+            "binary_f1": 0.7097,
+            "verdict_counts": {
+              "REJECT": 26,
+              "CONSIDER": 10,
+              "HIRE": 10
+            }
+          },
+          "Software Architecture / Technical Leadership": {
+            "n": 132,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 39,
+              "HIRE": 72
+            },
+            "accuracy": 0.6212,
+            "macro_f1": 0.6584,
+            "binary_f1": 0.973,
+            "verdict_counts": {
+              "REJECT": 21,
+              "CONSIDER": 53,
+              "HIRE": 58
+            }
+          }
+        }
+      },
+      "alias_robustness_test": {
+        "n": 624,
+        "downgrade_rate": 0.0449,
+        "upgrade_rate": 0.0144
+      }
+    },
+    "candidate_tfidf_before_raw_x100": {
+      "weights": {
+        "tfidf": 1.0,
+        "embedding": 0.0,
+        "skill": 0.0
+      },
+      "three_class": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            417,
+            43,
+            76
+          ],
+          [
+            545,
+            0,
+            0
+          ],
+          [
+            719,
+            0,
+            0
+          ]
+        ],
+        "labels": [
+          "REJECT",
+          "CONSIDER",
+          "HIRE"
+        ],
+        "macro_f1": 0.1254,
+        "per_class": {
+          "REJECT": {
+            "precision": 0.2481,
+            "recall": 0.778,
+            "f1": 0.3762,
+            "support": 536
+          },
+          "CONSIDER": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 545
+          },
+          "HIRE": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 719
+          }
+        },
+        "quadratic_kappa": -0.1287,
+        "verdict_counts": {
+          "REJECT": 1681,
+          "CONSIDER": 43,
+          "HIRE": 76
+        }
+      },
+      "binary_consider_or_better": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            417,
+            119
+          ],
+          [
+            1264,
+            0
+          ]
+        ],
+        "accuracy": 0.2317,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive": 119
+      },
+      "binary_hire_vs_strong": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            1005,
+            76
+          ],
+          [
+            719,
+            0
+          ]
+        ],
+        "accuracy": 0.5583,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive": 76
+      },
+      "ranking": {
+        "roc_auc": 0.9787,
+        "pr_auc": 0.991
+      },
+      "bootstrap": {
+        "macro_f1_95ci": [
+          0.1175,
+          0.1343
+        ],
+        "binary_f1_95ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "subgroups": {
+        "language": {
+          "cross_lingual": {
+            "n": 120,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 35,
+              "HIRE": 52
+            },
+            "accuracy": 0.1833,
+            "macro_f1": 0.1033,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 109,
+              "CONSIDER": 6,
+              "HIRE": 5
+            }
+          },
+          "fr": {
+            "n": 1680,
+            "class_counts": {
+              "REJECT": 503,
+              "CONSIDER": 510,
+              "HIRE": 667
+            },
+            "accuracy": 0.2351,
+            "macro_f1": 0.1269,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 1572,
+              "CONSIDER": 37,
+              "HIRE": 71
+            }
+          }
+        },
+        "difficulty": {
+          "easy": {
+            "n": 613,
+            "class_counts": {
+              "REJECT": 0,
+              "CONSIDER": 0,
+              "HIRE": 613
+            },
+            "accuracy": 0.0,
+            "macro_f1": 0.0,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 613,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "hard": {
+            "n": 723,
+            "class_counts": {
+              "REJECT": 72,
+              "CONSIDER": 545,
+              "HIRE": 106
+            },
+            "accuracy": 0.0719,
+            "macro_f1": 0.0447,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 703,
+              "CONSIDER": 8,
+              "HIRE": 12
+            }
+          },
+          "medium": {
+            "n": 464,
+            "class_counts": {
+              "REJECT": 464,
+              "CONSIDER": 0,
+              "HIRE": 0
+            },
+            "accuracy": 0.7866,
+            "macro_f1": 0.2935,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 365,
+              "CONSIDER": 35,
+              "HIRE": 64
+            }
+          }
+        },
+        "domain": {
+          "AI / NLP / LLM Engineering": {
+            "n": 65,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 6,
+              "HIRE": 25
+            },
+            "accuracy": 0.4154,
+            "macro_f1": 0.1957,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 58,
+              "CONSIDER": 1,
+              "HIRE": 6
+            }
+          },
+          "BI / Analytics / Visualization": {
+            "n": 106,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 38,
+              "HIRE": 45
+            },
+            "accuracy": 0.1698,
+            "macro_f1": 0.0968,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 101,
+              "CONSIDER": 2,
+              "HIRE": 3
+            }
+          },
+          "Backend Development": {
+            "n": 152,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 57,
+              "HIRE": 72
+            },
+            "accuracy": 0.1382,
+            "macro_f1": 0.0809,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 150,
+              "CONSIDER": 0,
+              "HIRE": 2
+            }
+          },
+          "Blockchain / Web3": {
+            "n": 42,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 0,
+              "HIRE": 8
+            },
+            "accuracy": 0.6905,
+            "macro_f1": 0.2723,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 37,
+              "CONSIDER": 2,
+              "HIRE": 3
+            }
+          },
+          "Cybersecurity / AppSec": {
+            "n": 133,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 48,
+              "HIRE": 56
+            },
+            "accuracy": 0.1579,
+            "macro_f1": 0.0909,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 125,
+              "CONSIDER": 2,
+              "HIRE": 6
+            }
+          },
+          "Data Engineering / Analytics Engineering": {
+            "n": 99,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 34,
+              "HIRE": 36
+            },
+            "accuracy": 0.2222,
+            "macro_f1": 0.1212,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 92,
+              "CONSIDER": 3,
+              "HIRE": 4
+            }
+          },
+          "Data Science / ML Engineering": {
+            "n": 96,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 33,
+              "HIRE": 34
+            },
+            "accuracy": 0.25,
+            "macro_f1": 0.1333,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 91,
+              "CONSIDER": 1,
+              "HIRE": 4
+            }
+          },
+          "DevOps / Cloud Engineering": {
+            "n": 138,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 65,
+              "HIRE": 52
+            },
+            "accuracy": 0.1159,
+            "macro_f1": 0.0693,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 133,
+              "CONSIDER": 2,
+              "HIRE": 3
+            }
+          },
+          "ERP / CRM / Enterprise Apps": {
+            "n": 63,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 8,
+              "HIRE": 22
+            },
+            "accuracy": 0.3968,
+            "macro_f1": 0.1894,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 55,
+              "CONSIDER": 3,
+              "HIRE": 5
+            }
+          },
+          "Embedded / IoT / Robotics": {
+            "n": 56,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 11,
+              "HIRE": 16
+            },
+            "accuracy": 0.3929,
+            "macro_f1": 0.188,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 49,
+              "CONSIDER": 4,
+              "HIRE": 3
+            }
+          },
+          "Frontend Development": {
+            "n": 130,
+            "class_counts": {
+              "REJECT": 24,
+              "CONSIDER": 49,
+              "HIRE": 57
+            },
+            "accuracy": 0.1462,
+            "macro_f1": 0.085,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 125,
+              "CONSIDER": 4,
+              "HIRE": 1
+            }
+          },
+          "Full Stack Web Development": {
+            "n": 107,
+            "class_counts": {
+              "REJECT": 27,
+              "CONSIDER": 37,
+              "HIRE": 43
+            },
+            "accuracy": 0.1963,
+            "macro_f1": 0.1094,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 101,
+              "CONSIDER": 2,
+              "HIRE": 4
+            }
+          },
+          "Game Development / AR / VR": {
+            "n": 92,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 25,
+              "HIRE": 38
+            },
+            "accuracy": 0.2826,
+            "macro_f1": 0.1469,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 89,
+              "CONSIDER": 1,
+              "HIRE": 2
+            }
+          },
+          "Mobile Development": {
+            "n": 78,
+            "class_counts": {
+              "REJECT": 30,
+              "CONSIDER": 21,
+              "HIRE": 27
+            },
+            "accuracy": 0.2949,
+            "macro_f1": 0.1518,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 71,
+              "CONSIDER": 3,
+              "HIRE": 4
+            }
+          },
+          "Networking / Systems Administration": {
+            "n": 77,
+            "class_counts": {
+              "REJECT": 28,
+              "CONSIDER": 14,
+              "HIRE": 35
+            },
+            "accuracy": 0.2597,
+            "macro_f1": 0.1375,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 69,
+              "CONSIDER": 2,
+              "HIRE": 6
+            }
+          },
+          "Platform / SRE / Observability": {
+            "n": 127,
+            "class_counts": {
+              "REJECT": 25,
+              "CONSIDER": 51,
+              "HIRE": 51
+            },
+            "accuracy": 0.1181,
+            "macro_f1": 0.0704,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 117,
+              "CONSIDER": 3,
+              "HIRE": 7
+            }
+          },
+          "Product / UX Engineering": {
+            "n": 61,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 9,
+              "HIRE": 19
+            },
+            "accuracy": 0.4754,
+            "macro_f1": 0.2148,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 57,
+              "CONSIDER": 2,
+              "HIRE": 2
+            }
+          },
+          "QA / Test Automation": {
+            "n": 46,
+            "class_counts": {
+              "REJECT": 35,
+              "CONSIDER": 0,
+              "HIRE": 11
+            },
+            "accuracy": 0.587,
+            "macro_f1": 0.2466,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 38,
+              "CONSIDER": 1,
+              "HIRE": 7
+            }
+          },
+          "Software Architecture / Technical Leadership": {
+            "n": 132,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 39,
+              "HIRE": 72
+            },
+            "accuracy": 0.0909,
+            "macro_f1": 0.0556,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 123,
+              "CONSIDER": 5,
+              "HIRE": 4
+            }
+          }
+        }
+      }
+    },
+    "candidate_embedding_validation_cuts": {
+      "weights": {
+        "tfidf": 0.0,
+        "embedding": 1.0,
+        "skill": 0.0
+      },
+      "cuts": [
+        0.5542,
+        0.6384
+      ],
+      "three_class": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            333,
+            174,
+            29
+          ],
+          [
+            138,
+            263,
+            144
+          ],
+          [
+            85,
+            298,
+            336
+          ]
+        ],
+        "labels": [
+          "REJECT",
+          "CONSIDER",
+          "HIRE"
+        ],
+        "macro_f1": 0.5227,
+        "per_class": {
+          "REJECT": {
+            "precision": 0.5989,
+            "recall": 0.6213,
+            "f1": 0.6099,
+            "support": 536
+          },
+          "CONSIDER": {
+            "precision": 0.3578,
+            "recall": 0.4826,
+            "f1": 0.4109,
+            "support": 545
+          },
+          "HIRE": {
+            "precision": 0.6601,
+            "recall": 0.4673,
+            "f1": 0.5472,
+            "support": 719
+          }
+        },
+        "quadratic_kappa": 0.4806,
+        "verdict_counts": {
+          "REJECT": 556,
+          "CONSIDER": 735,
+          "HIRE": 509
+        }
+      },
+      "binary_consider_or_better": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            333,
+            203
+          ],
+          [
+            223,
+            1041
+          ]
+        ],
+        "accuracy": 0.7633,
+        "precision": 0.8368,
+        "recall": 0.8236,
+        "f1": 0.8301,
+        "predicted_positive": 1244
+      },
+      "binary_hire_vs_strong": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            908,
+            173
+          ],
+          [
+            383,
+            336
+          ]
+        ],
+        "accuracy": 0.6911,
+        "precision": 0.6601,
+        "recall": 0.4673,
+        "f1": 0.5472,
+        "predicted_positive": 509
+      },
+      "ranking": {
+        "roc_auc": 0.8113,
+        "pr_auc": 0.908
+      },
+      "bootstrap": {
+        "macro_f1_95ci": [
+          0.5004,
+          0.5453
+        ],
+        "binary_f1_95ci": [
+          0.8138,
+          0.8452
+        ]
+      },
+      "subgroups": {
+        "language": {
+          "cross_lingual": {
+            "n": 120,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 35,
+              "HIRE": 52
+            },
+            "accuracy": 0.4417,
+            "macro_f1": 0.4216,
+            "binary_f1": 0.7234,
+            "verdict_counts": {
+              "REJECT": 66,
+              "CONSIDER": 41,
+              "HIRE": 13
+            }
+          },
+          "fr": {
+            "n": 1680,
+            "class_counts": {
+              "REJECT": 503,
+              "CONSIDER": 510,
+              "HIRE": 667
+            },
+            "accuracy": 0.5232,
+            "macro_f1": 0.5287,
+            "binary_f1": 0.8365,
+            "verdict_counts": {
+              "REJECT": 490,
+              "CONSIDER": 694,
+              "HIRE": 496
+            }
+          }
+        },
+        "difficulty": {
+          "easy": {
+            "n": 613,
+            "class_counts": {
+              "REJECT": 0,
+              "CONSIDER": 0,
+              "HIRE": 613
+            },
+            "accuracy": 0.4747,
+            "macro_f1": 0.2146,
+            "binary_f1": 0.9376,
+            "verdict_counts": {
+              "REJECT": 72,
+              "CONSIDER": 250,
+              "HIRE": 291
+            }
+          },
+          "hard": {
+            "n": 723,
+            "class_counts": {
+              "REJECT": 72,
+              "CONSIDER": 545,
+              "HIRE": 106
+            },
+            "accuracy": 0.4882,
+            "macro_f1": 0.412,
+            "binary_f1": 0.8489,
+            "verdict_counts": {
+              "REJECT": 196,
+              "CONSIDER": 336,
+              "HIRE": 191
+            }
+          },
+          "medium": {
+            "n": 464,
+            "class_counts": {
+              "REJECT": 464,
+              "CONSIDER": 0,
+              "HIRE": 0
+            },
+            "accuracy": 0.6207,
+            "macro_f1": 0.2553,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 288,
+              "CONSIDER": 149,
+              "HIRE": 27
+            }
+          }
+        },
+        "domain": {
+          "AI / NLP / LLM Engineering": {
+            "n": 65,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 6,
+              "HIRE": 25
+            },
+            "accuracy": 0.6769,
+            "macro_f1": 0.6028,
+            "binary_f1": 0.8451,
+            "verdict_counts": {
+              "REJECT": 25,
+              "CONSIDER": 21,
+              "HIRE": 19
+            }
+          },
+          "BI / Analytics / Visualization": {
+            "n": 106,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 38,
+              "HIRE": 45
+            },
+            "accuracy": 0.4528,
+            "macro_f1": 0.4621,
+            "binary_f1": 0.8267,
+            "verdict_counts": {
+              "REJECT": 39,
+              "CONSIDER": 40,
+              "HIRE": 27
+            }
+          },
+          "Backend Development": {
+            "n": 152,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 57,
+              "HIRE": 72
+            },
+            "accuracy": 0.4408,
+            "macro_f1": 0.4367,
+            "binary_f1": 0.9035,
+            "verdict_counts": {
+              "REJECT": 22,
+              "CONSIDER": 94,
+              "HIRE": 36
+            }
+          },
+          "Blockchain / Web3": {
+            "n": 42,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 0,
+              "HIRE": 8
+            },
+            "accuracy": 0.619,
+            "macro_f1": 0.5115,
+            "binary_f1": 0.5,
+            "verdict_counts": {
+              "REJECT": 18,
+              "CONSIDER": 13,
+              "HIRE": 11
+            }
+          },
+          "Cybersecurity / AppSec": {
+            "n": 133,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 48,
+              "HIRE": 56
+            },
+            "accuracy": 0.5338,
+            "macro_f1": 0.5351,
+            "binary_f1": 0.867,
+            "verdict_counts": {
+              "REJECT": 34,
+              "CONSIDER": 46,
+              "HIRE": 53
+            }
+          },
+          "Data Engineering / Analytics Engineering": {
+            "n": 99,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 34,
+              "HIRE": 36
+            },
+            "accuracy": 0.4545,
+            "macro_f1": 0.4565,
+            "binary_f1": 0.8163,
+            "verdict_counts": {
+              "REJECT": 22,
+              "CONSIDER": 40,
+              "HIRE": 37
+            }
+          },
+          "Data Science / ML Engineering": {
+            "n": 96,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 33,
+              "HIRE": 34
+            },
+            "accuracy": 0.6354,
+            "macro_f1": 0.6394,
+            "binary_f1": 0.8741,
+            "verdict_counts": {
+              "REJECT": 28,
+              "CONSIDER": 35,
+              "HIRE": 33
+            }
+          },
+          "DevOps / Cloud Engineering": {
+            "n": 138,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 65,
+              "HIRE": 52
+            },
+            "accuracy": 0.5507,
+            "macro_f1": 0.5468,
+            "binary_f1": 0.9231,
+            "verdict_counts": {
+              "REJECT": 21,
+              "CONSIDER": 76,
+              "HIRE": 41
+            }
+          },
+          "ERP / CRM / Enterprise Apps": {
+            "n": 63,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 8,
+              "HIRE": 22
+            },
+            "accuracy": 0.6508,
+            "macro_f1": 0.5869,
+            "binary_f1": 0.7667,
+            "verdict_counts": {
+              "REJECT": 33,
+              "CONSIDER": 18,
+              "HIRE": 12
+            }
+          },
+          "Embedded / IoT / Robotics": {
+            "n": 56,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 11,
+              "HIRE": 16
+            },
+            "accuracy": 0.5179,
+            "macro_f1": 0.4921,
+            "binary_f1": 0.6429,
+            "verdict_counts": {
+              "REJECT": 27,
+              "CONSIDER": 20,
+              "HIRE": 9
+            }
+          },
+          "Frontend Development": {
+            "n": 130,
+            "class_counts": {
+              "REJECT": 24,
+              "CONSIDER": 49,
+              "HIRE": 57
+            },
+            "accuracy": 0.4692,
+            "macro_f1": 0.4752,
+            "binary_f1": 0.8627,
+            "verdict_counts": {
+              "REJECT": 32,
+              "CONSIDER": 67,
+              "HIRE": 31
+            }
+          },
+          "Full Stack Web Development": {
+            "n": 107,
+            "class_counts": {
+              "REJECT": 27,
+              "CONSIDER": 37,
+              "HIRE": 43
+            },
+            "accuracy": 0.4112,
+            "macro_f1": 0.4168,
+            "binary_f1": 0.8736,
+            "verdict_counts": {
+              "REJECT": 13,
+              "CONSIDER": 48,
+              "HIRE": 46
+            }
+          },
+          "Game Development / AR / VR": {
+            "n": 92,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 25,
+              "HIRE": 38
+            },
+            "accuracy": 0.4783,
+            "macro_f1": 0.437,
+            "binary_f1": 0.5745,
+            "verdict_counts": {
+              "REJECT": 61,
+              "CONSIDER": 15,
+              "HIRE": 16
+            }
+          },
+          "Mobile Development": {
+            "n": 78,
+            "class_counts": {
+              "REJECT": 30,
+              "CONSIDER": 21,
+              "HIRE": 27
+            },
+            "accuracy": 0.6795,
+            "macro_f1": 0.6567,
+            "binary_f1": 0.8409,
+            "verdict_counts": {
+              "REJECT": 38,
+              "CONSIDER": 21,
+              "HIRE": 19
+            }
+          },
+          "Networking / Systems Administration": {
+            "n": 77,
+            "class_counts": {
+              "REJECT": 28,
+              "CONSIDER": 14,
+              "HIRE": 35
+            },
+            "accuracy": 0.6234,
+            "macro_f1": 0.6057,
+            "binary_f1": 0.8868,
+            "verdict_counts": {
+              "REJECT": 20,
+              "CONSIDER": 27,
+              "HIRE": 30
+            }
+          },
+          "Platform / SRE / Observability": {
+            "n": 127,
+            "class_counts": {
+              "REJECT": 25,
+              "CONSIDER": 51,
+              "HIRE": 51
+            },
+            "accuracy": 0.4409,
+            "macro_f1": 0.4362,
+            "binary_f1": 0.8125,
+            "verdict_counts": {
+              "REJECT": 37,
+              "CONSIDER": 61,
+              "HIRE": 29
+            }
+          },
+          "Product / UX Engineering": {
+            "n": 61,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 9,
+              "HIRE": 19
+            },
+            "accuracy": 0.623,
+            "macro_f1": 0.6088,
+            "binary_f1": 0.7714,
+            "verdict_counts": {
+              "REJECT": 19,
+              "CONSIDER": 25,
+              "HIRE": 17
+            }
+          },
+          "QA / Test Automation": {
+            "n": 46,
+            "class_counts": {
+              "REJECT": 35,
+              "CONSIDER": 0,
+              "HIRE": 11
+            },
+            "accuracy": 0.6304,
+            "macro_f1": 0.5152,
+            "binary_f1": 0.5946,
+            "verdict_counts": {
+              "REJECT": 20,
+              "CONSIDER": 15,
+              "HIRE": 11
+            }
+          },
+          "Software Architecture / Technical Leadership": {
+            "n": 132,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 39,
+              "HIRE": 72
+            },
+            "accuracy": 0.3864,
+            "macro_f1": 0.3827,
+            "binary_f1": 0.7857,
+            "verdict_counts": {
+              "REJECT": 47,
+              "CONSIDER": 53,
+              "HIRE": 32
+            }
+          }
+        }
+      },
+      "alias_robustness_test": {
+        "n": 624,
+        "downgrade_rate": 0.0369,
+        "upgrade_rate": 0.0112
+      }
+    },
+    "candidate_embedding_before_raw_x100": {
+      "weights": {
+        "tfidf": 0.0,
+        "embedding": 1.0,
+        "skill": 0.0
+      },
+      "three_class": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            316,
+            220,
+            0
+          ],
+          [
+            123,
+            422,
+            0
+          ],
+          [
+            78,
+            600,
+            41
+          ]
+        ],
+        "labels": [
+          "REJECT",
+          "CONSIDER",
+          "HIRE"
+        ],
+        "macro_f1": 0.3935,
+        "per_class": {
+          "REJECT": {
+            "precision": 0.6112,
+            "recall": 0.5896,
+            "f1": 0.6002,
+            "support": 536
+          },
+          "CONSIDER": {
+            "precision": 0.3398,
+            "recall": 0.7743,
+            "f1": 0.4723,
+            "support": 545
+          },
+          "HIRE": {
+            "precision": 1.0,
+            "recall": 0.057,
+            "f1": 0.1079,
+            "support": 719
+          }
+        },
+        "quadratic_kappa": 0.3429,
+        "verdict_counts": {
+          "REJECT": 517,
+          "CONSIDER": 1242,
+          "HIRE": 41
+        }
+      },
+      "binary_consider_or_better": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            316,
+            220
+          ],
+          [
+            201,
+            1063
+          ]
+        ],
+        "accuracy": 0.7661,
+        "precision": 0.8285,
+        "recall": 0.841,
+        "f1": 0.8347,
+        "predicted_positive": 1283
+      },
+      "binary_hire_vs_strong": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            1081,
+            0
+          ],
+          [
+            678,
+            41
+          ]
+        ],
+        "accuracy": 0.6233,
+        "precision": 1.0,
+        "recall": 0.057,
+        "f1": 0.1079,
+        "predicted_positive": 41
+      },
+      "ranking": {
+        "roc_auc": 0.8113,
+        "pr_auc": 0.908
+      },
+      "bootstrap": {
+        "macro_f1_95ci": [
+          0.3738,
+          0.4127
+        ],
+        "binary_f1_95ci": [
+          0.8188,
+          0.8493
+        ]
+      },
+      "subgroups": {
+        "language": {
+          "cross_lingual": {
+            "n": 120,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 35,
+              "HIRE": 52
+            },
+            "accuracy": 0.3833,
+            "macro_f1": 0.3252,
+            "binary_f1": 0.7586,
+            "verdict_counts": {
+              "REJECT": 62,
+              "CONSIDER": 58,
+              "HIRE": 0
+            }
+          },
+          "fr": {
+            "n": 1680,
+            "class_counts": {
+              "REJECT": 503,
+              "CONSIDER": 510,
+              "HIRE": 667
+            },
+            "accuracy": 0.4363,
+            "macro_f1": 0.3974,
+            "binary_f1": 0.8393,
+            "verdict_counts": {
+              "REJECT": 455,
+              "CONSIDER": 1184,
+              "HIRE": 41
+            }
+          }
+        },
+        "difficulty": {
+          "easy": {
+            "n": 613,
+            "class_counts": {
+              "REJECT": 0,
+              "CONSIDER": 0,
+              "HIRE": 613
+            },
+            "accuracy": 0.0555,
+            "macro_f1": 0.035,
+            "binary_f1": 0.9422,
+            "verdict_counts": {
+              "REJECT": 67,
+              "CONSIDER": 512,
+              "HIRE": 34
+            }
+          },
+          "hard": {
+            "n": 723,
+            "class_counts": {
+              "REJECT": 72,
+              "CONSIDER": 545,
+              "HIRE": 106
+            },
+            "accuracy": 0.6487,
+            "macro_f1": 0.4085,
+            "binary_f1": 0.8617,
+            "verdict_counts": {
+              "REJECT": 174,
+              "CONSIDER": 542,
+              "HIRE": 7
+            }
+          },
+          "medium": {
+            "n": 464,
+            "class_counts": {
+              "REJECT": 464,
+              "CONSIDER": 0,
+              "HIRE": 0
+            },
+            "accuracy": 0.5948,
+            "macro_f1": 0.2486,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 276,
+              "CONSIDER": 188,
+              "HIRE": 0
+            }
+          }
+        },
+        "domain": {
+          "AI / NLP / LLM Engineering": {
+            "n": 65,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 6,
+              "HIRE": 25
+            },
+            "accuracy": 0.4769,
+            "macro_f1": 0.4116,
+            "binary_f1": 0.8333,
+            "verdict_counts": {
+              "REJECT": 24,
+              "CONSIDER": 38,
+              "HIRE": 3
+            }
+          },
+          "BI / Analytics / Visualization": {
+            "n": 106,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 38,
+              "HIRE": 45
+            },
+            "accuracy": 0.3868,
+            "macro_f1": 0.3396,
+            "binary_f1": 0.8267,
+            "verdict_counts": {
+              "REJECT": 39,
+              "CONSIDER": 67,
+              "HIRE": 0
+            }
+          },
+          "Backend Development": {
+            "n": 152,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 57,
+              "HIRE": 72
+            },
+            "accuracy": 0.3882,
+            "macro_f1": 0.3125,
+            "binary_f1": 0.9008,
+            "verdict_counts": {
+              "REJECT": 19,
+              "CONSIDER": 132,
+              "HIRE": 1
+            }
+          },
+          "Blockchain / Web3": {
+            "n": 42,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 0,
+              "HIRE": 8
+            },
+            "accuracy": 0.4048,
+            "macro_f1": 0.2874,
+            "binary_f1": 0.4706,
+            "verdict_counts": {
+              "REJECT": 16,
+              "CONSIDER": 25,
+              "HIRE": 1
+            }
+          },
+          "Cybersecurity / AppSec": {
+            "n": 133,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 48,
+              "HIRE": 56
+            },
+            "accuracy": 0.4737,
+            "macro_f1": 0.4467,
+            "binary_f1": 0.8792,
+            "verdict_counts": {
+              "REJECT": 30,
+              "CONSIDER": 96,
+              "HIRE": 7
+            }
+          },
+          "Data Engineering / Analytics Engineering": {
+            "n": 99,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 34,
+              "HIRE": 36
+            },
+            "accuracy": 0.4545,
+            "macro_f1": 0.41,
+            "binary_f1": 0.8188,
+            "verdict_counts": {
+              "REJECT": 20,
+              "CONSIDER": 74,
+              "HIRE": 5
+            }
+          },
+          "Data Science / ML Engineering": {
+            "n": 96,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 33,
+              "HIRE": 34
+            },
+            "accuracy": 0.5,
+            "macro_f1": 0.4348,
+            "binary_f1": 0.8841,
+            "verdict_counts": {
+              "REJECT": 25,
+              "CONSIDER": 70,
+              "HIRE": 1
+            }
+          },
+          "DevOps / Cloud Engineering": {
+            "n": 138,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 65,
+              "HIRE": 52
+            },
+            "accuracy": 0.5145,
+            "macro_f1": 0.4043,
+            "binary_f1": 0.9283,
+            "verdict_counts": {
+              "REJECT": 18,
+              "CONSIDER": 120,
+              "HIRE": 0
+            }
+          },
+          "ERP / CRM / Enterprise Apps": {
+            "n": 63,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 8,
+              "HIRE": 22
+            },
+            "accuracy": 0.5556,
+            "macro_f1": 0.4569,
+            "binary_f1": 0.7937,
+            "verdict_counts": {
+              "REJECT": 30,
+              "CONSIDER": 31,
+              "HIRE": 2
+            }
+          },
+          "Embedded / IoT / Robotics": {
+            "n": 56,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 11,
+              "HIRE": 16
+            },
+            "accuracy": 0.3571,
+            "macro_f1": 0.3115,
+            "binary_f1": 0.6102,
+            "verdict_counts": {
+              "REJECT": 24,
+              "CONSIDER": 30,
+              "HIRE": 2
+            }
+          },
+          "Frontend Development": {
+            "n": 130,
+            "class_counts": {
+              "REJECT": 24,
+              "CONSIDER": 49,
+              "HIRE": 57
+            },
+            "accuracy": 0.3923,
+            "macro_f1": 0.3387,
+            "binary_f1": 0.8641,
+            "verdict_counts": {
+              "REJECT": 30,
+              "CONSIDER": 99,
+              "HIRE": 1
+            }
+          },
+          "Full Stack Web Development": {
+            "n": 107,
+            "class_counts": {
+              "REJECT": 27,
+              "CONSIDER": 37,
+              "HIRE": 43
+            },
+            "accuracy": 0.4019,
+            "macro_f1": 0.3135,
+            "binary_f1": 0.8686,
+            "verdict_counts": {
+              "REJECT": 12,
+              "CONSIDER": 95,
+              "HIRE": 0
+            }
+          },
+          "Game Development / AR / VR": {
+            "n": 92,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 25,
+              "HIRE": 38
+            },
+            "accuracy": 0.3804,
+            "macro_f1": 0.3368,
+            "binary_f1": 0.5833,
+            "verdict_counts": {
+              "REJECT": 59,
+              "CONSIDER": 27,
+              "HIRE": 6
+            }
+          },
+          "Mobile Development": {
+            "n": 78,
+            "class_counts": {
+              "REJECT": 30,
+              "CONSIDER": 21,
+              "HIRE": 27
+            },
+            "accuracy": 0.6026,
+            "macro_f1": 0.5386,
+            "binary_f1": 0.8539,
+            "verdict_counts": {
+              "REJECT": 37,
+              "CONSIDER": 37,
+              "HIRE": 4
+            }
+          },
+          "Networking / Systems Administration": {
+            "n": 77,
+            "class_counts": {
+              "REJECT": 28,
+              "CONSIDER": 14,
+              "HIRE": 35
+            },
+            "accuracy": 0.4416,
+            "macro_f1": 0.4284,
+            "binary_f1": 0.9074,
+            "verdict_counts": {
+              "REJECT": 18,
+              "CONSIDER": 57,
+              "HIRE": 2
+            }
+          },
+          "Platform / SRE / Observability": {
+            "n": 127,
+            "class_counts": {
+              "REJECT": 25,
+              "CONSIDER": 51,
+              "HIRE": 51
+            },
+            "accuracy": 0.4173,
+            "macro_f1": 0.3321,
+            "binary_f1": 0.8308,
+            "verdict_counts": {
+              "REJECT": 34,
+              "CONSIDER": 93,
+              "HIRE": 0
+            }
+          },
+          "Product / UX Engineering": {
+            "n": 61,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 9,
+              "HIRE": 19
+            },
+            "accuracy": 0.4754,
+            "macro_f1": 0.4188,
+            "binary_f1": 0.7887,
+            "verdict_counts": {
+              "REJECT": 18,
+              "CONSIDER": 41,
+              "HIRE": 2
+            }
+          },
+          "QA / Test Automation": {
+            "n": 46,
+            "class_counts": {
+              "REJECT": 35,
+              "CONSIDER": 0,
+              "HIRE": 11
+            },
+            "accuracy": 0.4783,
+            "macro_f1": 0.3774,
+            "binary_f1": 0.5789,
+            "verdict_counts": {
+              "REJECT": 19,
+              "CONSIDER": 24,
+              "HIRE": 3
+            }
+          },
+          "Software Architecture / Technical Leadership": {
+            "n": 132,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 39,
+              "HIRE": 72
+            },
+            "accuracy": 0.2652,
+            "macro_f1": 0.2524,
+            "binary_f1": 0.798,
+            "verdict_counts": {
+              "REJECT": 45,
+              "CONSIDER": 86,
+              "HIRE": 1
+            }
+          }
+        }
+      }
+    },
+    "candidate_skill_validation_cuts": {
+      "weights": {
+        "tfidf": 0.0,
+        "embedding": 0.0,
+        "skill": 1.0
+      },
+      "cuts": [
+        0.0763,
+        0.2667
+      ],
+      "three_class": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            483,
+            51,
+            2
+          ],
+          [
+            122,
+            308,
+            115
+          ],
+          [
+            17,
+            208,
+            494
+          ]
+        ],
+        "labels": [
+          "REJECT",
+          "CONSIDER",
+          "HIRE"
+        ],
+        "macro_f1": 0.7103,
+        "per_class": {
+          "REJECT": {
+            "precision": 0.7765,
+            "recall": 0.9011,
+            "f1": 0.8342,
+            "support": 536
+          },
+          "CONSIDER": {
+            "precision": 0.5432,
+            "recall": 0.5651,
+            "f1": 0.554,
+            "support": 545
+          },
+          "HIRE": {
+            "precision": 0.8085,
+            "recall": 0.6871,
+            "f1": 0.7429,
+            "support": 719
+          }
+        },
+        "quadratic_kappa": 0.7703,
+        "verdict_counts": {
+          "REJECT": 622,
+          "CONSIDER": 567,
+          "HIRE": 611
+        }
+      },
+      "binary_consider_or_better": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            483,
+            53
+          ],
+          [
+            139,
+            1125
+          ]
+        ],
+        "accuracy": 0.8933,
+        "precision": 0.955,
+        "recall": 0.89,
+        "f1": 0.9214,
+        "predicted_positive": 1178
+      },
+      "binary_hire_vs_strong": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            964,
+            117
+          ],
+          [
+            225,
+            494
+          ]
+        ],
+        "accuracy": 0.81,
+        "precision": 0.8085,
+        "recall": 0.6871,
+        "f1": 0.7429,
+        "predicted_positive": 611
+      },
+      "ranking": {
+        "roc_auc": 0.9472,
+        "pr_auc": 0.9755
+      },
+      "bootstrap": {
+        "macro_f1_95ci": [
+          0.6895,
+          0.7309
+        ],
+        "binary_f1_95ci": [
+          0.911,
+          0.9317
+        ]
+      },
+      "subgroups": {
+        "language": {
+          "cross_lingual": {
+            "n": 120,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 35,
+              "HIRE": 52
+            },
+            "accuracy": 0.6833,
+            "macro_f1": 0.6825,
+            "binary_f1": 0.9193,
+            "verdict_counts": {
+              "REJECT": 46,
+              "CONSIDER": 42,
+              "HIRE": 32
+            }
+          },
+          "fr": {
+            "n": 1680,
+            "class_counts": {
+              "REJECT": 503,
+              "CONSIDER": 510,
+              "HIRE": 667
+            },
+            "accuracy": 0.7161,
+            "macro_f1": 0.7122,
+            "binary_f1": 0.9215,
+            "verdict_counts": {
+              "REJECT": 576,
+              "CONSIDER": 525,
+              "HIRE": 579
+            }
+          }
+        },
+        "difficulty": {
+          "easy": {
+            "n": 613,
+            "class_counts": {
+              "REJECT": 0,
+              "CONSIDER": 0,
+              "HIRE": 613
+            },
+            "accuracy": 0.6998,
+            "macro_f1": 0.2745,
+            "binary_f1": 0.9893,
+            "verdict_counts": {
+              "REJECT": 13,
+              "CONSIDER": 171,
+              "HIRE": 429
+            }
+          },
+          "hard": {
+            "n": 723,
+            "class_counts": {
+              "REJECT": 72,
+              "CONSIDER": 545,
+              "HIRE": 106
+            },
+            "accuracy": 0.6086,
+            "macro_f1": 0.5495,
+            "binary_f1": 0.8891,
+            "verdict_counts": {
+              "REJECT": 193,
+              "CONSIDER": 350,
+              "HIRE": 180
+            }
+          },
+          "medium": {
+            "n": 464,
+            "class_counts": {
+              "REJECT": 464,
+              "CONSIDER": 0,
+              "HIRE": 0
+            },
+            "accuracy": 0.8966,
+            "macro_f1": 0.3152,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 416,
+              "CONSIDER": 46,
+              "HIRE": 2
+            }
+          }
+        },
+        "domain": {
+          "AI / NLP / LLM Engineering": {
+            "n": 65,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 6,
+              "HIRE": 25
+            },
+            "accuracy": 0.8154,
+            "macro_f1": 0.6771,
+            "binary_f1": 0.9032,
+            "verdict_counts": {
+              "REJECT": 34,
+              "CONSIDER": 10,
+              "HIRE": 21
+            }
+          },
+          "BI / Analytics / Visualization": {
+            "n": 106,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 38,
+              "HIRE": 45
+            },
+            "accuracy": 0.6604,
+            "macro_f1": 0.6705,
+            "binary_f1": 0.9193,
+            "verdict_counts": {
+              "REJECT": 28,
+              "CONSIDER": 42,
+              "HIRE": 36
+            }
+          },
+          "Backend Development": {
+            "n": 152,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 57,
+              "HIRE": 72
+            },
+            "accuracy": 0.6447,
+            "macro_f1": 0.636,
+            "binary_f1": 0.9008,
+            "verdict_counts": {
+              "REJECT": 39,
+              "CONSIDER": 58,
+              "HIRE": 55
+            }
+          },
+          "Blockchain / Web3": {
+            "n": 42,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 0,
+              "HIRE": 8
+            },
+            "accuracy": 0.8095,
+            "macro_f1": 0.5511,
+            "binary_f1": 0.7273,
+            "verdict_counts": {
+              "REJECT": 28,
+              "CONSIDER": 6,
+              "HIRE": 8
+            }
+          },
+          "Cybersecurity / AppSec": {
+            "n": 133,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 48,
+              "HIRE": 56
+            },
+            "accuracy": 0.6842,
+            "macro_f1": 0.695,
+            "binary_f1": 0.9293,
+            "verdict_counts": {
+              "REJECT": 39,
+              "CONSIDER": 49,
+              "HIRE": 45
+            }
+          },
+          "Data Engineering / Analytics Engineering": {
+            "n": 99,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 34,
+              "HIRE": 36
+            },
+            "accuracy": 0.6465,
+            "macro_f1": 0.6451,
+            "binary_f1": 0.8682,
+            "verdict_counts": {
+              "REJECT": 40,
+              "CONSIDER": 32,
+              "HIRE": 27
+            }
+          },
+          "Data Science / ML Engineering": {
+            "n": 96,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 33,
+              "HIRE": 34
+            },
+            "accuracy": 0.7604,
+            "macro_f1": 0.7633,
+            "binary_f1": 0.9242,
+            "verdict_counts": {
+              "REJECT": 31,
+              "CONSIDER": 34,
+              "HIRE": 31
+            }
+          },
+          "DevOps / Cloud Engineering": {
+            "n": 138,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 65,
+              "HIRE": 52
+            },
+            "accuracy": 0.6884,
+            "macro_f1": 0.6925,
+            "binary_f1": 0.9224,
+            "verdict_counts": {
+              "REJECT": 36,
+              "CONSIDER": 51,
+              "HIRE": 51
+            }
+          },
+          "ERP / CRM / Enterprise Apps": {
+            "n": 63,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 8,
+              "HIRE": 22
+            },
+            "accuracy": 0.9048,
+            "macro_f1": 0.8413,
+            "binary_f1": 1.0,
+            "verdict_counts": {
+              "REJECT": 33,
+              "CONSIDER": 10,
+              "HIRE": 20
+            }
+          },
+          "Embedded / IoT / Robotics": {
+            "n": 56,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 11,
+              "HIRE": 16
+            },
+            "accuracy": 0.7321,
+            "macro_f1": 0.6899,
+            "binary_f1": 0.8772,
+            "verdict_counts": {
+              "REJECT": 26,
+              "CONSIDER": 18,
+              "HIRE": 12
+            }
+          },
+          "Frontend Development": {
+            "n": 130,
+            "class_counts": {
+              "REJECT": 24,
+              "CONSIDER": 49,
+              "HIRE": 57
+            },
+            "accuracy": 0.6538,
+            "macro_f1": 0.6724,
+            "binary_f1": 0.951,
+            "verdict_counts": {
+              "REJECT": 32,
+              "CONSIDER": 42,
+              "HIRE": 56
+            }
+          },
+          "Full Stack Web Development": {
+            "n": 107,
+            "class_counts": {
+              "REJECT": 27,
+              "CONSIDER": 37,
+              "HIRE": 43
+            },
+            "accuracy": 0.6729,
+            "macro_f1": 0.6849,
+            "binary_f1": 0.9441,
+            "verdict_counts": {
+              "REJECT": 26,
+              "CONSIDER": 35,
+              "HIRE": 46
+            }
+          },
+          "Game Development / AR / VR": {
+            "n": 92,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 25,
+              "HIRE": 38
+            },
+            "accuracy": 0.6739,
+            "macro_f1": 0.6541,
+            "binary_f1": 0.8718,
+            "verdict_counts": {
+              "REJECT": 38,
+              "CONSIDER": 25,
+              "HIRE": 29
+            }
+          },
+          "Mobile Development": {
+            "n": 78,
+            "class_counts": {
+              "REJECT": 30,
+              "CONSIDER": 21,
+              "HIRE": 27
+            },
+            "accuracy": 0.7949,
+            "macro_f1": 0.7868,
+            "binary_f1": 0.9072,
+            "verdict_counts": {
+              "REJECT": 29,
+              "CONSIDER": 24,
+              "HIRE": 25
+            }
+          },
+          "Networking / Systems Administration": {
+            "n": 77,
+            "class_counts": {
+              "REJECT": 28,
+              "CONSIDER": 14,
+              "HIRE": 35
+            },
+            "accuracy": 0.8182,
+            "macro_f1": 0.7702,
+            "binary_f1": 0.9149,
+            "verdict_counts": {
+              "REJECT": 32,
+              "CONSIDER": 15,
+              "HIRE": 30
+            }
+          },
+          "Platform / SRE / Observability": {
+            "n": 127,
+            "class_counts": {
+              "REJECT": 25,
+              "CONSIDER": 51,
+              "HIRE": 51
+            },
+            "accuracy": 0.7402,
+            "macro_f1": 0.7483,
+            "binary_f1": 0.943,
+            "verdict_counts": {
+              "REJECT": 36,
+              "CONSIDER": 42,
+              "HIRE": 49
+            }
+          },
+          "Product / UX Engineering": {
+            "n": 61,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 9,
+              "HIRE": 19
+            },
+            "accuracy": 0.7869,
+            "macro_f1": 0.6999,
+            "binary_f1": 0.9286,
+            "verdict_counts": {
+              "REJECT": 33,
+              "CONSIDER": 13,
+              "HIRE": 15
+            }
+          },
+          "QA / Test Automation": {
+            "n": 46,
+            "class_counts": {
+              "REJECT": 35,
+              "CONSIDER": 0,
+              "HIRE": 11
+            },
+            "accuracy": 0.913,
+            "macro_f1": 0.6092,
+            "binary_f1": 0.9565,
+            "verdict_counts": {
+              "REJECT": 34,
+              "CONSIDER": 4,
+              "HIRE": 8
+            }
+          },
+          "Software Architecture / Technical Leadership": {
+            "n": 132,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 39,
+              "HIRE": 72
+            },
+            "accuracy": 0.6136,
+            "macro_f1": 0.6367,
+            "binary_f1": 0.9488,
+            "verdict_counts": {
+              "REJECT": 28,
+              "CONSIDER": 57,
+              "HIRE": 47
+            }
+          }
+        }
+      },
+      "alias_robustness_test": {
+        "n": 624,
+        "downgrade_rate": 0.0,
+        "upgrade_rate": 0.0
+      }
+    },
+    "candidate_skill_before_raw_x100": {
+      "weights": {
+        "tfidf": 0.0,
+        "embedding": 0.0,
+        "skill": 1.0
+      },
+      "three_class": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            536,
+            0,
+            0
+          ],
+          [
+            540,
+            3,
+            2
+          ],
+          [
+            692,
+            27,
+            0
+          ]
+        ],
+        "labels": [
+          "REJECT",
+          "CONSIDER",
+          "HIRE"
+        ],
+        "macro_f1": 0.1586,
+        "per_class": {
+          "REJECT": {
+            "precision": 0.3032,
+            "recall": 1.0,
+            "f1": 0.4653,
+            "support": 536
+          },
+          "CONSIDER": {
+            "precision": 0.1,
+            "recall": 0.0055,
+            "f1": 0.0104,
+            "support": 545
+          },
+          "HIRE": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 719
+          }
+        },
+        "quadratic_kappa": 0.0139,
+        "verdict_counts": {
+          "REJECT": 1768,
+          "CONSIDER": 30,
+          "HIRE": 2
+        }
+      },
+      "binary_consider_or_better": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            536,
+            0
+          ],
+          [
+            1232,
+            32
+          ]
+        ],
+        "accuracy": 0.3156,
+        "precision": 1.0,
+        "recall": 0.0253,
+        "f1": 0.0494,
+        "predicted_positive": 32
+      },
+      "binary_hire_vs_strong": {
+        "confusion_matrix_rows_true_cols_pred": [
+          [
+            1079,
+            2
+          ],
+          [
+            719,
+            0
+          ]
+        ],
+        "accuracy": 0.5994,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive": 2
+      },
+      "ranking": {
+        "roc_auc": 0.9472,
+        "pr_auc": 0.9755
+      },
+      "bootstrap": {
+        "macro_f1_95ci": [
+          0.1489,
+          0.1679
+        ],
+        "binary_f1_95ci": [
+          0.0325,
+          0.0664
+        ]
+      },
+      "subgroups": {
+        "language": {
+          "cross_lingual": {
+            "n": 120,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 35,
+              "HIRE": 52
+            },
+            "accuracy": 0.275,
+            "macro_f1": 0.1447,
+            "binary_f1": 0.0227,
+            "verdict_counts": {
+              "REJECT": 119,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          },
+          "fr": {
+            "n": 1680,
+            "class_counts": {
+              "REJECT": 503,
+              "CONSIDER": 510,
+              "HIRE": 667
+            },
+            "accuracy": 0.3012,
+            "macro_f1": 0.1595,
+            "binary_f1": 0.0513,
+            "verdict_counts": {
+              "REJECT": 1649,
+              "CONSIDER": 29,
+              "HIRE": 2
+            }
+          }
+        },
+        "difficulty": {
+          "easy": {
+            "n": 613,
+            "class_counts": {
+              "REJECT": 0,
+              "CONSIDER": 0,
+              "HIRE": 613
+            },
+            "accuracy": 0.0,
+            "macro_f1": 0.0,
+            "binary_f1": 0.0723,
+            "verdict_counts": {
+              "REJECT": 590,
+              "CONSIDER": 23,
+              "HIRE": 0
+            }
+          },
+          "hard": {
+            "n": 723,
+            "class_counts": {
+              "REJECT": 72,
+              "CONSIDER": 545,
+              "HIRE": 106
+            },
+            "accuracy": 0.1037,
+            "macro_f1": 0.0647,
+            "binary_f1": 0.0273,
+            "verdict_counts": {
+              "REJECT": 714,
+              "CONSIDER": 7,
+              "HIRE": 2
+            }
+          },
+          "medium": {
+            "n": 464,
+            "class_counts": {
+              "REJECT": 464,
+              "CONSIDER": 0,
+              "HIRE": 0
+            },
+            "accuracy": 1.0,
+            "macro_f1": 0.3333,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 464,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          }
+        },
+        "domain": {
+          "AI / NLP / LLM Engineering": {
+            "n": 65,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 6,
+              "HIRE": 25
+            },
+            "accuracy": 0.5231,
+            "macro_f1": 0.2337,
+            "binary_f1": 0.1212,
+            "verdict_counts": {
+              "REJECT": 63,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "BI / Analytics / Visualization": {
+            "n": 106,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 38,
+              "HIRE": 45
+            },
+            "accuracy": 0.217,
+            "macro_f1": 0.1198,
+            "binary_f1": 0.0238,
+            "verdict_counts": {
+              "REJECT": 105,
+              "CONSIDER": 0,
+              "HIRE": 1
+            }
+          },
+          "Backend Development": {
+            "n": 152,
+            "class_counts": {
+              "REJECT": 23,
+              "CONSIDER": 57,
+              "HIRE": 72
+            },
+            "accuracy": 0.1579,
+            "macro_f1": 0.0999,
+            "binary_f1": 0.0305,
+            "verdict_counts": {
+              "REJECT": 150,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "Blockchain / Web3": {
+            "n": 42,
+            "class_counts": {
+              "REJECT": 34,
+              "CONSIDER": 0,
+              "HIRE": 8
+            },
+            "accuracy": 0.8095,
+            "macro_f1": 0.3022,
+            "binary_f1": 0.2222,
+            "verdict_counts": {
+              "REJECT": 41,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          },
+          "Cybersecurity / AppSec": {
+            "n": 133,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 48,
+              "HIRE": 56
+            },
+            "accuracy": 0.218,
+            "macro_f1": 0.1216,
+            "binary_f1": 0.0561,
+            "verdict_counts": {
+              "REJECT": 130,
+              "CONSIDER": 3,
+              "HIRE": 0
+            }
+          },
+          "Data Engineering / Analytics Engineering": {
+            "n": 99,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 34,
+              "HIRE": 36
+            },
+            "accuracy": 0.2929,
+            "macro_f1": 0.1534,
+            "binary_f1": 0.0556,
+            "verdict_counts": {
+              "REJECT": 97,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "Data Science / ML Engineering": {
+            "n": 96,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 33,
+              "HIRE": 34
+            },
+            "accuracy": 0.3021,
+            "macro_f1": 0.1572,
+            "binary_f1": 0.058,
+            "verdict_counts": {
+              "REJECT": 94,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "DevOps / Cloud Engineering": {
+            "n": 138,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 65,
+              "HIRE": 52
+            },
+            "accuracy": 0.1522,
+            "macro_f1": 0.0892,
+            "binary_f1": 0.0336,
+            "verdict_counts": {
+              "REJECT": 136,
+              "CONSIDER": 1,
+              "HIRE": 1
+            }
+          },
+          "ERP / CRM / Enterprise Apps": {
+            "n": 63,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 8,
+              "HIRE": 22
+            },
+            "accuracy": 0.5238,
+            "macro_f1": 0.234,
+            "binary_f1": 0.125,
+            "verdict_counts": {
+              "REJECT": 61,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "Embedded / IoT / Robotics": {
+            "n": 56,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 11,
+              "HIRE": 16
+            },
+            "accuracy": 0.5179,
+            "macro_f1": 0.2302,
+            "binary_f1": 0.0714,
+            "verdict_counts": {
+              "REJECT": 55,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          },
+          "Frontend Development": {
+            "n": 130,
+            "class_counts": {
+              "REJECT": 24,
+              "CONSIDER": 49,
+              "HIRE": 57
+            },
+            "accuracy": 0.2,
+            "macro_f1": 0.1318,
+            "binary_f1": 0.0727,
+            "verdict_counts": {
+              "REJECT": 126,
+              "CONSIDER": 4,
+              "HIRE": 0
+            }
+          },
+          "Full Stack Web Development": {
+            "n": 107,
+            "class_counts": {
+              "REJECT": 27,
+              "CONSIDER": 37,
+              "HIRE": 43
+            },
+            "accuracy": 0.2523,
+            "macro_f1": 0.1364,
+            "binary_f1": 0.0488,
+            "verdict_counts": {
+              "REJECT": 105,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "Game Development / AR / VR": {
+            "n": 92,
+            "class_counts": {
+              "REJECT": 29,
+              "CONSIDER": 25,
+              "HIRE": 38
+            },
+            "accuracy": 0.3152,
+            "macro_f1": 0.1625,
+            "binary_f1": 0.0615,
+            "verdict_counts": {
+              "REJECT": 90,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "Mobile Development": {
+            "n": 78,
+            "class_counts": {
+              "REJECT": 30,
+              "CONSIDER": 21,
+              "HIRE": 27
+            },
+            "accuracy": 0.3846,
+            "macro_f1": 0.1869,
+            "binary_f1": 0.0408,
+            "verdict_counts": {
+              "REJECT": 77,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          },
+          "Networking / Systems Administration": {
+            "n": 77,
+            "class_counts": {
+              "REJECT": 28,
+              "CONSIDER": 14,
+              "HIRE": 35
+            },
+            "accuracy": 0.3636,
+            "macro_f1": 0.1812,
+            "binary_f1": 0.0784,
+            "verdict_counts": {
+              "REJECT": 75,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "Platform / SRE / Observability": {
+            "n": 127,
+            "class_counts": {
+              "REJECT": 25,
+              "CONSIDER": 51,
+              "HIRE": 51
+            },
+            "accuracy": 0.1969,
+            "macro_f1": 0.1096,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 127,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "Product / UX Engineering": {
+            "n": 61,
+            "class_counts": {
+              "REJECT": 33,
+              "CONSIDER": 9,
+              "HIRE": 19
+            },
+            "accuracy": 0.541,
+            "macro_f1": 0.234,
+            "binary_f1": 0.0,
+            "verdict_counts": {
+              "REJECT": 61,
+              "CONSIDER": 0,
+              "HIRE": 0
+            }
+          },
+          "QA / Test Automation": {
+            "n": 46,
+            "class_counts": {
+              "REJECT": 35,
+              "CONSIDER": 0,
+              "HIRE": 11
+            },
+            "accuracy": 0.7609,
+            "macro_f1": 0.2954,
+            "binary_f1": 0.3077,
+            "verdict_counts": {
+              "REJECT": 44,
+              "CONSIDER": 2,
+              "HIRE": 0
+            }
+          },
+          "Software Architecture / Technical Leadership": {
+            "n": 132,
+            "class_counts": {
+              "REJECT": 21,
+              "CONSIDER": 39,
+              "HIRE": 72
+            },
+            "accuracy": 0.1591,
+            "macro_f1": 0.0921,
+            "binary_f1": 0.0179,
+            "verdict_counts": {
+              "REJECT": 131,
+              "CONSIDER": 1,
+              "HIRE": 0
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -90,7 +90,9 @@ def test_full_coverage_when_cv_lists_all_required_skills():
     required = ["HTML", "CSS", "JavaScript", "React", "Node.js",
                 "Express", "MongoDB", "SQL", "Git", "REST API", "Docker"]
     job = "Full Stack Web Developer. Required skills: " + ", ".join(required) + "."
-    cv = "Full Stack Web Developer. Proficient in " + ", ".join(required) + "."
+    # Same skills in a different order: the CV must not repeat the offer
+    # verbatim, otherwise the copied run is ignored (see the next test).
+    cv = "Full Stack Web Developer. Proficient in " + ", ".join(reversed(required)) + "."
 
     matcher = SkillMatcher()
     analysis = matcher.predict_detailed(cv, job)
@@ -106,3 +108,13 @@ def test_full_coverage_when_cv_lists_all_required_skills():
     assert matched | missing == job_hard
     assert matched & missing == set()
 
+
+def test_requirement_list_copied_verbatim_is_ignored():
+    """Pasting the offer's requirement list in the same order is treated as copy."""
+    required = ["HTML", "CSS", "JavaScript", "React", "Node.js",
+                "Express", "MongoDB", "SQL", "Git", "REST API", "Docker"]
+    job = "Full Stack Web Developer. Required skills: " + ", ".join(required) + "."
+    cv = "Full Stack Web Developer. Proficient in " + ", ".join(required) + "."
+    analysis = SkillMatcher().predict_detailed(cv, job)
+    assert analysis["evidence"]["copied_tokens"] >= 8
+    assert analysis["matching_hard_skills"] == []

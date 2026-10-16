@@ -23,7 +23,9 @@ import { cn } from "@/lib/utils";
 
 interface Ranked {
   name: string;
-  score: number; // pct
+  score: number; // calibrated display score (0-100)
+  rawScore: number | null; // method's native 0-1 score
+  calibration: string;
   decision: Decision | "ERROR";
   confidence: string;
   matched: string[];
@@ -84,6 +86,8 @@ export default function LeaderboardPage() {
         out.push({
           name,
           score: r.result.percentage,
+          rawScore: r.result.raw_score ?? null,
+          calibration: r.result.calibration_version ?? "uncalibrated",
           decision: r.decision.decision,
           confidence: r.decision.confidence_level,
           matched: ex.skill_analysis.matching_skills,
@@ -91,11 +95,13 @@ export default function LeaderboardPage() {
           summary: ex.hiring_recommendation.justification,
         });
       } catch (e) {
-        out.push({ name, score: 0, decision: "ERROR", confidence: "", matched: [], critical: [], summary: e instanceof Error ? e.message : "Failed" });
+        out.push({ name, score: 0, rawScore: null, calibration: "", decision: "ERROR", confidence: "", matched: [], critical: [], summary: e instanceof Error ? e.message : "Failed" });
       }
     }
-    // sort: score desc, name asc (deterministic ties)
-    out.sort((a, b) => b.score - a.score || a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+    // sort: calibrated score desc, then raw score desc (the calibration caps the
+    // display at 100, so distinct raw scores can share 100), then name asc.
+    out.sort((a, b) => b.score - a.score || (b.rawScore ?? -1) - (a.rawScore ?? -1)
+      || a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
     setResults(out);
     setRunning(false);
   };
@@ -109,10 +115,14 @@ export default function LeaderboardPage() {
 
   const exportCsv = () => {
     if (!results) return;
-    const header = ["Rank", "Candidate", "Score (%)", "Decision", "Matched Skills", "Priority Gaps"];
+    const q = (v: string) => `"${v.replace(/"/g, '""')}"`;
+    const header = ["Rank", "Candidate", "Calibrated score", "Raw score", "Decision",
+      "Potential Fit threshold", "Strong Fit threshold", "Calibration", "Matched Skills", "Priority Gaps"];
     const lines = results.map((r, i) => [
-      i + 1, `"${r.name}"`, r.score.toFixed(1), r.decision,
-      `"${r.matched.slice(0, 5).join(", ")}"`, `"${r.critical.slice(0, 3).join(", ")}"`,
+      i + 1, q(r.name), r.decision === "ERROR" ? "" : r.score.toFixed(1),
+      r.rawScore != null ? r.rawScore.toFixed(4) : "", r.decision,
+      cfg.potential, cfg.strong, q(r.calibration),
+      q(r.matched.slice(0, 5).join(", ")), q(r.critical.slice(0, 3).join(", ")),
     ].join(","));
     const csv = [header.join(","), ...lines].join("\n");
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
@@ -121,12 +131,11 @@ export default function LeaderboardPage() {
     URL.revokeObjectURL(url);
   };
 
-  const maxScore = Math.max(1, ...(results ?? []).map((r) => r.score));
 
   return (
     <div className="flex flex-col gap-6">
       <PageHeader badge="Talent Leaderboard" title="Talent" highlight="Leaderboard"
-        subtitle="Upload multiple CVs and a single job description. JobTest ranks every candidate by AI compatibility score with a full skill breakdown and hire decision for each." />
+        subtitle="Upload multiple CVs and a single job description. JobTest ranks every candidate by calibrated score (/100) with a skill breakdown and a recommended verdict for each." />
 
       <div className="grid gap-4 lg:grid-cols-[1fr_1.6fr]">
         <Card elevation={2}>
@@ -138,7 +147,7 @@ export default function LeaderboardPage() {
               {jobs.map((j) => <option key={j.id} value={j.id}>[{j.job_code}] {j.title}</option>)}
             </Select>
             <div className="mt-3 rounded-lg bg-accent/8 px-3 py-2 text-caption text-ink-secondary ring-1 ring-accent/15">
-              Active policy — Strong Fit ≥ {cfg.strong}%, Potential Fit {cfg.potential}–{cfg.strong - 1}%.
+              Active policy (calibrated score /100) — Strong Fit ≥ {cfg.strong}, Potential Fit ≥ {cfg.potential}.
             </div>
           </CardBody>
         </Card>
@@ -194,8 +203,8 @@ export default function LeaderboardPage() {
             <MiniStat icon={<CheckCircle2 className="h-4 w-4" />} label="Strong Fit" value={nHire} tone="success" />
             <MiniStat icon={<MinusCircle className="h-4 w-4" />} label="Potential Fit" value={nCons} tone="warning" />
             <MiniStat icon={<XCircle className="h-4 w-4" />} label="Low Fit" value={nRej} tone="danger" />
-            <MiniStat icon={<Award className="h-4 w-4" />} label="Avg Score" value={`${avg.toFixed(0)}%`} tone="accent" />
-            <MiniStat icon={<Trophy className="h-4 w-4" />} label="Top Score" value={`${top.toFixed(0)}%`} tone="cyan" />
+            <MiniStat icon={<Award className="h-4 w-4" />} label="Avg Score" value={`${avg.toFixed(0)}/100`} tone="accent" />
+            <MiniStat icon={<Trophy className="h-4 w-4" />} label="Top Score" value={`${top.toFixed(0)}/100`} tone="cyan" />
           </motion.div>
 
           <Card elevation={2}>
@@ -209,9 +218,9 @@ export default function LeaderboardPage() {
                     <span className="w-32 shrink-0 truncate text-caption text-ink-secondary">{r.name}</span>
                     <div className="h-3 flex-1 overflow-hidden rounded-full bg-surface-overlay">
                       <motion.div className={cn("h-full rounded-full", tone === "success" ? "bg-success" : tone === "warning" ? "bg-warning" : tone === "danger" ? "bg-danger" : "bg-ink-muted")}
-                        initial={{ width: 0 }} animate={{ width: `${(r.score / maxScore) * 100}%` }} transition={{ duration: 0.7, delay: i * 0.03 }} />
+                        initial={{ width: 0 }} animate={{ width: `${Math.min(100, r.score)}%` }} transition={{ duration: 0.7, delay: i * 0.03 }} />
                     </div>
-                    <span className="tnum w-10 text-right text-caption font-medium text-ink">{r.score.toFixed(0)}%</span>
+                    <span className="tnum w-14 text-right text-caption font-medium text-ink">{r.score.toFixed(0)}/100</span>
                   </div>
                 );
               })}
@@ -288,7 +297,7 @@ function PodiumCol({ c, delay, reduced }: { c: { r: Ranked; rank: number }; dela
         </div>
         <div className="max-w-[8rem] truncate text-caption font-semibold text-ink">{c.r.name}</div>
         <div className="font-display text-h3 font-bold text-gradient tnum">
-          <CountUp to={c.r.score} decimals={0} suffix="%" duration={900} delay={reduced ? 0 : (delay + 0.25) * 1000} />
+          <CountUp to={c.r.score} decimals={0} suffix="/100" duration={900} delay={reduced ? 0 : (delay + 0.25) * 1000} />
         </div>
         {c.r.decision !== "ERROR" && <Badge status={status as "success" | "warning" | "danger"}>{BAND_LABEL[c.r.decision]}</Badge>}
       </motion.div>
@@ -358,7 +367,7 @@ function LeaderCard({ rank, r }: { rank: number; r: Ranked }) {
         </div>
         <div className="relative grid place-items-center text-right">
           {r.decision === "HIRE" && <StrongFitBurst show size="sm" />}
-          <div className="relative font-display text-h1 font-bold text-gradient tnum">{r.score.toFixed(0)}%</div>
+          <div className="relative font-display text-h1 font-bold text-gradient tnum">{r.score.toFixed(0)}<span className="text-h4">/100</span></div>
         </div>
       </div>
     </motion.div>

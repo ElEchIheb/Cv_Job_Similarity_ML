@@ -1,6 +1,7 @@
 import os
 import sys
 from pathlib import Path
+import json
 import pickle
 import pandas as pd
 import logging
@@ -31,19 +32,27 @@ def export_model():
     
     logger.info(f"Split sizes: Train={len(split.train)}, Validation={len(split.validation)}, Test={len(split.test)}")
     
-    logger.info("Using the documented production fusion weights (no weight optimization)...")
-    hybrid = HybridMatcher(weights=DOCUMENTED_DEFAULT_WEIGHTS)
-    hybrid.fit(split.train)
-    calibration = hybrid.calibrate_threshold(split.validation)
-    logger.info("Using weights: %s", hybrid.weights)
-    logger.info("Validation-calibrated threshold: %s", hybrid.optimal_threshold)
+    # The fusion weights and the score calibration are produced together by
+    # evaluation/calibration_study.py (selection on train/validation only).
+    calibration_path = PROJECT_ROOT / "models" / "checkpoints" / "score_calibration.json"
+    weights = dict(DOCUMENTED_DEFAULT_WEIGHTS)
+    if calibration_path.exists():
+        weights = json.loads(calibration_path.read_text(encoding="utf-8"))["provenance"]["hybrid_weights"]
+    logger.info("Using fusion weights: %s", weights)
+    hybrid = HybridMatcher(weights=weights)
 
-    # The validation split selects only the operating threshold. Refit the
-    # vocabulary on train+validation for the deployable checkpoint; test is
-    # never read by this export path.
-    logger.info("Refitting TFIDFMatcher on Training & Validation data...")
-    hybrid.fit(pd.concat([split.train, split.validation], ignore_index=True))
-    
+    # The calibration anchors were learned on TF-IDF scores from a vectorizer
+    # fitted on the TRAINING split only; the deployable checkpoint must use the
+    # same vectorizer, otherwise the learned cut points would not apply exactly.
+    hybrid.fit(split.train)
+    # The experimental binary threshold is a benchmark artefact (not used for
+    # decisions); keep the recorded value instead of re-scoring validation.
+    results_path = PROJECT_ROOT / "evaluation" / "results" / "evaluation_results.json"
+    if results_path.exists():
+        hybrid.optimal_threshold = json.loads(results_path.read_text(encoding="utf-8"))[
+            "metrics"]["hybrid"]["operating_threshold"]
+    logger.info("Experimental threshold kept for reference only: %s", hybrid.optimal_threshold)
+
     logger.info(f"TFIDF is_fitted status: {hybrid.models['tfidf'].is_fitted}")
     
     checkpoint_dir = PROJECT_ROOT / "models" / "checkpoints"

@@ -195,6 +195,11 @@ def _assert_owned(db: Session, current_user, *, candidate_id=None, job_offer_id=
             raise HTTPException(status_code=404, detail="Job offer not found")
 
 
+def _service_model_version() -> str:
+    from src.matching.service import MODEL_VERSION
+    return MODEL_VERSION
+
+
 # ── Core matching logic ───────────────────────────────────────────────────────
 def _model_result(
     model_name: str,
@@ -207,20 +212,16 @@ def _model_result(
 
     start = time.perf_counter()
 
-    if model_name == "hybrid":
-        result = _svc("hybrid").predict(cv_text, job_text)
-    else:
-        score  = float(_svc(model_name).predict(cv_text, job_text))
-        threshold = settings.MATCH_THRESHOLD
-        result = {
-            "final_score":      round(score, 4),
-            "percentage":       round(score * 100.0, 1),
-            "label":            1 if score >= threshold else 0,
-            "confidence":       "high" if abs(score - threshold) > 0.15 else "medium",
-            "component_scores": {f"{model_name}_score": round(score, 4)},
-            "weights_used":     {model_name: 1.0},
-            "skill_details":    _svc("skill").predict_detailed(cv_text, job_text),
-        }
+    # Same scoring path as the UI routes: raw score -> versioned calibration.
+    from src.matching.service import score_pair
+    from src.decisioning import DecisionEngine
+    result = score_pair(_get_services(), cv_text, job_text, model_name)
+    decision = DecisionEngine().evaluate(
+        result["percentage"],
+        critical_missing=list(result.get("skill_details", {}).get("critical_missing", [])),
+    )
+    result["label"] = 0 if decision.decision == "REJECT" else 1
+    result["confidence"] = decision.confidence_level
 
     explanation      = _svc("explainer").explain(cv_text, job_text, result)
     recommendations  = _svc("recommender").generate(explanation["gap_analysis"])
@@ -234,7 +235,10 @@ def _model_result(
 
     return {
         "score":             result["final_score"],
+        "raw_score":         result["raw_score"],
         "percentage":        result["percentage"],
+        "calibration_version": result["calibration_version"],
+        "decision":          decision.decision,
         "label":             result["label"],
         "confidence":        result["confidence"],
         "component_scores":  result.get("component_scores", {}),
@@ -425,7 +429,9 @@ def create_app():
                     candidate_id=request.candidate_id,
                     job_offer_id=request.job_offer_id,
                     final_score=result.get("score"),
-                    score_hybrid=result.get("component_scores", {}).get("hybrid_score"),
+                    score_raw=result.get("raw_score"),
+                    calibration_version=result.get("calibration_version"),
+                    score_hybrid=result.get("raw_score") if request.model == "hybrid" else None,
                     score_semantic=result.get("component_scores", {}).get("embedding_score"),
                     score_keyword=result.get("component_scores", {}).get("tfidf_score"),
                     score_skill=result.get("component_scores", {}).get("skill_score"),
@@ -434,7 +440,7 @@ def create_app():
                     decision_confidence=result.get("explanation", {}).get("hiring_recommendation", {}).get("confidence"),
                     strong_fit_threshold=result.get("explanation", {}).get("decision_config", {}).get("strong_fit_threshold"),
                     potential_fit_threshold=result.get("explanation", {}).get("decision_config", {}).get("potential_fit_threshold"),
-                    model_version="hybrid-checkpoint-v2",
+                    model_version=_service_model_version(),
                     model_used=request.model,
                     decision_config=json.dumps(result.get("explanation", {}).get("decision_config", {})),
                     metadata_flags=json.dumps({
@@ -517,16 +523,24 @@ def create_app():
             handle.write(await cv_file.read())
             temp_path = handle.name
         try:
-            if suffix == ".pdf":
-                cv_text = extract_text_from_pdf(temp_path)
-            elif suffix in {".docx", ".doc"}:
-                cv_text = extract_text_from_docx(temp_path)
-            else:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Only PDF and DOCX files are supported.",
-                )
-            
+            try:
+                if suffix == ".pdf":
+                    cv_text = extract_text_from_pdf(temp_path)
+                elif suffix in {".docx", ".doc"}:
+                    cv_text = extract_text_from_docx(temp_path)
+                else:
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Only PDF and DOCX files are supported.",
+                    )
+            except HTTPException:
+                raise
+            except Exception as exc:  # corrupt / encrypted / mislabelled document
+                raise HTTPException(status_code=400,
+                                    detail="This file could not be read as a PDF or DOCX document.") from exc
+            if not cv_text or len(cv_text.split()) < 5:
+                raise HTTPException(status_code=400, detail="No readable text extracted from this file.")
+
             result = _model_result(model, cv_text, job_text)
             
             # Save MatchResult if candidate and job offer are provided
@@ -539,7 +553,9 @@ def create_app():
                     candidate_id=candidate_id,
                     job_offer_id=job_offer_id,
                     final_score=result.get("score"),
-                    score_hybrid=result.get("component_scores", {}).get("hybrid_score"),
+                    score_raw=result.get("raw_score"),
+                    calibration_version=result.get("calibration_version"),
+                    score_hybrid=result.get("raw_score") if model == "hybrid" else None,
                     score_semantic=result.get("component_scores", {}).get("embedding_score"),
                     score_keyword=result.get("component_scores", {}).get("tfidf_score"),
                     score_skill=result.get("component_scores", {}).get("skill_score"),
@@ -548,7 +564,7 @@ def create_app():
                     decision_confidence=result.get("explanation", {}).get("hiring_recommendation", {}).get("confidence"),
                     strong_fit_threshold=result.get("explanation", {}).get("decision_config", {}).get("strong_fit_threshold"),
                     potential_fit_threshold=result.get("explanation", {}).get("decision_config", {}).get("potential_fit_threshold"),
-                    model_version="hybrid-checkpoint-v2",
+                    model_version=_service_model_version(),
                     model_used=model,
                     explanation_json=json.dumps({
                         "explanation": result.get("explanation"),
@@ -603,6 +619,7 @@ def create_app():
                     "rank":              0,  # filled below
                     "candidate_name":    name,
                     "score":             res["score"],
+                    "raw_score":         res["raw_score"],
                     "percentage":        res["percentage"],
                     "label":             res["label"],
                     "confidence":        res["confidence"],
@@ -616,7 +633,9 @@ def create_app():
                 logger.warning("Failed to rank candidate '%s': %s", name, exc)
                 ranked.append({"candidate_name": name, "error": str(exc)})
 
-        ranked.sort(key=lambda x: x.get("score", -1), reverse=True)
+        # Calibrated score first; the calibration caps the display at 100, so
+        # ties between distinct raw scores are broken by the raw score.
+        ranked.sort(key=lambda x: (x.get("score", -1), x.get("raw_score", -1)), reverse=True)
         for i, item in enumerate(ranked, 1):
             item["rank"] = i
 

@@ -21,9 +21,11 @@ export function ConfidenceBar({
   return (
     <div>
       <div className="mb-1.5 flex items-center justify-between text-caption">
-        <span className="text-ink-secondary">Model confidence</span>
+        <span className="text-ink-secondary" title="Distance between the score and the nearest decision threshold. It is not a probability of hire or of correctness.">
+          Distance from threshold
+        </span>
         <span className={cn("font-medium capitalize", level === "high" ? "text-success-fg" : level === "medium" ? "text-warning-fg" : "text-danger-fg")}>
-          {level} · {(value * 100).toFixed(0)}%
+          {level} · {(value * 100).toFixed(0)}/100
         </span>
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-surface-overlay">

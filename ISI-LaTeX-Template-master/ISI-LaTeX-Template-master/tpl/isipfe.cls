@@ -117,6 +117,17 @@
 % Disabled for compatibility with the current MiKTeX Babel/Arabi stack.
 % The main report does not include the optional Arabic abstract template.
 \renewcommand{\selectlanguage}[1]{}
+% Without babel the standard class names stay in English ("Chapter",
+% "Appendix"); set the French names used in chapter openings and headers.
+\renewcommand{\chaptername}{Chapitre}
+\renewcommand{\appendixname}{Annexe}
+% French hyphenation patterns without babel (when present in the format),
+% plus some emergency stretch so long technical words do not overflow.
+\ifdefined\l@french
+  \language=\l@french
+  \typeout{isipfe: French hyphenation patterns enabled}
+\fi
+\setlength{\emergencystretch}{2em}
 
 %%%%%%%%%%%
 
@@ -127,8 +138,9 @@
 \PassOptionsToPackage{%
     %backend=bibtex8,bibencoding=ascii,%
     %language=autobib,%
-    language=auto,
-    %language=french,
+    %language=auto,
+    % babel is disabled (see above): force French bibliography strings.
+    language=french,
     %autocite=inline,
     %style=numeric-comp,%
     %style=authoryear-comp, % Author 1999, 2010
@@ -150,6 +162,13 @@
 %\renewcommand*{\bibfont}{\small\raggedright}
 %\DefineBibliographyExtras{french}{\renewcommand*\mkbibnamelast[1]{#1}}
 \addbibresource{biblio.bib}
+% Do not print consultation dates ("visité le ...") in the bibliography.
+\AtEveryBibitem{\clearfield{urlyear}\clearfield{urlmonth}\clearfield{urlday}}
+% Allow long URLs to break at any character instead of overflowing.
+\RequirePackage{xurl}
+\setcounter{biburllcpenalty}{7000}
+\setcounter{biburlucpenalty}{8000}
+\setcounter{biburlnumpenalty}{9000}
 %\DefineBibliographyStrings{french}{%
 %  bibliography = {Bibliographie},
 %}

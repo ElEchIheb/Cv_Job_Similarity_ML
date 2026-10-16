@@ -1,0 +1,5 @@
+Rank,Candidate,Score (%),Decision,Matched Skills,Priority Gaps
+1,"Amira Khelifi",81.5,HIRE,"aws, docker, fastapi, kubernetes, machine learning",""
+2,"Mehdi Gharbi",48.0,REJECT,"docker, postgresql, python, tensorflow, communication","aws, fastapi, kubernetes"
+3,"Lina Mansour",40.3,REJECT,"docker, fastapi, postgresql, python, communication","aws, kubernetes, mlflow"
+4,"Karim Jaziri",13.7,REJECT,"communication","aws, docker, fastapi"

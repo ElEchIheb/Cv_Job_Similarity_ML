@@ -128,7 +128,7 @@ export function ProgressMini({ value }: { value: number }) {
       <div className="h-1.5 w-16 overflow-hidden rounded-full bg-surface-overlay">
         <div className={`h-full rounded-full ${tone}`} style={{ width: `${Math.min(100, v)}%` }} />
       </div>
-      <span className="tnum text-caption font-medium text-ink">{v.toFixed(0)}%</span>
+      <span className="tnum text-caption font-medium text-ink">{v.toFixed(0)}<span className="text-ink-muted">/100</span></span>
     </div>
   );
 }

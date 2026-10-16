@@ -1,0 +1,22 @@
+[
+ {
+  "t": 5.04,
+  "label": "loaded"
+ },
+ {
+  "t": 5.76,
+  "label": "shot:login"
+ },
+ {
+  "t": 14.39,
+  "label": "register"
+ },
+ {
+  "t": 18.72,
+  "label": "shot:register"
+ },
+ {
+  "t": 26.53,
+  "label": "end"
+ }
+]

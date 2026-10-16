@@ -15,10 +15,10 @@ export default function LoginPage() {
   const router = useRouter();
   const toast = useToast();
   const [mode, setMode] = useState<"login" | "register">("login");
-  const [email, setEmail] = useState("testadmin@gmail.com");
-  const [password, setPassword] = useState("test1234");
-  const [confirm, setConfirm] = useState("test1234");
-  const [name, setName] = useState("Test Admin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
   const submit = async (e: React.FormEvent) => {

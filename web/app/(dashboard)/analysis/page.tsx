@@ -109,7 +109,7 @@ export default function AnalysisPage() {
               badge="Candidate Evaluation"
               title="Candidate"
               highlight="Analysis"
-              subtitle="Evaluate a candidate's profile against a job description using the JobTest AI engine — receive a compatibility score, skill breakdown, and a clear hire recommendation."
+              subtitle="Evaluate a candidate's profile against a job description using the JobTest AI engine — receive a calibrated score (/100), a skill breakdown and a recommended verdict."
             />
 
             <div className="grid gap-4 lg:grid-cols-[1fr_1.4fr]">
@@ -145,7 +145,7 @@ export default function AnalysisPage() {
                       </div>
                     )}
                     <div className="rounded-lg bg-accent/8 px-3 py-2 text-caption text-ink-secondary ring-1 ring-accent/15">
-                      Active policy — Strong Fit ≥ {cfg.strong}%, Potential Fit {cfg.potential}–{cfg.strong - 1}%.
+                      Active policy (calibrated score /100) — Strong Fit ≥ {cfg.strong}, Potential Fit ≥ {cfg.potential}.
                     </div>
                   </CardBody>
                 </Card>
@@ -294,6 +294,28 @@ function ResultView({ result, name, jobTitle, onReset, toast }: {
               confidenceLevel={result.decision.confidence_level}
             />
             <p className="mt-2 max-w-md text-center text-body text-ink-secondary">{ex.hiring_recommendation.justification}</p>
+            {ex.hiring_recommendation.evidence && (ex.hiring_recommendation.evidence_gap
+              || ex.hiring_recommendation.evidence.declared_only_skills.length > 0
+              || ex.hiring_recommendation.evidence.copied_tokens > 0) && (
+              <div className="max-w-md rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-caption text-ink-secondary">
+                <strong className="text-ink">Evidence check.</strong>{" "}
+                {ex.hiring_recommendation.evidence.structure_detected
+                  ? `${ex.hiring_recommendation.evidence.demonstrated_count} of ${ex.hiring_recommendation.evidence.matched_hard_count} matched skills appear in the described experience.`
+                  : "No section heading detected: declared and demonstrated skills cannot be separated."}
+                {ex.hiring_recommendation.evidence.declared_only_skills.length > 0 &&
+                  ` Listed without supporting experience: ${ex.hiring_recommendation.evidence.declared_only_skills.slice(0, 6).join(", ")}.`}
+                {ex.hiring_recommendation.evidence.copied_tokens > 0 &&
+                  ` ${ex.hiring_recommendation.evidence.copied_tokens} words copied verbatim from the offer were ignored.`}
+              </div>
+            )}
+            <p className="max-w-md text-center text-caption text-ink-muted">
+              {result.result.score_scale === "uncalibrated"
+                ? "Uncalibrated score (raw method score × 100): no calibration file is installed."
+                : `Calibrated score (calibration ${result.result.calibration_version ?? "n/a"})`}
+              {result.result.raw_score != null && ` · method raw score ${result.result.raw_score.toFixed(3)}`}
+              {` · bands: Potential Fit ≥ ${result.config.potential_fit_threshold}, Strong Fit ≥ ${result.config.strong_fit_threshold}.`}
+              {" The calibration was fitted on synthetic data; the final decision remains the recruiter's."}
+            </p>
           </CardBody>
         </Card>
 
@@ -315,7 +337,7 @@ function ResultView({ result, name, jobTitle, onReset, toast }: {
 
       {/* breakdown + experience */}
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
-        <Card elevation={2}><CardHeader><CardTitle>Score breakdown</CardTitle></CardHeader>
+        <Card elevation={2}><CardHeader><CardTitle>Score breakdown</CardTitle><span className="text-caption text-ink-muted">raw sub-scores, before fusion and calibration</span></CardHeader>
           <CardBody><ScoreBreakdown scores={result.result.component_scores} /></CardBody></Card>
         <Card elevation={2}><CardHeader><CardTitle>Experience fit</CardTitle></CardHeader>
           <CardBody className="flex flex-col gap-3 text-body">
@@ -377,7 +399,7 @@ function ResultView({ result, name, jobTitle, onReset, toast }: {
                 </div>
               )}
               <div className="grid grid-cols-3 gap-3 border-t border-subtle/10 pt-4">
-                <Metric icon={<Brain className="h-4 w-4" />} label="Semantic Match" value={`${sem.score.toFixed(1)}%`} />
+                <Metric icon={<Brain className="h-4 w-4" />} label="Semantic similarity (raw)" value={`${sem.score.toFixed(1)}%`} />
                 <Metric label="Topic Overlap" value={`${(sem.theme_overlap * 100).toFixed(0)}%`} />
                 <Metric label="Interpretation" value={sem.interpretation} small />
               </div>
@@ -450,7 +472,7 @@ function ResultView({ result, name, jobTitle, onReset, toast }: {
 
       <div className="flex items-center gap-2 text-caption text-ink-muted">
         <Lightbulb className="h-3.5 w-3.5" />
-        Decision policy at evaluation time — Strong Fit ≥ {result.decision.strong_fit_threshold}%, Potential Fit ≥ {result.decision.potential_fit_threshold}%.
+        Decision policy at evaluation time (calibrated score /100) — Strong Fit ≥ {result.decision.strong_fit_threshold}, Potential Fit ≥ {result.decision.potential_fit_threshold}.
       </div>
     </motion.div>
   );

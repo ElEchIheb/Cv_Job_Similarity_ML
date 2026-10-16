@@ -45,9 +45,9 @@ export function ScoreReveal({
           <div className="flex flex-col items-center">
             <div className="font-display text-[3.5rem] font-bold leading-none">
               <CountUp to={percentage} decimals={0} duration={1200} className="text-gradient" />
-              <span className="text-gradient text-h2 align-top">%</span>
+              <span className="text-gradient text-h4 align-top">/100</span>
             </div>
-            <span className="mt-1 text-caption uppercase tracking-widest text-ink-muted">Compatibility</span>
+            <span className="mt-1 text-caption uppercase tracking-widest text-ink-muted">Calibrated score</span>
           </div>
         </ScoreObject>
       </div>

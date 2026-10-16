@@ -30,11 +30,13 @@ export default function OverviewPage() {
   // breathes (min 0.6) and a busy one never overwhelms (max ~1.2).
   const activity = ov ? Math.min(1, (ov.total_matches / 40) * 0.6 + ov.avg_score * 0.4) : 0;
   const bgIntensity = 0.6 + activity * 0.6;
+  // Decisions taken on the old raw scale are not mixed with calibrated ones.
+  const current = matches.filter((m) => !m.legacy_scale);
   const dist = (["HIRE", "CONSIDER", "REJECT"] as const).map((d) => ({
     d,
-    count: matches.filter((m) => m.decision === d).length,
+    count: current.filter((m) => m.decision === d).length,
   }));
-  const distTotal = Math.max(1, matches.length);
+  const distTotal = Math.max(1, current.length);
 
   return (
     <div className="flex flex-col gap-6">
@@ -81,7 +83,7 @@ export default function OverviewPage() {
         className="grid grid-cols-2 gap-4 lg:grid-cols-5"
       >
         <StatCard label="Candidates Evaluated" value={ov?.total_candidates ?? 0} icon={<Users className="h-5 w-5" />} tone="accent" />
-        <StatCard label="Avg. Compatibility" value={avgPct} suffix="%" decimals={1} icon={<Award className="h-5 w-5" />} tone="success" />
+        <StatCard label="Avg. score (/100)" value={avgPct} decimals={1} icon={<Award className="h-5 w-5" />} tone="success" />
         <StatCard label="HIRE Rate" value={ov?.hire_pct ?? 0} suffix="%" decimals={1} icon={<Shield className="h-5 w-5" />} tone="cyan" />
         <StatCard label="Active Job Offers" value={ov?.total_jobs ?? 0} icon={<Zap className="h-5 w-5" />} tone="warning" />
         <StatCard label="Total Match Reports" value={ov?.total_matches ?? 0} icon={<FileText className="h-5 w-5" />} tone="accent" className="col-span-2 lg:col-span-1" />
@@ -119,7 +121,7 @@ export default function OverviewPage() {
                     <div className="truncate text-caption text-ink-muted">{m.job_title}</div>
                   </div>
                   <div className="tnum text-right font-display text-h4 font-semibold text-ink">
-                    {Math.round((m.final_score ?? 0) * 100)}%
+                    {Math.round((m.final_score ?? 0) * 100)}<span className="text-caption text-ink-muted">/100</span>
                   </div>
                   {m.decision && (
                     <Badge status={status as "success" | "warning" | "danger"} className="w-[92px] justify-center">

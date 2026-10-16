@@ -10,6 +10,7 @@ import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { CountUp } from "@/components/ui/CountUp";
 import { Textarea, Label } from "@/components/ui/Field";
+import { useDecisionConfig } from "@/lib/decision-config";
 import { useToast } from "@/components/ui/Toast";
 import { staggerContainer, fadeUp } from "@/lib/motion";
 import { MODEL_COLORS, MODEL_DESCRIPTIONS, MODEL_LABELS } from "@/lib/constants";
@@ -20,14 +21,18 @@ const ICONS: Record<ModelKey, React.ReactNode> = {
   tfidf: <Search className="h-4 w-4" />, skill: <Layers className="h-4 w-4" />,
 };
 
-function tier(pct: number) {
-  if (pct >= 75) return { label: "Strong Fit", cls: "text-success-fg" };
-  if (pct >= 55) return { label: "Potential Fit", cls: "text-warning-fg" };
-  return { label: "Low Fit", cls: "text-danger-fg" };
+/** Band display for the decision returned by the backend DecisionEngine
+ * (never re-derived here from hard-coded thresholds). */
+function tier(decision: CompareRow["decision"]) {
+  if (decision === "HIRE") return { label: "Strong Fit", cls: "text-success-fg" };
+  if (decision === "CONSIDER") return { label: "Potential Fit", cls: "text-warning-fg" };
+  if (decision === "REJECT") return { label: "Low Fit", cls: "text-danger-fg" };
+  return { label: "N/A", cls: "text-ink-muted" };
 }
 
 export default function InsightsPage() {
   const toast = useToast();
+  const cfg = useDecisionConfig();
   const [cv, setCv] = useState("");
   const [jd, setJd] = useState("");
   const [rows, setRows] = useState<CompareRow[] | null>(null);
@@ -37,13 +42,13 @@ export default function InsightsPage() {
     if (!cv.trim() || !jd.trim()) return toast("error", "Please provide both a CV and a job description.");
     setLoading(true);
     try {
-      const { rows } = await api.compare(cv, jd);
+      const { rows } = await api.compare(cv, jd, { strong: cfg.strong, potential: cfg.potential });
       setRows(rows);
     } catch (e) { toast("error", e instanceof Error ? e.message : "Comparison failed."); }
     finally { setLoading(false); }
   };
 
-  const maxPct = Math.max(1, ...(rows ?? []).map((r) => r.percentage));
+  const calibration = rows?.find((r) => r.calibration_version)?.calibration_version;
 
   return (
     <div className="flex flex-col gap-6">
@@ -63,26 +68,36 @@ export default function InsightsPage() {
 
       {rows && (
         <>
-          <Card elevation={2}><CardHeader><CardTitle className="text-h4">Score comparison</CardTitle></CardHeader>
+          <Card elevation={2}><CardHeader><CardTitle className="text-h4">Calibrated score comparison (/100)</CardTitle></CardHeader>
             <CardBody className="flex flex-col gap-3">
+              <p className="text-caption text-ink-secondary">
+                Each method&apos;s raw similarity (0–1) is mapped to the same 0–100 display scale by its own calibration
+                {calibration ? ` (${calibration})` : ""}, so the bars can be read against the same verdict bands. A score is not a probability of hire.
+              </p>
               {rows.map((r) => (
-                <div key={r.model} className="flex items-center gap-3">
-                  <span className="flex w-40 shrink-0 items-center gap-2 text-caption text-ink-secondary">
+                <div key={r.model} className="flex flex-wrap items-center gap-x-3 gap-y-1 sm:flex-nowrap">
+                  <span className="flex w-full shrink-0 items-center gap-2 text-caption text-ink-secondary sm:w-40">
                     <span style={{ color: MODEL_COLORS[r.model] }}>{ICONS[r.model]}</span>{MODEL_LABELS[r.model]}
                   </span>
-                  <div className="h-3 flex-1 overflow-hidden rounded-full bg-surface-overlay">
+                  <div className="relative h-3 flex-1 overflow-hidden rounded-full bg-surface-overlay">
                     <motion.div className="h-full rounded-full" style={{ background: MODEL_COLORS[r.model] }}
-                      initial={{ width: 0 }} animate={{ width: `${(r.percentage / maxPct) * 100}%` }} transition={{ duration: 0.8 }} />
+                      initial={{ width: 0 }} animate={{ width: `${Math.min(100, r.percentage)}%` }} transition={{ duration: 0.8 }} />
+                    <span className="absolute inset-y-0 w-px bg-warning" style={{ left: `${cfg.potential}%` }} />
+                    <span className="absolute inset-y-0 w-px bg-success" style={{ left: `${cfg.strong}%` }} />
                   </div>
-                  <span className="tnum w-12 text-right text-caption font-medium text-ink">{r.percentage.toFixed(0)}%</span>
+                  <span className="tnum w-16 text-right text-caption font-medium text-ink">{r.percentage.toFixed(1)}/100</span>
                 </div>
               ))}
+              <div className="flex flex-wrap gap-4 text-micro text-ink-muted">
+                <span className="flex items-center gap-1.5"><span className="h-3 w-px bg-warning" /> Potential Fit from {cfg.potential}</span>
+                <span className="flex items-center gap-1.5"><span className="h-3 w-px bg-success" /> Strong Fit from {cfg.strong}</span>
+              </div>
             </CardBody>
           </Card>
 
           <motion.div variants={staggerContainer(0.1)} initial="hidden" animate="show" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {rows.map((r, i) => {
-              const t = tier(r.percentage);
+              const t = tier(r.decision);
               return (
                 <motion.div key={r.model} variants={fadeUp} whileHover={{ y: -4 }}
                   transition={{ type: "spring", stiffness: 300, damping: 24 }}
@@ -91,12 +106,12 @@ export default function InsightsPage() {
                   <span className="relative mb-3 grid h-10 w-10 place-items-center rounded-lg" style={{ color: MODEL_COLORS[r.model], background: `${MODEL_COLORS[r.model]}1f` }}>{ICONS[r.model]}</span>
                   <div className="relative text-caption font-semibold text-ink">{MODEL_LABELS[r.model]}</div>
                   <div className="relative my-1 font-display text-h1 font-bold tnum" style={{ color: MODEL_COLORS[r.model] }}>
-                    <CountUp to={r.percentage} decimals={0} duration={900} delay={i * 100} suffix="%" />
+                    <CountUp to={r.percentage} decimals={0} duration={900} delay={i * 100} suffix="/100" />
                   </div>
                   <div className={cn("relative mb-3 text-caption font-semibold", t.cls)}>{t.label}</div>
                   <div className="relative flex w-full items-center justify-between border-t border-subtle/10 pt-3 text-micro text-ink-muted">
-                    <span>Speed: {r.speed_ms != null ? `${r.speed_ms} ms` : "N/A"}</span>
-                    <span>Conf: {r.confidence ? String(r.confidence) : "—"}</span>
+                    <span>Raw: {r.raw_score != null ? r.raw_score.toFixed(3) : "—"}</span>
+                    <span>{r.speed_ms != null ? `${r.speed_ms} ms` : "N/A"}</span>
                   </div>
                 </motion.div>
               );
@@ -105,19 +120,21 @@ export default function InsightsPage() {
 
           <Card elevation={1}><CardHeader><CardTitle className="text-h4">Comparison table</CardTitle></CardHeader>
             <CardBody className="overflow-x-auto">
-              <table className="w-full min-w-[520px] text-body">
+              <table className="w-full min-w-[640px] text-body">
                 <thead><tr className="border-b border-subtle/12 text-caption uppercase tracking-wide text-ink-muted">
-                  <th className="px-3 py-2 text-left">Evaluation Method</th><th className="px-3 py-2 text-right">Score</th>
-                  <th className="px-3 py-2 text-left">Assessment</th><th className="px-3 py-2 text-right">Speed</th><th className="px-3 py-2 text-left">Confidence</th>
+                  <th className="px-3 py-2 text-left">Evaluation Method</th><th className="px-3 py-2 text-right">Calibrated score</th>
+                  <th className="px-3 py-2 text-right">Raw score (0–1)</th><th className="px-3 py-2 text-left">Verdict band</th>
+                  <th className="px-3 py-2 text-left" title="Distance between the score and the nearest decision threshold; not a probability.">Distance from threshold</th><th className="px-3 py-2 text-right">Speed</th>
                 </tr></thead>
                 <tbody>
                   {rows.map((r) => (
                     <tr key={r.model} className="border-b border-subtle/8 last:border-0">
                       <td className="px-3 py-2.5 font-medium text-ink">{MODEL_LABELS[r.model]}</td>
-                      <td className="px-3 py-2.5 text-right tnum">{r.percentage.toFixed(1)}%</td>
-                      <td className={cn("px-3 py-2.5", tier(r.percentage).cls)}>{tier(r.percentage).label}</td>
+                      <td className="px-3 py-2.5 text-right tnum">{r.percentage.toFixed(1)}/100</td>
+                      <td className="px-3 py-2.5 text-right tnum text-ink-secondary">{r.raw_score != null ? r.raw_score.toFixed(3) : "—"}</td>
+                      <td className={cn("px-3 py-2.5", tier(r.decision).cls)}>{tier(r.decision).label}</td>
+                      <td className="px-3 py-2.5 capitalize text-ink-secondary">{r.confidence ? String(r.confidence) : "—"}</td>
                       <td className="px-3 py-2.5 text-right tnum text-ink-secondary">{r.speed_ms != null ? `${r.speed_ms} ms` : "N/A"}</td>
-                      <td className="px-3 py-2.5 text-ink-secondary">{r.confidence ? String(r.confidence) : "—"}</td>
                     </tr>
                   ))}
                 </tbody>

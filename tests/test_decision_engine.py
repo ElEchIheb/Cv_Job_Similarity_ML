@@ -34,10 +34,17 @@ def test_below_potential_is_reject(engine):
     assert engine.classify(46) == REJECT     # the old "46% -> HIRE" bug is gone
 
 
-def test_fraction_and_percentage_equivalent(engine):
-    # 0.83 (fraction) and 83 (percentage) must classify identically
-    assert engine.classify(0.83) == engine.classify(83) == HIRE
-    assert engine.classify(0.40) == engine.classify(40) == REJECT
+def test_small_percentages_are_not_rescaled(engine):
+    # Regression: the engine used to treat any value in [0, 1] as a fraction,
+    # so a 0.9 % score became 90 % and was classified HIRE.
+    assert engine.classify(0.9) == REJECT
+    assert engine.classify(1.0) == REJECT
+    assert engine.evaluate(0.5).percentage == 0.5
+
+
+def test_fractions_need_explicit_conversion(engine):
+    assert engine.classify(engine.from_fraction(0.83)) == engine.classify(83) == HIRE
+    assert engine.classify(engine.from_fraction(0.40)) == engine.classify(40) == REJECT
 
 
 # ── Configurable thresholds ──────────────────────────────────────────────────
@@ -90,8 +97,8 @@ def test_confidence_grows_away_from_boundary(engine):
 
 # ── Determinism / reproducibility ────────────────────────────────────────────
 def test_same_input_same_output(engine):
-    a = engine.evaluate(0.6846)
-    b = engine.evaluate(0.6846)
+    a = engine.evaluate(68.46)
+    b = engine.evaluate(68.46)
     assert a.as_dict() == b.as_dict()
 
 

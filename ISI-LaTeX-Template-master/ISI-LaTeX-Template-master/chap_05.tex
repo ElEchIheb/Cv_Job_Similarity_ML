@@ -8,14 +8,14 @@ Ce chapitre décrit le passage de la conception à une plateforme utilisable par
 
 \subsection{Environnement matériel}
 
-Le développement, les validations locales et la rédaction de ce mémoire ont été réalisés sur l'ordinateur personnel ci-dessous. Cet environnement local est distinct de la machine virtuelle Azure décrite au chapitre~6 ; aucune mesure de performance matérielle n'est déduite de ces caractéristiques.
+J'ai réalisé le développement, les validations locales et la rédaction de ce mémoire sur mon ordinateur personnel, décrit ci-dessous. Cet environnement local est distinct de la machine virtuelle Azure décrite au chapitre~6 ; aucune mesure de performance matérielle n'est déduite de ces caractéristiques.
 
 Le tableau~\ref{tab:chap5-hardware} en donne les caractéristiques.
 
 \begin{table}[H]
 \centering
 \small
-\caption{Environnement matériel local de réalisation}
+\caption{Environnement matériel}
 \label{tab:chap5-hardware}
 \begin{tabularx}{.82\textwidth}{|p{.34\textwidth}|X|}
 \hline
@@ -37,7 +37,7 @@ Le tableau~\ref{tab:chap5-environment} récapitule ces outils et le rôle tenu p
 \begin{table}[H]
 \centering
 \small
-\caption{Environnement de réalisation effectivement utilisé}
+\caption{Environnement de réalisation}
 \label{tab:chap5-environment}
 \begin{tabularx}{\textwidth}{|l|l|X|}
 \hline
@@ -57,7 +57,7 @@ Outils IA & scikit-learn, Sentence-Transformers, spaCy, Ollama & Moteur de rappr
 \hline
 Documents & ReportLab & Construction du rapport PDF d'évaluation.\\
 \hline
-Conteneurs & Docker Compose, Nginx, PostgreSQL & Environnement de déploiement ; détaillé au chapitre 6.\\
+Conteneurs & Docker Compose, Caddy, PostgreSQL & Environnement de déploiement ; détaillé au chapitre 6.\\
 \hline
 \end{tabularx}
 \end{table}
@@ -90,14 +90,14 @@ La seconde couche qualitative est appelée après l'affichage du résultat princ
 
 \subsection{Technologies de données et d'infrastructure}
 
-SQLite constitue le choix par défaut en développement local grâce à une base fichier et à l'intégration SQLAlchemy. Pour l'environnement conteneurisé, le fichier \texttt{docker-compose.yml} définit PostgreSQL 16 comme service de données. Docker Compose réunit également l'API, l'application Web, Ollama et Nginx. Nginx est le point d'entrée HTTP ; il relaie les chemins \texttt{/api/v1/} vers FastAPI et les autres chemins vers Next.js. La procédure complète de sécurisation, de conteneurisation et de déploiement sur machine virtuelle Azure est réservée au chapitre 6.
+SQLite constitue le choix par défaut en développement local grâce à une base fichier et à l'intégration SQLAlchemy. Pour l'environnement conteneurisé, le fichier \texttt{docker-compose.yml} définit PostgreSQL 16 comme service de données. Docker Compose réunit également l'API, l'application Web, Ollama et le proxy inverse. Dans la version déployée, ce proxy est Caddy, point d'entrée HTTPS ; il relaie les chemins \texttt{/api/v1/} vers FastAPI et les autres chemins vers Next.js. La procédure complète de sécurisation, de conteneurisation et de déploiement sur machine virtuelle Azure est réservée au chapitre 6.
 
 Le tableau~\ref{tab:chap5-technology-summary} synthétise ces choix et l'usage qui en est réellement fait.
 
 \begin{table}[H]
 \centering
 \small
-\caption{Synthèse des choix techniques et de leur usage}
+\caption{Choix techniques}
 \label{tab:chap5-technology-summary}
 \begin{tabularx}{\textwidth}{|l|l|X|}
 \hline
@@ -136,7 +136,7 @@ src/ai/              prompts et analyse qualitative Ollama
 src/parsing/         extraction PDF/DOCX et nettoyage
 src/reporting/       génération ReportLab
 src/models_db.py     modèles SQLAlchemy
-deploy/nginx/        configuration de relais HTTP
+deploy/Caddyfile     proxy inverse HTTPS
 \end{verbatim}
 
 Le frontend ne recopie pas les règles du moteur. Son fichier \texttt{lib/api/client.ts} centralise les appels HTTP et les types associés. Côté API, le routeur de parité UI traduit les requêtes de l'interface vers le même service métier que les endpoints techniques. Cette organisation limite les divergences entre un calcul réalisé depuis un écran et un calcul réalisé par API.
@@ -171,213 +171,230 @@ Le parcours d'une évaluation relie deux responsabilités complémentaires. Le n
   \item Sur demande, le frontend envoie les éléments nécessaires à \texttt{/api/v1/report/pdf} et télécharge le document retourné.
 \end{enumerate}
 
-En développement, le client pointe vers l'API locale configurée par \texttt{NEXT\_PUBLIC\_API\_BASE}. Dans le déploiement, le même chemin relatif \texttt{/api/v1} est servi derrière Nginx, ce qui évite d'exposer au navigateur les adresses internes des conteneurs. Les réponses d'erreur HTTP sont transformées en messages d'interface ; l'état particulier de la Layer 2 est, lui, affiché comme une disponibilité de service et non comme un échec de l'évaluation principale.
+En développement, le client pointe vers l'API locale configurée par \texttt{NEXT\_PUBLIC\_API\_BASE}. Dans le déploiement, le même chemin relatif \texttt{/api/v1} est servi derrière le proxy inverse, ce qui évite d'exposer au navigateur les adresses internes des conteneurs. Les réponses d'erreur HTTP sont transformées en messages d'interface ; l'état particulier de la Layer 2 est, lui, affiché comme une disponibilité de service et non comme un échec de l'évaluation principale.
 
 \section{Présentation des interfaces}
 
-Les écrans suivants sont ceux définis par le frontend Next.js final. La capture de la figure \ref{fig:chap5-login} a été obtenue sur l'instance locale lancée pour cette réalisation ; les valeurs préremplies correspondent au jeu de démonstration de la page. Aucune donnée de candidat réel n'a été utilisée.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{img/interfaces/login.png}
-  \caption{Écran réel de connexion de JobTest, sur l'instance locale de démonstration}
-  \label{fig:chap5-login}
-\end{figure}
+J'ai réalisé les captures de cette section sur une instance locale exécutant la version finale du code (modèle \texttt{hybrid-checkpoint-v4} et calibration versionnée livrée). Je les ai produites avec le navigateur Chrome, piloté par un script du dépôt (\texttt{scripts/capture\_screens.py}), dans une fenêtre de 1\,440 $\times$ 900 pixels, sans autre retouche que le masquage des dates. Pour la lisibilité, la barre de navigation latérale, identique sur toutes les pages et visible sur la figure~\ref{fig:chap5-overview}, est recadrée sur les autres écrans de l'application. Le jeu de démonstration est entièrement fictif~: compte recruteur de test, offres rédigées pour l'occasion, candidats dotés d'adresses \texttt{example.com} et dix-huit CV fictifs au format PDF. Aucun CV personnel n'y figure.
 
 \subsection{Connexion et identité visuelle}
 
-La page de connexion comporte les champs courriel et mot de passe, un lien de création de compte et une notification d'erreur en cas d'échec. La partie visuelle présente l'identité JobTest et le rôle d'aide au recrutement. Après authentification, l'utilisateur est dirigé vers la vue d'ensemble. L'inscription est présente sur ce même écran ; elle demande le nom, le courriel, le mot de passe et sa confirmation.
-
-La figure~\ref{fig:chap5-register} montre le formulaire correspondant.
+La page de connexion comporte les champs courriel et mot de passe, un lien de création de compte et une notification d'erreur en cas d'échec. Les champs sont vides à l'ouverture. La partie visuelle présente l'identité JobTest et le rôle d'aide au recrutement. Après authentification, l'utilisateur est dirigé vers la vue d'ensemble (figure~\ref{fig:chap5-login}).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.72\textwidth]{img/interfaces/register.png}
-  \caption{Écran d'inscription du recruteur}
+  \includegraphics[width=.95\textwidth]{img/interfaces/login.png}
+  \caption{Écran de connexion}
+  \label{fig:chap5-login}
+\end{figure}
+
+L'inscription est proposée sur ce même écran~; elle demande le nom, le courriel, le mot de passe et sa confirmation (figure~\ref{fig:chap5-register}).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.95\textwidth]{img/interfaces/register.png}
+  \caption{Écran d'inscription}
   \label{fig:chap5-register}
 \end{figure}
 
 \subsection{Consultation sur mobile}
 
-Les interfaces conservent leur lisibilité sur un écran mobile. Les captures suivantes illustrent l'adaptation de la consultation à un format compact, sans modifier les règles métier ni les résultats fournis par l'API.
-
-La figure~\ref{fig:chap5-mobile-1} donne un premier aperçu de cette adaptation.
+La mise en page s'adapte aux écrans étroits~: la barre latérale laisse place à une navigation horizontale et les grilles passent sur une colonne, sans modifier les règles métier ni les résultats fournis par l'API. La figure~\ref{fig:chap5-mobile-1} montre la vue d'ensemble et l'historique à la largeur d'un téléphone, obtenus par l'émulation mobile du navigateur (390 pixels de large).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.48\textwidth,height=.68\textheight,keepaspectratio]{img/interfaces/phone_1.jpg}
-  \caption{Interface JobTest adaptée à la consultation sur mobile}
+  \includegraphics[width=.34\textwidth]{img/interfaces/phone_1.png}\hspace{1.2cm}%
+  \includegraphics[width=.34\textwidth]{img/interfaces/phone_2.png}
+  \caption{Affichage en largeur mobile}
   \label{fig:chap5-mobile-1}
-\end{figure}
-
-La figure~\ref{fig:chap5-mobile-2} complète cette illustration sur un autre écran.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=.48\textwidth,height=.68\textheight,keepaspectratio]{img/interfaces/phone_2.jpg}
-  \caption{Deuxième vue de l'interface JobTest sur mobile}
-  \label{fig:chap5-mobile-2}
 \end{figure}
 
 \subsection{Vue d'ensemble, offres et candidats}
 
-La vue \emph{Overview} synthétise le nombre de candidats, le nombre d'offres, le nombre d'évaluations, le score moyen ainsi que la part des verdicts \emph{HIRE}. Elle complète ces indicateurs par les résultats récents. Ces valeurs sont calculées côté API à partir des objets appartenant au recruteur connecté, et ne sont donc pas des statistiques globales fictives.
-
-La page \emph{Job Offers} permet de créer, consulter, modifier, fermer ou rouvrir une offre. Chaque offre possède un code, un titre, une description, des compétences demandées et un statut parmi \emph{OPEN}, \emph{ON\_HOLD} et \emph{CLOSED}. La page \emph{Candidates} distingue les candidats des comptes recruteurs. Elle affiche les informations métier disponibles, l'état du parcours et les évaluations associées ; la modification et la suppression sont des actions explicitement proposées par l'interface.
-
-Cette vue est reproduite sur la figure~\ref{fig:chap5-overview}.
+La vue \emph{Overview} synthétise le nombre de candidats, le nombre d'offres, le nombre d'évaluations, le score calibré moyen sur 100 ainsi que la part des verdicts \texttt{HIRE}, puis les résultats récents et la répartition des verdicts. Ces valeurs sont calculées côté API à partir des objets appartenant au recruteur connecté, et seuls les résultats calculés sur l'échelle calibrée entrent dans les moyennes (figure~\ref{fig:chap5-overview}).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.82\textwidth]{img/interfaces/overview.png}
-  \caption{Vue d'ensemble de l'interface JobTest}
+  \includegraphics[width=.95\textwidth]{img/interfaces/overview.png}
+  \caption{Vue d'ensemble}
   \label{fig:chap5-overview}
 \end{figure}
 
-La figure~\ref{fig:chap5-search} illustre la recherche transversale accessible depuis la barre supérieure.
+La figure~\ref{fig:chap5-search} illustre la recherche transversale accessible depuis la barre supérieure (raccourci \texttt{Ctrl+K}).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.82\textwidth]{img/interfaces/search.png}
-  \caption{Fonction de recherche dans l'interface JobTest}
+  \includegraphics[width=.95\textwidth]{img/interfaces/search.png}
+  \caption{Recherche transversale}
   \label{fig:chap5-search}
 \end{figure}
 
-La liste des offres apparaît sur la figure~\ref{fig:chap5-job-offers}.
+La page \emph{Job Offers} permet de créer, consulter, modifier, fermer ou rouvrir une offre. Chaque offre possède un code, un titre, une description, des compétences demandées et un statut parmi \emph{OPEN}, \emph{ON\_HOLD} et \emph{CLOSED} (figures~\ref{fig:chap5-job-offers} et~\ref{fig:chap5-add-job-offer}).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.82\textwidth]{img/interfaces/job_offers.png}
-  \caption{Consultation des offres d'emploi}
+  \includegraphics[width=.8\textwidth]{img/interfaces/job_offers.png}
+  \caption{Liste des offres d'emploi}
   \label{fig:chap5-job-offers}
 \end{figure}
 
-Le formulaire de création est présenté par la figure~\ref{fig:chap5-add-job-offer}.
-
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.82\textwidth]{img/interfaces/add_job_offer.png}
-  \caption{Formulaire de création d'une offre d'emploi}
+  \includegraphics[width=.8\textwidth]{img/interfaces/add_job_offer.png}
+  \caption{Création d'une offre d'emploi}
   \label{fig:chap5-add-job-offer}
 \end{figure}
 
-La figure~\ref{fig:chap5-candidate-history} montre le suivi des candidats et leur état de pipeline.
+La page \emph{Candidate History} distingue les candidats des comptes recruteurs. Elle affiche les informations disponibles, l'état du parcours, le nombre d'évaluations et le meilleur score calibré de chaque candidat~; la modification et la suppression sont des actions explicites (figure~\ref{fig:chap5-candidate-history}).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.82\textwidth]{img/interfaces/condidate_history.png}
+  \includegraphics[width=.8\textwidth]{img/interfaces/condidate_history.png}
   \caption{Suivi des candidats}
   \label{fig:chap5-candidate-history}
 \end{figure}
 
-L'historique des évaluations correspondantes est visible sur la figure~\ref{fig:chap5-analysis-history}.
+L'historique des évaluations liste chaque résultat persisté avec son offre, son score sur 100 et son verdict. Le panneau de détail rappelle la version de calibration, le score brut de la méthode et les seuils appliqués lors du calcul~; un résultat calculé sur l'ancienne échelle y serait signalé comme tel (figure~\ref{fig:chap5-analysis-history}).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.82\textwidth]{img/interfaces/analysis_history.png}
+  \includegraphics[width=.8\textwidth]{img/interfaces/analysis_history.png}
   \caption{Historique des évaluations}
   \label{fig:chap5-analysis-history}
 \end{figure}
 
 \subsection{Évaluation, résultat et analyse approfondie}
 
-L'écran \emph{Candidate Analysis} constitue le point de départ du parcours principal. Il présente les compétences demandées de l'offre choisie, la politique de décision active et le bouton de lancement. Pendant le traitement, l'interface rend visibles les étapes de parsing, d'extraction de compétences, de calcul sémantique, de fusion et de verdict. Cette représentation décrit la progression technique sans présenter le système comme décideur d'embauche.
-
-Le résultat affiche le score global, le verdict recommandé, les sous-scores, le radar et les éléments d'explication. Les compétences correspondantes et manquantes, les forces, les écarts et les actions recommandées sont issus du résultat calculé. Le verdict reste une recommandation algorithmique que le recruteur interprète avec son propre jugement. Le composant d'analyse approfondie peut ensuite montrer une synthèse, une trajectoire, des signaux à examiner, des recommandations et des questions d'entretien lorsque le runtime LLM répond ; sinon, son indisponibilité est affichée sans altérer le score principal.
-
-La figure~\ref{fig:chap5-analysis-entry} montre l'écran de saisie qui ouvre ce parcours.
+L'écran \emph{Candidate Analysis} constitue le point de départ du parcours principal. Il présente les compétences demandées par l'offre choisie, la politique de décision active et le bouton de lancement (figure~\ref{fig:chap5-analysis-entry}). L'exemple suivant évalue un CV fictif de développeur web face à l'offre \emph{Full Stack Web Developer}.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.82\textwidth]{img/interfaces/condidate_anal_1.png}
-  \caption{Saisie des éléments de l'évaluation d'un candidat}
+  \includegraphics[width=.8\textwidth]{img/interfaces/condidate_anal_1.png}
+  \caption{Saisie d'une évaluation}
   \label{fig:chap5-analysis-entry}
 \end{figure}
 
-La progression du calcul puis le score global apparaissent sur la figure~\ref{fig:chap5-analysis-score}.
+Le résultat affiche le score calibré sur 100, le verdict recommandé, la distance au seuil le plus proche et la justification. Sous le score, une mention rappelle la version de calibration, le score brut de la méthode et les bandes appliquées. Dans cet exemple, le score brut de 0,651 dépasse la borne haute de la calibration (0,613)~: le score affiché atteint donc 100, alors que 8 des 11 compétences demandées sont reconnues. La justification signale aussi qu'une compétence exigée, TypeScript, reste à vérifier. La distance au seuil n'est pas une probabilité (figure~\ref{fig:chap5-analysis-score}).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.82\textwidth]{img/interfaces/condidate_anal_2.png}
-  \caption{Progression du calcul et score global de l'évaluation}
+  \includegraphics[width=.8\textwidth]{img/interfaces/condidate_anal_2.png}
+  \caption{Score, verdict et profil de compétences}
   \label{fig:chap5-analysis-score}
 \end{figure}
 
-Le détail des composantes et de l'explication est reproduit par la figure~\ref{fig:chap5-analysis-components}.
+Les sous-scores sont présentés comme des valeurs brutes, avant fusion et calibration, à côté de l'adéquation d'expérience (figure~\ref{fig:chap5-analysis-components}). Les onglets donnent accès aux compétences, aux forces et écarts, aux actions recommandées et aux données brutes.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.82\textwidth]{img/interfaces/condidate_anal_3.png}
-  \caption{Composantes et explication du résultat d'évaluation}
+  \includegraphics[width=.8\textwidth]{img/interfaces/condidate_anal_3.png}
+  \caption{Sous-scores et adéquation d'expérience}
   \label{fig:chap5-analysis-components}
 \end{figure}
 
-La figure~\ref{fig:chap5-analysis-visualization} en donne la lecture graphique complémentaire.
+La constellation des compétences distingue les compétences reconnues, les lacunes prioritaires, les compétences manquantes et les compétences supplémentaires du candidat (figure~\ref{fig:chap5-analysis-visualization}).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.82\textwidth]{img/interfaces/condidate_anal_4.png}
-  \caption{Visualisation complémentaire du résultat d'évaluation}
+  \includegraphics[width=.8\textwidth]{img/interfaces/condidate_anal_4.png}
+  \caption{Compétences reconnues et manquantes}
   \label{fig:chap5-analysis-visualization}
 \end{figure}
 
-La figure~\ref{fig:chap5-analysis-deep} montre la suite du parcours, une fois l'analyse approfondie demandée.
+L'analyse approfondie est demandée automatiquement après l'affichage du résultat. Exécutée localement par \texttt{qwen2.5:1.5b} via Ollama, elle propose une synthèse, une trajectoire, des signaux à examiner, des recommandations et des questions d'entretien. Une mention rappelle qu'elle ne modifie ni le score ni le verdict (figure~\ref{fig:chap5-analysis-deep}). Si le runtime ne répond pas, son indisponibilité est affichée sans altérer le résultat principal.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.72\textwidth]{img/interfaces/condidate_anal_5.png}
-  \caption{Poursuite de l'analyse approfondie dans le parcours candidat}
+  \includegraphics[width=.8\textwidth]{img/interfaces/condidate_anal_5.png}
+  \caption{Analyse approfondie locale}
   \label{fig:chap5-analysis-deep}
 \end{figure}
 
-\subsection{Historique, comparaison et rapport PDF}
-
-La page \emph{History} consulte les résultats persistés, propose un filtrage et donne accès au détail enregistré. \emph{AI Insights} compare les quatre méthodes sur un même couple CV--offre sans créer un nouveau résultat persistant. Le \emph{Talent Leaderboard} accepte plusieurs CV pour une offre et restitue un classement ; le \emph{Quality Center} expose les résultats d'évaluation hors ligne et les figures associées. Enfin, le bouton \emph{Export PDF} de l'écran de résultat déclenche la génération ReportLab et le téléchargement du rapport. Le document reprend les éléments de décision déjà visibles, au lieu de fournir une décision autonome supplémentaire.
-
-La figure~\ref{fig:chap5-leaderboard-selection} montre la sélection de l'offre et des CV à comparer.
+Lorsque les compétences correspondantes reposent surtout sur des déclarations ou sur du texte recopié de l'offre, un encadré \emph{Evidence check} le signale. La figure~\ref{fig:chap5-evidence} montre un CV fictif de graphiste complété par la liste des compétences de l'offre \emph{Data Engineer}~: son score calibré atteint 80,6, mais aucune des huit compétences correspondantes n'apparaît dans l'expérience décrite. Le verdict est donc limité à \emph{Potential Fit} (\texttt{CONSIDER}), avec la liste des compétences seulement déclarées.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.82\textwidth]{img/interfaces/talent_leader_1.png}
-  \caption{Sélection de l'offre et des CV dans Talent Leaderboard}
+  \includegraphics[width=.8\textwidth]{img/interfaces/evidence_check.png}
+  \caption{Verdict limité par le contrôle des preuves}
+  \label{fig:chap5-evidence}
+\end{figure}
+
+\subsection{Classement, comparaison, qualité et paramètres}
+
+Le \emph{Talent Leaderboard} accepte plusieurs CV pour une offre et restitue un classement. Les figures~\ref{fig:chap5-leaderboard-selection} à~\ref{fig:chap5-leaderboard-result} rejouent avec la version finale l'essai décrit au chapitre~\ref{chap:tests-securite}~: dix-huit CV fictifs au format PDF face à l'offre \emph{Full Stack Web Developer}. L'export CSV du classement inclut le score calibré, le score brut, les seuils et la version de calibration.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.8\textwidth]{img/interfaces/talent_leader_1.png}
+  \caption{Sélection de l'offre et des CV}
   \label{fig:chap5-leaderboard-selection}
 \end{figure}
 
-Le classement obtenu est reproduit sur la figure~\ref{fig:chap5-leaderboard-ranking}.
-
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.82\textwidth]{img/interfaces/talent_leader_2.png}
-  \caption{Classement initial des candidats dans Talent Leaderboard}
+  \includegraphics[width=.8\textwidth]{img/interfaces/talent_leader_2.png}
+  \caption{Distribution des scores du classement}
   \label{fig:chap5-leaderboard-ranking}
 \end{figure}
 
-La figure~\ref{fig:chap5-leaderboard-podium} en présente la lecture synthétique et le détail d'un candidat.
-
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.82\textwidth]{img/interfaces/talent_leader_3.png}
-  \caption{Podium et détail d'un classement multi-CV}
+  \includegraphics[width=.8\textwidth]{img/interfaces/talent_leader_3.png}
+  \caption{Podium du classement}
   \label{fig:chap5-leaderboard-podium}
 \end{figure}
 
-La figure~\ref{fig:chap5-leaderboard-result} complète cette restitution.
-
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.82\textwidth]{img/interfaces/talent_leader_4.png}
-  \caption{Résultats complémentaires du classement multi-CV}
+  \includegraphics[width=.8\textwidth]{img/interfaces/talent_leader_4.png}
+  \caption{Suite du classement}
   \label{fig:chap5-leaderboard-result}
 \end{figure}
 
-La figure~\ref{fig:chap5-settings} montre l'écran de réglage des seuils et l'état des composants de la plateforme.
+\emph{AI Insights} compare les quatre méthodes sur un même couple CV--offre sans créer de résultat persistant. Chaque score brut est ramené à l'échelle sur 100 par sa propre calibration, et les barres sont tracées sur cette échelle commune avec les bornes 55 et 75 (figure~\ref{fig:chap5-insights}).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=.72\textwidth]{img/interfaces/plateform_settings.png}
-  \caption{Écran de paramètres et état des composants de la plateforme}
+  \includegraphics[width=.8\textwidth]{img/interfaces/insights.png}
+  \caption{Comparaison des quatre méthodes}
+  \label{fig:chap5-insights}
+\end{figure}
+
+L'écran de paramètres règle les seuils \emph{Strong Fit} et \emph{Potential Fit}, exprimés sur l'échelle calibrée, et présente l'état des composants de la plateforme (figure~\ref{fig:chap5-settings}).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.8\textwidth]{img/interfaces/plateform_settings.png}
+  \caption{Réglage des seuils de décision}
   \label{fig:chap5-settings}
 \end{figure}
+
+L'écran \emph{AI Quality Center} présente les résultats d'évaluation hors ligne en indiquant pour chacun le fichier source, la taille de l'échantillon et sa concordance avec la calibration livrée. Il distingue trois catégories~: le banc d'essai synthétique, seul porteur de métriques~; les essais fonctionnels sur CV fictifs~; et les essais menés avec mes propres CV, pour lesquels les métriques sont affichées comme non mesurées (figure~\ref{fig:chap5-quality-1}).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.8\textwidth]{img/interfaces/quality_1.png}
+  \caption{\emph{AI Quality Center}~: configuration}
+  \label{fig:chap5-quality-1}
+\end{figure}
+
+La qualité des verdicts affichés (macro-F1 à trois classes) et la qualité du classement du score brut (F1 binaire à un seuil expérimental) y sont présentées dans deux tableaux distincts, avec leurs définitions et la matrice de confusion de la version livrée (figure~\ref{fig:chap5-quality-2}). Une dernière partie reprend les essais de robustesse face aux CV manipulés (figure~\ref{fig:chap5-quality-3}). Toutes ces valeurs sont lues dans les fichiers versionnés du dossier \texttt{evaluation/results}~; une métrique absente est affichée comme non mesurée, jamais comme nulle.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.8\textwidth]{img/interfaces/quality_2.png}
+  \caption{\emph{AI Quality Center}~: qualité des verdicts}
+  \label{fig:chap5-quality-2}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.8\textwidth]{img/interfaces/quality_3.png}
+  \caption{\emph{AI Quality Center}~: robustesse}
+  \label{fig:chap5-quality-3}
+\end{figure}
+
+Enfin, le bouton \emph{Export PDF} de l'écran de résultat déclenche la génération ReportLab et le téléchargement du rapport. Le document reprend les éléments de décision déjà visibles, au lieu de fournir une décision autonome supplémentaire.
 
 \section{Parcours fonctionnel de démonstration}
 
@@ -392,7 +409,7 @@ Le tableau~\ref{tab:chap5-difficulties} les présente avec la réponse apportée
 \begin{table}[H]
 \centering
 \small
-\caption{Difficultés de réalisation et réponses apportées}
+\caption{Difficultés et solutions}
 \label{tab:chap5-difficulties}
 \begin{tabularx}{\textwidth}{|p{0.27\textwidth}|p{0.28\textwidth}|X|}
 \hline

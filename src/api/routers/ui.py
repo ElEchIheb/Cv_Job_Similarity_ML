@@ -35,6 +35,7 @@ from src.database import get_db
 from src import models_db
 from src.security.auth import get_current_user
 from src.decisioning import DecisionConfig
+from src.decisioning.calibration import load_calibration
 from src.decisioning.decision_engine import DecisionConfigError
 
 router = APIRouter(prefix="/api/v1/ui", tags=["UI Parity"])
@@ -76,6 +77,36 @@ def _next_job_code(db: Session) -> str:
 
 def _iso(dt: Optional[datetime]) -> Optional[str]:
     return dt.isoformat() if dt else None
+
+
+def _is_current_scale(m: models_db.MatchResult) -> bool:
+    """True when the stored score is on the calibrated display scale."""
+    return bool(m.calibration_version) and m.calibration_version != "uncalibrated"
+
+
+def _scale_fields(m: models_db.MatchResult) -> Dict:
+    """Scale metadata shown next to every persisted score.
+
+    Results produced before the calibration (calibration_version NULL) keep
+    their original score and decision; they are flagged instead of being
+    silently re-read on the new scale.
+    """
+    current = _is_current_scale(m)
+    return {
+        "score_raw": m.score_raw,
+        "calibration_version": m.calibration_version,
+        "score_scale": "calibrated" if current else "legacy",
+        "legacy_scale": not current,
+        "model_version": m.model_version,
+        "evaluation_method": m.evaluation_method or m.model_used,
+    }
+
+
+def _current_scale_filter(query):
+    return query.filter(
+        models_db.MatchResult.calibration_version.isnot(None),
+        models_db.MatchResult.calibration_version != "uncalibrated",
+    )
 
 
 def _config_from(strong: Optional[float], potential: Optional[float]) -> DecisionConfig:
@@ -122,18 +153,25 @@ def overview(db: Session = Depends(get_db), user: models_db.User = Depends(get_c
     total_candidates = cand_q.count()
     total_jobs = job_q.count()
     total_matches = match_q.count()
+    # Scores of different scales are never averaged together: the average and
+    # the HIRE rate use calibrated results only; legacy results are counted.
+    current_q = _current_scale_filter(match_q)
+    current_matches = current_q.count()
     avg_score = (
-        db.query(func.avg(models_db.MatchResult.final_score))
-        .join(models_db.Candidate)
-        .filter(models_db.Candidate.recruiter_id == user.id)
-        .scalar()
+        _current_scale_filter(
+            db.query(func.avg(models_db.MatchResult.final_score))
+            .join(models_db.Candidate)
+            .filter(models_db.Candidate.recruiter_id == user.id)
+        ).scalar()
     ) or 0
-    hire_count = match_q.filter(models_db.MatchResult.decision == "HIRE").count()
-    hire_pct = (hire_count / total_matches * 100) if total_matches > 0 else 0
+    hire_count = current_q.filter(models_db.MatchResult.decision == "HIRE").count()
+    hire_pct = (hire_count / current_matches * 100) if current_matches > 0 else 0
     return {
         "total_candidates": total_candidates,
         "total_jobs": total_jobs,
         "total_matches": total_matches,
+        "current_scale_matches": current_matches,
+        "legacy_matches": total_matches - current_matches,
         "avg_score": float(avg_score),
         "hire_count": hire_count,
         "hire_pct": hire_pct,
@@ -255,10 +293,14 @@ class CandidateIn(BaseModel):
 def _candidate_dict(db: Session, c: models_db.Candidate) -> Dict:
     count = db.query(models_db.MatchResult).filter(models_db.MatchResult.candidate_id == c.id).count()
     best = (
-        db.query(func.max(models_db.MatchResult.final_score))
-        .filter(models_db.MatchResult.candidate_id == c.id)
-        .scalar()
+        _current_scale_filter(
+            db.query(func.max(models_db.MatchResult.final_score))
+            .filter(models_db.MatchResult.candidate_id == c.id)
+        ).scalar()
     )
+    legacy_count = count - _current_scale_filter(
+        db.query(models_db.MatchResult).filter(models_db.MatchResult.candidate_id == c.id)
+    ).count()
     return {
         "id": c.id,
         "full_name": c.full_name,
@@ -269,6 +311,7 @@ def _candidate_dict(db: Session, c: models_db.Candidate) -> Dict:
         "created_at": _iso(c.created_at),
         "evaluation_count": count,
         "best_score": float(best) if best is not None else None,
+        "legacy_evaluation_count": legacy_count,
     }
 
 
@@ -357,6 +400,9 @@ def list_matches(db: Session = Depends(get_db), user: models_db.User = Depends(g
             "decision": m.decision,
             "confidence": m.confidence,
             "created_at": _iso(m.created_at),
+            "strong_fit_threshold": m.strong_fit_threshold,
+            "potential_fit_threshold": m.potential_fit_threshold,
+            **_scale_fields(m),
         })
     return out
 
@@ -379,6 +425,9 @@ def match_detail(match_id: int, db: Session = Depends(get_db), user: models_db.U
         "final_score": m.final_score,
         "decision": m.decision,
         "created_at": _iso(m.created_at),
+        "strong_fit_threshold": m.strong_fit_threshold,
+        "potential_fit_threshold": m.potential_fit_threshold,
+        **_scale_fields(m),
         "explanation": payload.get("explanation"),
         "recommendations": payload.get("recommendations"),
         "raw": payload,
@@ -472,6 +521,11 @@ async def evaluate_file(
             cv_text = extract_text_from_docx(tmp_path)
         else:
             raise HTTPException(status_code=400, detail="Only PDF and DOCX files are supported.")
+    except HTTPException:
+        raise
+    except Exception as exc:  # corrupt / encrypted / mislabelled document
+        logger.info("Unreadable CV document rejected: %s", type(exc).__name__)
+        raise HTTPException(status_code=400, detail="This file could not be read as a PDF or DOCX document.") from exc
     finally:
         Path(tmp_path).unlink(missing_ok=True)
 
@@ -509,6 +563,8 @@ def _evaluation_from_match(m: models_db.MatchResult) -> Dict:
         "result": {
             "percentage": percentage,
             "final_score": m.final_score,
+            "raw_score": m.score_raw,
+            "calibration_version": m.calibration_version,
             "component_scores": {
                 "tfidf_score": m.score_keyword,
                 "embedding_score": m.score_semantic,
@@ -581,6 +637,8 @@ def evaluate_deep_analysis(body: DeepAnalysisIn, db: Session = Depends(get_db),
 class CompareIn(BaseModel):
     cv_text: str
     job_text: str
+    strong_fit_threshold: Optional[float] = Field(None, ge=0, le=100)
+    potential_fit_threshold: Optional[float] = Field(None, ge=0, le=100)
 
 
 @router.post("/compare")
@@ -591,17 +649,20 @@ def compare(body: CompareIn, user: models_db.User = Depends(get_current_user)) -
         raise HTTPException(status_code=400, detail="Please provide both a CV and a job description.")
 
     models = _services()
+    config = _config_from(body.strong_fit_threshold, body.potential_fit_threshold)
     rows = []
     for key in ["hybrid", "embedding", "tfidf", "skill"]:
         t0 = time.perf_counter()
         try:
-            payload = run_evaluation(models, body.cv_text, body.job_text, model_key=key)
+            payload = run_evaluation(models, body.cv_text, body.job_text, model_key=key, config=config)
             elapsed = round((time.perf_counter() - t0) * 1000.0)
             res = payload["result"]
             rows.append({
                 "model": key,
                 "percentage": res.get("percentage", 0.0),
-                "confidence": res.get("confidence"),
+                "raw_score": res.get("raw_score"),
+                "calibration_version": res.get("calibration_version"),
+                "confidence": payload["decision"].confidence_level,
                 "speed_ms": elapsed,
                 "decision": payload["decision"].decision,
                 "band_label": payload["decision"].band_label,
@@ -613,39 +674,211 @@ def compare(body: CompareIn, user: models_db.User = Depends(get_current_user)) -
 
 
 # ═════════════════════════════════════════════════════════════════════════════
-# AI QUALITY CENTER  (mirrors frontend/pages/evaluation_metrics.py — file-backed)
+# AI QUALITY CENTER — file-backed, read-only view of the versioned results
+#
+# Every number shown by the page comes from a file under evaluation/results/
+# (or the figures manifest). Each source is reported with its provenance and a
+# status: "current" (matches the shipped calibration), "stale" (computed for
+# another calibration) or "missing". Nothing is recomputed live, and no metric
+# is reported for the student's own CV trials, which have no reference labels.
 # ═════════════════════════════════════════════════════════════════════════════
+_RESULTS_DIR = settings.PROJECT_ROOT / "evaluation" / "results"
+_FIGURES_DIR = settings.PROJECT_ROOT / "evaluation" / "figures"
+_FIGURE_LABELS = {
+    "cm": ("Verdicts of the shipped configuration vs synthetic classes", "verdicts"),
+    "dist": ("Verdict counts of the shipped configuration", "verdicts"),
+    "roc": ("ROC curves of the raw scores (ranking only)", "ranking"),
+    "box": ("Hybrid raw score by class, with calibration anchors", "ranking"),
+}
+_PROBE_LABELS = {
+    "P1_verbatim_list_in_skills_section": "Unrelated CV + offer requirements copied verbatim",
+    "P2_reordered_list_in_skills_section": "Unrelated CV + same skills, reordered, in a Skills section",
+    "P4_whole_offer_pasted": "Unrelated CV + whole offer pasted",
+    "P5_negated_mention": "Unrelated CV + negated mention of the skills",
+    "P3_skills_in_experience_sentence": "Unrelated CV + skills inserted in an experience sentence",
+    "P6_partial_profile": "Strong fit with half of its skills removed",
+    "P7_long_cv": "Strong fit padded into a long CV",
+}
+_STRONG_BASE_PROBES = {"P6_partial_profile", "P7_long_cv"}
+
+
+def _read_result(name: str) -> tuple[Optional[Dict], Optional[str]]:
+    path = _RESULTS_DIR / name
+    if not path.exists():
+        return None, None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001 — a corrupt file is reported as missing
+        logger.warning("Unreadable results file: %s", name)
+        return None, None
+    return data, datetime.fromtimestamp(path.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
+
+
+def _status(file_version: Optional[str], current: str) -> str:
+    if file_version is None:
+        return "unversioned"
+    return "current" if file_version == current else "stale"
+
+
+def _verdict_row(key: str, label: str, role: str, block: Dict) -> Dict:
+    tc = block["three_class"]
+    return {
+        "key": key, "label": label, "role": role,
+        "macro_f1": tc["macro_f1"],
+        "macro_f1_95ci": block.get("bootstrap", {}).get("macro_f1_95ci"),
+        "binary_f1": block["binary_consider_or_better"]["f1"],
+        "binary_f1_95ci": block.get("bootstrap", {}).get("binary_f1_95ci"),
+        "hire_f1": block["binary_hire_vs_strong"]["f1"],
+        "kappa": tc.get("quadratic_kappa"),
+        "verdict_counts": tc["verdict_counts"],
+    }
+
+
+def _verdict_quality(report: Dict) -> Optional[Dict]:
+    rows = report.get("rows", {})
+    after = rows.get("AFTER_product_shipped_calibrated")
+    if not after:
+        return None
+    out_rows = [_verdict_row("hybrid", "Hybrid 0.2 / 0.4 / 0.4, calibrated (shipped)", "shipped", after)]
+    if "candidate_tfidf_validation_cuts" in rows:
+        out_rows.append(_verdict_row("tfidf", "TF-IDF alone, calibrated (comparison)", "comparison",
+                                     rows["candidate_tfidf_validation_cuts"]))
+    support = {c: after["three_class"]["per_class"][c]["support"] for c in ("REJECT", "CONSIDER", "HIRE")}
+    return {
+        "n": sum(support.values()),
+        "class_support": support,
+        "rows": out_rows,
+        "confusion": {
+            "verdicts": after["three_class"]["labels"],
+            "classes": ["Unrelated", "Transferable", "Strong fit"],
+            "matrix": after["three_class"]["confusion_matrix_rows_true_cols_pred"],
+        },
+        "per_class": after["three_class"]["per_class"],
+        "paired_hybrid_minus_tfidf": report.get("paired_bootstrap_macro_f1_differences", {}).get("hybrid_documented_minus_tfidf"),
+        "subgroups": {
+            k: {g: {"n": v["n"], "macro_f1": v["macro_f1"]} for g, v in after.get("subgroups", {}).get(k, {}).items()}
+            for k in ("language", "difficulty")
+        },
+    }
+
+
+def _raw_score_quality(payload: Dict) -> Dict:
+    metrics = payload.get("metrics", {})
+    analysis = payload.get("analysis", {})
+    order = [m for m in ("hybrid", "tfidf", "skill", "embedding") if m in metrics]
+    return {
+        "n": payload.get("test_size") or analysis.get("split_sizes", {}).get("test"),
+        "split_sizes": analysis.get("split_sizes"),
+        "methodology": payload.get("methodology"),
+        "rows": [{
+            "key": m,
+            "threshold": metrics[m].get("operating_threshold"),
+            "accuracy": metrics[m].get("accuracy"),
+            "precision": metrics[m].get("precision"),
+            "recall": metrics[m].get("recall"),
+            "binary_f1": metrics[m].get("f1"),
+            "binary_f1_95ci": analysis.get("bootstrap_ci", {}).get(m, {}).get("f1"),
+            "roc_auc": metrics[m].get("roc_auc"),
+            "pr_auc": metrics[m].get("pr_auc"),
+            "inference_ms_per_pair": metrics[m].get("inference_ms_per_pair"),
+        } for m in order],
+    }
+
+
+def _robustness(probes: Dict) -> Dict:
+    rows = []
+    for key, label in _PROBE_LABELS.items():
+        p = probes.get("probes", {}).get(key)
+        if p:
+            rows.append({"key": key, "label": label, "n": p["n"],
+                         "base": "strong" if key in _STRONG_BASE_PROBES else "unrelated",
+                         "before": p["before"], "after": p["after"]})
+    return {
+        "n_per_probe": probes.get("n_per_probe"),
+        "split": "validation",
+        "rows": rows,
+        "unrelated_reference": probes.get("unrelated_reference"),
+        "strong_reference": (probes.get("strong_reference") or {}).get("after"),
+        "genuine_pairs": probes.get("genuine_validation"),
+    }
+
+
 @router.get("/quality")
 def quality(user: models_db.User = Depends(get_current_user)) -> Dict:
-    results_path = settings.PROJECT_ROOT / "evaluation" / "results" / "evaluation_results.json"
-    if not results_path.exists():
-        return {"available": False}
-    try:
-        payload = json.loads(results_path.read_text(encoding="utf-8"))
-    except Exception as exc:  # noqa: BLE001
-        raise HTTPException(status_code=500, detail=f"Failed to load evaluation results: {exc}") from exc
-    mtime = datetime.fromtimestamp(results_path.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
-    n_samples = payload.get("dataset_size") or payload.get("n_samples") or payload.get("test_size")
+    from src.matching.service import MODEL_VERSION
+
+    calib = load_calibration()
+    current = calib.version
+    report, report_date = _read_result("calibration_report.json")
+    raw, raw_date = _read_result("evaluation_results.json")
+    probes, probes_date = _read_result("robustness_probes.json")
+    trial, trial_date = _read_result("functional_trial_fictitious_pdfs.json")
+    verdicts = _verdict_quality(report) if report else None
+    raw_quality = _raw_score_quality(raw) if raw else None
+
+    def src(key, kind, label, file, date, n, unit, version, status):
+        return {"key": key, "kind": kind, "label": label, "file": file, "generated": date, "n": n,
+                "unit": unit, "calibration_version": version, "status": status}
+
+    sources = [
+        src("verdicts", "synthetic", "Displayed verdicts — isolated synthetic test split", "calibration_report.json",
+            report_date, verdicts["n"] if verdicts else None, "CV–offer pairs",
+            report.get("calibration_version") if report else None,
+            (_status(report.get("calibration_version"), current) if verdicts else "missing")),
+        src("raw", "synthetic", "Raw-score ranking — isolated synthetic test split", "evaluation_results.json",
+            raw_date, raw_quality["n"] if raw_quality else None, "CV–offer pairs", None,
+            "independent_of_calibration" if raw else "missing"),
+        src("robustness", "synthetic", "Manipulated-CV probes — validation split", "robustness_probes.json",
+            probes_date, probes.get("n_per_probe") if probes else None, "pairs per scenario",
+            probes.get("calibration_version") if probes else None,
+            _status(probes.get("calibration_version"), current) if probes else "missing"),
+        src("fictitious_pdfs", "functional", "Ranking of fictitious PDF CVs — no reference labels",
+            "functional_trial_fictitious_pdfs.json", trial_date, trial.get("n_cvs") if trial else None, "CVs",
+            trial.get("calibration_version") if trial else None,
+            _status(trial.get("calibration_version"), current) if trial else "missing"),
+        src("personal_trials", "personal", "Trials with the student's own CVs — qualitative", None, None, None, None,
+            None, "not_measured"),
+    ]
     return {
-        "available": True,
-        "metrics": payload.get("metrics", {}),
-        "analysis": payload.get("analysis", {}),
-        "provenance": {
-            "source": results_path.name,
-            "generated": mtime,
-            "n_samples": n_samples,
-            "methodology": payload.get("methodology"),
+        "available": any(s["status"] not in ("missing", "not_measured") for s in sources),
+        "shipped": {
+            "model_version": MODEL_VERSION,
+            "calibration_version": current,
+            "weights": calib.provenance.get("hybrid_weights"),
+            "thresholds": {"potential_fit": 55.0, "strong_fit": 75.0},
+            "fitted_on": calib.provenance.get("fitted_on"),
+            "warning": calib.provenance.get("warning"),
         },
+        "sources": sources,
+        "verdict_quality": verdicts,
+        "raw_score": raw_quality,
+        "robustness": _robustness(probes) if probes else None,
+        "functional": {
+            "n_cvs": trial.get("n_cvs"),
+            "verdict_counts": trial.get("verdict_counts"),
+            "history_consistent": trial.get("history_consistent"),
+            "pdf_export_ok": trial.get("pdf_status") == 200,
+        } if trial else None,
     }
 
 
 @router.get("/quality/figures")
 def quality_figures(user: models_db.User = Depends(get_current_user)) -> List[Dict]:
-    figures_dir = settings.PROJECT_ROOT / "evaluation" / "figures"
-    if not figures_dir.exists():
+    manifest_path = _FIGURES_DIR / "figures_manifest.json"
+    if not manifest_path.exists():
         return []
-    figs = sorted(figures_dir.glob("*.png"))[:4]
-    return [{"name": f.name, "label": f.stem.replace("_", " ").title()} for f in figs]
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return []
+    stale = manifest.get("calibration_version") != load_calibration().version
+    out = []
+    for key, name in manifest.get("figures", {}).items():
+        if key in _FIGURE_LABELS and (_FIGURES_DIR / name).exists():
+            label, group = _FIGURE_LABELS[key]
+            out.append({"name": name, "label": label, "group": group, "stale": stale,
+                        "n": manifest.get("n_test_pairs")})
+    return out
 
 
 @router.get("/quality/figures/{name}")
@@ -653,7 +886,7 @@ def quality_figure(name: str, user: models_db.User = Depends(get_current_user)):
     # prevent path traversal — only a bare *.png filename inside the figures dir
     if "/" in name or "\\" in name or not name.endswith(".png"):
         raise HTTPException(status_code=400, detail="Invalid figure name.")
-    path = settings.PROJECT_ROOT / "evaluation" / "figures" / name
+    path = _FIGURES_DIR / name
     if not path.exists():
         raise HTTPException(status_code=404, detail="Figure not found.")
     return FileResponse(str(path), media_type="image/png")
@@ -689,4 +922,5 @@ def system(user: models_db.User = Depends(get_current_user)) -> Dict:
             "strong_fit_threshold": 75.0,
             "potential_fit_threshold": 55.0,
         },
+        "calibration": load_calibration().summary(),
     }

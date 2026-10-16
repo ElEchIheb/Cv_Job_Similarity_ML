@@ -89,3 +89,25 @@ def embedding_matcher(mock_sentence_transformer):
     """EmbeddingMatcher — uses mocked SentenceTransformer."""
     from src.models.embedding_model import EmbeddingMatcher
     return EmbeddingMatcher()
+
+
+# ── Rate-limiter isolation ───────────────────────────────────────────────────
+
+@pytest.fixture(autouse=True)
+def reset_rate_limiter():
+    """Start every test with an empty per-host rate-limit window.
+
+    The limiter keeps a process-wide sliding window keyed by client host, and
+    every TestClient request comes from the same host ("testclient"). Without
+    this reset, the order and number of earlier API tests decide whether a
+    later test receives 429 instead of the status it actually checks. The
+    limiter itself stays active and is covered by its own test.
+    """
+    try:
+        from src.api import main as api_main
+    except Exception:
+        yield
+        return
+    api_main._REQUEST_LOG.clear()
+    yield
+    api_main._REQUEST_LOG.clear()

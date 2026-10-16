@@ -96,6 +96,11 @@ class MatchResult(Base):
     job_offer_id = Column(Integer, ForeignKey("job_offers.id"), nullable=True)
     
     final_score = Column(Float, nullable=True)
+    # Since hybrid-checkpoint-v3: final_score is the CALIBRATED display score
+    # (0-1, i.e. percentage / 100); score_raw keeps the method's native score.
+    # Rows with calibration_version NULL were scored on the old raw scale.
+    score_raw = Column(Float, nullable=True)
+    calibration_version = Column(String, nullable=True)
     score_hybrid = Column(Float, nullable=True)
     score_semantic = Column(Float, nullable=True)
     score_keyword = Column(Float, nullable=True)

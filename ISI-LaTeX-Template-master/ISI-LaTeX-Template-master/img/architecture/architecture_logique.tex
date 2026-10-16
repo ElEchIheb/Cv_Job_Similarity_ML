@@ -1,12 +1,12 @@
 \begin{tikzpicture}[node distance=9mm and 11mm]
   \node[archbox,fill=green!7] (browser) {Navigateur\\recruteur};
-  \node[archbox,right=of browser,fill=orange!10] (nginx) {Nginx\\public :80};
+  \node[archbox,right=of browser,fill=orange!10] (nginx) {Caddy (HTTPS)\\public :443};
   \node[archbox,right=of nginx] (web) {Next.js\\interne :3000};
   \node[archbox,below=18mm of web] (api) {FastAPI et services\\internes :8000};
   \node[archbox,below=18mm of nginx,minimum width=3.0cm] (layer1) {Layer 1 : TF--IDF,\\embeddings, compétences,\\décision et explication};
   \node[datastore,below=of layer1] (db) {PostgreSQL\\:5432};
   \node[archbox,below=of api] (ollama) {Ollama\\:11434};
-  \draw[-{Stealth[length=2mm]},line width=.55pt] (browser)--node[above,font=\scriptsize]{HTTP} (nginx);
+  \draw[-{Stealth[length=2mm]},line width=.55pt] (browser)--node[above,font=\scriptsize]{HTTPS} (nginx);
   \draw[-{Stealth[length=2mm]},line width=.55pt] (nginx)--node[above,font=\scriptsize]{/} (web);
   \draw[-{Stealth[length=2mm]},line width=.55pt] (nginx.south) -- node[right,font=\scriptsize]{/api/v1} (api.west);
   \draw[-{Stealth[length=2mm]},line width=.55pt] (api.west)--(layer1.east);

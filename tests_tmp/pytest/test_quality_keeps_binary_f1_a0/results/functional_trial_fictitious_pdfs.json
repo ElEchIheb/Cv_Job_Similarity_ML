@@ -1,0 +1,175 @@
+{
+  "n_cvs": 18,
+  "verdict_counts": {
+    "HIRE": 3,
+    "CONSIDER": 2,
+    "REJECT": 13
+  },
+  "history_consistent": true,
+  "pdf_status": 200,
+  "calibration_version": "synthetic-v1-2026-10-11-hybrid-documented",
+  "ranking": [
+    {
+      "cv": "cv_05",
+      "tier": "Excellent",
+      "score": 97.3,
+      "raw": 0.5856,
+      "decision": "HIRE",
+      "evidence_gap": false,
+      "match_id": 5
+    },
+    {
+      "cv": "cv_14",
+      "tier": "Average",
+      "score": 93.6,
+      "raw": 0.5491,
+      "decision": "HIRE",
+      "evidence_gap": false,
+      "match_id": 14
+    },
+    {
+      "cv": "cv_10",
+      "tier": "Good",
+      "score": 92.8,
+      "raw": 0.5408,
+      "decision": "HIRE",
+      "evidence_gap": false,
+      "match_id": 10
+    },
+    {
+      "cv": "cv_13",
+      "tier": "Average",
+      "score": 69.6,
+      "raw": 0.3366,
+      "decision": "CONSIDER",
+      "evidence_gap": false,
+      "match_id": 13
+    },
+    {
+      "cv": "cv_12",
+      "tier": "Good",
+      "score": 59.1,
+      "raw": 0.284,
+      "decision": "CONSIDER",
+      "evidence_gap": false,
+      "match_id": 12
+    },
+    {
+      "cv": "cv_11",
+      "tier": "Good",
+      "score": 52.0,
+      "raw": 0.249,
+      "decision": "REJECT",
+      "evidence_gap": true,
+      "match_id": 11
+    },
+    {
+      "cv": "cv_16",
+      "tier": "Bad",
+      "score": 44.5,
+      "raw": 0.2131,
+      "decision": "REJECT",
+      "evidence_gap": false,
+      "match_id": 16
+    },
+    {
+      "cv": "cv_09",
+      "tier": "Great",
+      "score": 44.0,
+      "raw": 0.2107,
+      "decision": "REJECT",
+      "evidence_gap": false,
+      "match_id": 9
+    },
+    {
+      "cv": "cv_03",
+      "tier": "Master",
+      "score": 36.4,
+      "raw": 0.1744,
+      "decision": "REJECT",
+      "evidence_gap": false,
+      "match_id": 3
+    },
+    {
+      "cv": "cv_04",
+      "tier": "Excellent",
+      "score": 35.1,
+      "raw": 0.1678,
+      "decision": "REJECT",
+      "evidence_gap": true,
+      "match_id": 4
+    },
+    {
+      "cv": "cv_01",
+      "tier": "Master",
+      "score": 33.8,
+      "raw": 0.162,
+      "decision": "REJECT",
+      "evidence_gap": true,
+      "match_id": 1
+    },
+    {
+      "cv": "cv_18",
+      "tier": "Bad",
+      "score": 32.9,
+      "raw": 0.1575,
+      "decision": "REJECT",
+      "evidence_gap": false,
+      "match_id": 18
+    },
+    {
+      "cv": "cv_07",
+      "tier": "Great",
+      "score": 31.4,
+      "raw": 0.1501,
+      "decision": "REJECT",
+      "evidence_gap": false,
+      "match_id": 7
+    },
+    {
+      "cv": "cv_15",
+      "tier": "Bad",
+      "score": 31.3,
+      "raw": 0.15,
+      "decision": "REJECT",
+      "evidence_gap": false,
+      "match_id": 15
+    },
+    {
+      "cv": "cv_08",
+      "tier": "Great",
+      "score": 28.2,
+      "raw": 0.1351,
+      "decision": "REJECT",
+      "evidence_gap": false,
+      "match_id": 8
+    },
+    {
+      "cv": "cv_06",
+      "tier": "Excellent",
+      "score": 24.9,
+      "raw": 0.119,
+      "decision": "REJECT",
+      "evidence_gap": false,
+      "match_id": 6
+    },
+    {
+      "cv": "cv_17",
+      "tier": "Bad",
+      "score": 24.7,
+      "raw": 0.1183,
+      "decision": "REJECT",
+      "evidence_gap": false,
+      "match_id": 17
+    },
+    {
+      "cv": "cv_02",
+      "tier": "Master",
+      "score": 18.2,
+      "raw": 0.0871,
+      "decision": "REJECT",
+      "evidence_gap": false,
+      "match_id": 2
+    }
+  ]
+}

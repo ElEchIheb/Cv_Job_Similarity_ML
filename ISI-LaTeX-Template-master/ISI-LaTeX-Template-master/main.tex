@@ -22,7 +22,7 @@
 \usepackage{needspace}
 \usepackage{longtable}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,calc}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,shapes.multipart,fit,calc}
 \arrayrulecolor{black!65}
 \setlength{\arrayrulewidth}{0.35pt}
 \renewcommand{\arraystretch}{1.15}
@@ -45,6 +45,11 @@
 % https://tex.stackexchange.com/questions/9913/input-index-file-not-found
 \makeindex
 
+% Printed copy: colour cover, blank verso and black-and-white cover.
+% The digital version keeps a single cover. Use \printversiontrue to print.
+\newif\ifprintversion
+\printversionfalse
+
 \begin{document}
     \input{global_config}
     \renewcommand{\contentsname}{Table des matières}
@@ -54,7 +59,11 @@
     
     \frontmatter
         \input{tpl/cover_page}
-        \include{tpl/cover_page_black}
+        \ifprintversion
+            \clearpage
+            \input{tpl/cover_page_black}
+        \fi
+        \clearpage
         \input{tpl/signatures}
         \cleardoublepage
         \input{dedicaces}
@@ -65,13 +74,16 @@
         \setcounter{page}{1}
         \setcounter{secnumdepth}{3}
         \setcounter{tocdepth}{2}
+        \markboth{\contentsname}{}
         \tableofcontents
         \thispagestyle{frontmatter}
         
         \cleardoublepage
+        \markboth{\listfigurename}{}
         \listoffigures
         \thispagestyle{frontmatter}
         \cleardoublepage
+        \markboth{\listtablename}{}
         \listoftables
         \thispagestyle{frontmatter}
         \cleardoublepage
@@ -103,6 +115,9 @@
 		% the command `\nocite{*}` is mandatory to avoid the “no \citation commands” error
         % https://tex.stackexchange.com/questions/18045/problem-with-compiling-bibtex-no-citation-commands-error
         %\nocite{*}
+        % Keeps the last table-of-contents entries on the same page instead of
+        % leaving a single line alone on an extra page.
+        \addtocontents{toc}{\protect\enlargethispage{2\baselineskip}}
         \printbibliography[heading=bibintoc]
         \clearpage
         \input{resume_jobtest}

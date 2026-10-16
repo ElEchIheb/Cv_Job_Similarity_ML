@@ -9,6 +9,7 @@ from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_sc
 from sklearn.model_selection import StratifiedKFold, train_test_split
 
 from src.models.embedding_model import EmbeddingMatcher
+from src.nlp.screening import similarity_text
 from src.models.skill_matcher import SkillMatcher
 from src.models.tfidf_model import TFIDFMatcher
 
@@ -53,8 +54,12 @@ class HybridMatcher:
         return self
 
     def predict(self, cv: str, job: str) -> Dict[str, object]:
-        tfidf_score = self.models["tfidf"].predict(cv, job)
-        embedding_score = self.models["embedding"].predict(cv, job)
+        # Passages copied verbatim from the offer and negated skill mentions are
+        # removed before the similarity components (src/nlp/screening.py);
+        # a CV without either is scored exactly as before.
+        cv_scored = similarity_text(cv, job, self.models["skill"].extractor)
+        tfidf_score = self.models["tfidf"].predict(cv_scored, job)
+        embedding_score = self.models["embedding"].predict(cv_scored, job)
         skill_details = self.models["skill"].predict_detailed(cv, job)
         skill_score = float(skill_details["score"])
 

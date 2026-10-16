@@ -1,0 +1,30 @@
+jobtest-pfe-iheb.eastus.cloudapp.azure.com {
+    encode zstd gzip
+
+    request_body {
+        max_size 15MB
+    }
+
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options SAMEORIGIN
+        Referrer-Policy strict-origin-when-cross-origin
+    }
+
+    handle /api/v1/* {
+        reverse_proxy api:8000 {
+            transport http {
+                dial_timeout 10s
+                response_header_timeout 180s
+            }
+        }
+    }
+
+    handle {
+        reverse_proxy web:3000
+    }
+}
+
+http://20.75.163.163 {
+    redir https://jobtest-pfe-iheb.eastus.cloudapp.azure.com{uri} 308
+}

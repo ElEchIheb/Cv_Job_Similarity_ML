@@ -1,0 +1,34 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "api-demo",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "src.api.main:app",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8000"
+      ],
+      "port": 8000,
+      "env": {
+        "DATABASE_URL": "sqlite:///C:/Users/ihebe/AppData/Local/Temp/claude/D--education-pfe-pfe-ai/fc9dc2dd-b152-45cf-8f66-a8ee1bcf6de6/scratchpad/demo/jobtest_demo.db",
+        "REQUEST_LIMIT_PER_MINUTE": "2000"
+      }
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "web",
+        "run",
+        "dev"
+      ],
+      "port": 3000
+    }
+  ]
+}

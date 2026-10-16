@@ -5,6 +5,7 @@ from typing import Dict, Iterable, List, Set
 
 import numpy as np
 
+from src.nlp.screening import DECLARED_SKILL_WEIGHT, screen_cv, strip_negated
 from src.nlp.skill_extractor import SkillExtractor
 from src.parsing.parser import clean_text
 
@@ -38,7 +39,11 @@ class SkillMatcher(BaseMatchingModel):
         return critical
 
     def predict_detailed(self, cv: str, job: str) -> Dict[str, object]:
-        cv_payload = self.extractor.extract(cv)
+        # Evidence screening (src/nlp/screening.py): text copied from the offer
+        # is ignored, negated mentions do not count as skills, and skills that
+        # only appear in a skills list count less than demonstrated ones.
+        screen = screen_cv(cv, job)
+        cv_payload = self.extractor.extract(strip_negated(screen.text))
         job_payload = self.extractor.extract(job)
 
         cv_hard = set(cv_payload["hard_skills"])
@@ -57,7 +62,16 @@ class SkillMatcher(BaseMatchingModel):
         critical_missing = sorted(critical_skills - cv_hard)
         relevant_certifications = sorted(cv_certifications & job_certifications)
 
-        hard_score = self._score_overlap(cv_hard, job_hard)
+        if screen.structure_detected:
+            demonstrated = set(self.extractor.extract(strip_negated(screen.evidence_text))["hard_skills"]) & cv_hard
+        else:
+            demonstrated = set(cv_hard)
+        matched_demonstrated = sorted(demonstrated & job_hard)
+        declared_only = sorted((cv_hard - demonstrated) & job_hard)
+        hard_score = (
+            (len(matched_demonstrated) + DECLARED_SKILL_WEIGHT * len(declared_only)) / len(job_hard)
+            if job_hard else 0.0
+        )
         soft_score = self._score_overlap(cv_soft, job_soft)
         
         # Dynamically redistribute weight if a skill category is completely absent in the job posting
@@ -94,6 +108,15 @@ class SkillMatcher(BaseMatchingModel):
             "job_domain": job_payload.get("domain"),
             "cv_payload": cv_payload,
             "job_payload": job_payload,
+            "evidence": {
+                **screen.as_dict(),
+                "matched_hard_count": len(matching_hard),
+                "demonstrated_count": len(matched_demonstrated),
+                "demonstrated_share": (round(len(matched_demonstrated) / len(matching_hard), 4)
+                                       if matching_hard else None),
+                "demonstrated_skills": matched_demonstrated,
+                "declared_only_skills": declared_only,
+            },
             "coverage": {
                 "hard_coverage": round(hard_score, 4),
                 "soft_coverage": round(soft_score, 4),

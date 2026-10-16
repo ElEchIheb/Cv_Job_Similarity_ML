@@ -49,7 +49,7 @@ export default function CandidatesPage() {
     { key: "full_name", header: "Candidate", sortable: true, sortValue: (c) => c.full_name.toLowerCase(), render: (c) => <span className="font-medium text-ink">{c.full_name}</span> },
     { key: "email", header: "Email", render: (c) => <span className="text-caption text-ink-muted">{c.email ?? "N/A"}</span> },
     { key: "evaluation_count", header: "Evaluations", align: "center", sortable: true, sortValue: (c) => c.evaluation_count, render: (c) => <span className="tnum">{c.evaluation_count}</span> },
-    { key: "best_score", header: "Best Match", sortable: true, sortValue: (c) => c.best_score ?? -1, render: (c) => c.best_score != null ? <ProgressMini value={c.best_score} /> : <span className="text-caption text-ink-muted">Not evaluated</span> },
+    { key: "best_score", header: "Best score (/100)", sortable: true, sortValue: (c) => c.best_score ?? -1, render: (c) => c.best_score != null ? <ProgressMini value={c.best_score} /> : <span className="text-caption text-ink-muted">Not evaluated</span> },
     { key: "created_at", header: "Created", sortable: true, sortValue: (c) => c.created_at ?? "", render: (c) => <span className="text-caption text-ink-muted">{c.created_at ? new Date(c.created_at).toLocaleDateString() : "N/A"}</span> },
     { key: "status", header: "Status", align: "center", render: (c) => <Badge status={STATUS_TONE[c.status]}>{c.status.replace("_", " ")}</Badge> },
     {
@@ -73,7 +73,7 @@ export default function CandidatesPage() {
         <motion.div variants={staggerContainer(0.05)} initial="hidden" animate="show" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatCard label="Total Candidates" value={cands.length} icon={<Users className="h-5 w-5" />} tone="accent" />
           <StatCard label="Total Evaluations" value={totalEvals} icon={<Activity className="h-5 w-5" />} tone="cyan" />
-          <StatCard label="Avg Compatibility" value={avg} suffix="%" decimals={1} icon={<TrendingUp className="h-5 w-5" />} tone="success" />
+          <StatCard label="Avg. best score (/100)" value={avg} decimals={1} icon={<TrendingUp className="h-5 w-5" />} tone="success" />
           <StatCard label="Best-scored" value={scored.length} icon={<Clock className="h-5 w-5" />} tone="warning" />
         </motion.div>
       )}

@@ -175,8 +175,14 @@ export const api = {
     }),
 
   // ── ai insights ─────────────────────────────────────────────────────────
-  compare: (cv_text: string, job_text: string) =>
-    req<{ rows: CompareRow[] }>("/ui/compare", { method: "POST", body: JSON.stringify({ cv_text, job_text }) }),
+  compare: (cv_text: string, job_text: string, thresholds?: { strong: number; potential: number }) =>
+    req<{ rows: CompareRow[] }>("/ui/compare", {
+      method: "POST",
+      body: JSON.stringify({
+        cv_text, job_text,
+        strong_fit_threshold: thresholds?.strong, potential_fit_threshold: thresholds?.potential,
+      }),
+    }),
 
   // ── quality center ──────────────────────────────────────────────────────
   quality: () => req<Quality>("/ui/quality"),

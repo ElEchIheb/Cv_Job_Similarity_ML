@@ -1,0 +1,47 @@
+{
+  "version": "synthetic-v1-2026-10-11-hybrid-documented",
+  "methods": {
+    "hybrid": {
+      "cut_consider": 0.263299,
+      "cut_hire": 0.363754,
+      "ceiling": 0.612617,
+      "consider_display": 55.0,
+      "hire_display": 75.0
+    },
+    "tfidf": {
+      "cut_consider": 0.038706,
+      "cut_hire": 0.112547,
+      "ceiling": 0.379052,
+      "consider_display": 55.0,
+      "hire_display": 75.0
+    },
+    "embedding": {
+      "cut_consider": 0.554174,
+      "cut_hire": 0.638372,
+      "ceiling": 0.843537,
+      "consider_display": 55.0,
+      "hire_display": 75.0
+    },
+    "skill": {
+      "cut_consider": 0.076334,
+      "cut_hire": 0.266667,
+      "ceiling": 0.69,
+      "consider_display": 55.0,
+      "hire_display": 75.0
+    }
+  },
+  "provenance": {
+    "fitted_on": "validation split of the synthetic benchmark (n=1800), seed 42",
+    "criterion": "3-class macro-F1 (unrelated / transferable / strong) on validation",
+    "hybrid_method": "hybrid_documented",
+    "hybrid_weights": {
+      "tfidf": 0.2,
+      "embedding": 0.4,
+      "skill": 0.4
+    },
+    "pre_registered_rule_winner": "fusion_learned",
+    "product_decision": "Rule winner fusion_learned (0.75 TF-IDF) not deployed: its synthetic gain comes from labels defined by copied-skill overlap, and TF-IDF-heavy weights over-reward reused offer wording (Bug 4 experiment; demo partial profile rated HIRE). Documented 0.2/0.4/0.4 kept as product default pending real annotated data.",
+    "dataset_sha256_16": "9b0e0eba41acef4e",
+    "warning": "Synthetic labels: not a validated hiring policy. Re-fit on annotated real data."
+  }
+}

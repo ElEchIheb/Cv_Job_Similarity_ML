@@ -1,0 +1,103 @@
+{
+  "tfidf": {
+    "raw_quantiles": {
+      "p0": 0.0,
+      "p10": 0.0115,
+      "p25": 0.0353,
+      "p50": 0.0878,
+      "p75": 0.1433,
+      "p90": 0.1942,
+      "p99": 0.2857,
+      "p100": 0.4491
+    },
+    "share_ge_55pct": 0.0,
+    "share_ge_75pct": 0.0,
+    "verdicts_at_55_75": {
+      "HIRE": 76,
+      "CONSIDER": 43,
+      "REJECT": 1681
+    },
+    "pairs_with_pct_in_(0,1]": 144,
+    "hire_from_double_scaling": 76
+  },
+  "embedding": {
+    "raw_quantiles": {
+      "p0": 0.3025,
+      "p10": 0.4959,
+      "p25": 0.5419,
+      "p50": 0.5916,
+      "p75": 0.6454,
+      "p90": 0.69,
+      "p99": 0.7723,
+      "p100": 0.8321
+    },
+    "share_ge_55pct": 0.7128,
+    "share_ge_75pct": 0.0228,
+    "verdicts_at_55_75": {
+      "HIRE": 41,
+      "CONSIDER": 1242,
+      "REJECT": 517
+    },
+    "pairs_with_pct_in_(0,1]": 0,
+    "hire_from_double_scaling": 0
+  },
+  "skill": {
+    "raw_quantiles": {
+      "p0": 0.0,
+      "p10": 0.0,
+      "p25": 0.0136,
+      "p50": 0.1745,
+      "p75": 0.3227,
+      "p90": 0.4168,
+      "p99": 0.5584,
+      "p100": 0.6667
+    },
+    "share_ge_55pct": 0.0144,
+    "share_ge_75pct": 0.0,
+    "verdicts_at_55_75": {
+      "HIRE": 2,
+      "CONSIDER": 30,
+      "REJECT": 1768
+    },
+    "pairs_with_pct_in_(0,1]": 10,
+    "hire_from_double_scaling": 2
+  },
+  "hybrid": {
+    "raw_quantiles": {
+      "p0": 0.1224,
+      "p10": 0.2134,
+      "p25": 0.2472,
+      "p50": 0.3293,
+      "p75": 0.4073,
+      "p90": 0.4588,
+      "p99": 0.5581,
+      "p100": 0.6093
+    },
+    "share_ge_55pct": 0.0128,
+    "share_ge_75pct": 0.0,
+    "verdicts_at_55_75": {
+      "HIRE": 0,
+      "CONSIDER": 23,
+      "REJECT": 1777
+    },
+    "pairs_with_pct_in_(0,1]": 0,
+    "hire_from_double_scaling": 0
+  },
+  "double_scaling_examples": {
+    "0.5%": "REJECT",
+    "0.9%": "HIRE",
+    "1.0%": "HIRE",
+    "1.1%": "REJECT",
+    "55.0%": "CONSIDER"
+  },
+  "checkpoint": {
+    "weights": {
+      "tfidf": 0.2,
+      "embedding": 0.4,
+      "skill": 0.4
+    },
+    "optimal_threshold": 0.2636,
+    "tfidf_vocabulary_size": 10000
+  },
+  "hybrid_ceiling_from_component_maxima": 0.6893
+}

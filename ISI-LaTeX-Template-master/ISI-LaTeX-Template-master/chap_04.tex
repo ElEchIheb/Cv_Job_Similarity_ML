@@ -5,11 +5,11 @@
 \section*{Introduction}
 \addcontentsline{toc}{section}{Introduction}
 
-Le moteur de rapprochement de JobTest relie un CV et une offre à une recommandation exploitable par un recruteur. Il ne prédit ni une embauche ni une décision autonome : il mesure une compatibilité textuelle et métier, puis applique des règles explicites. Ce chapitre décrit les composants réellement implémentés et leur évaluation reproductible sur le corpus synthétique du projet.
+Le moteur de rapprochement de JobTest relie un CV et une offre à une recommandation exploitable par un recruteur. Il ne prédit ni une embauche ni une décision autonome~: il mesure une compatibilité textuelle et métier, la calibre, puis applique des règles explicites. Ce chapitre décrit les composants réellement implémentés et leur évaluation quantitative reproductible sur le corpus synthétique du projet.
 
 \section{Objectifs et principes de conception}
 
-Le moteur doit accepter des CV hétérogènes, confronter vocabulaire et sens général, signaler les compétences manquantes et rendre le résultat vérifiable. Le choix retenu est une fusion tardive : chaque composant conserve son score avant agrégation. Deux couches sont séparées. La couche~1 produit le score, la décision et les justifications déterministes. La couche~2, optionnelle, enrichit seulement l'affichage par une analyse locale ; elle ne modifie ni score ni décision.
+Le moteur doit accepter des CV hétérogènes, confronter vocabulaire et sens général, signaler les compétences manquantes et rendre le résultat vérifiable. Le choix retenu est une fusion tardive~: chaque composant conserve son score avant agrégation. Deux couches sont séparées. La couche~1 produit le score, la décision et les justifications déterministes. La couche~2, optionnelle, enrichit seulement l'affichage par une analyse locale~; elle ne modifie ni score ni décision.
 
 La figure~\ref{fig:chap4-pipeline} résume cet enchaînement et la place qu'y occupe la couche optionnelle.
 
@@ -22,25 +22,25 @@ La figure~\ref{fig:chap4-pipeline} résume cet enchaînement et la place qu'y oc
     \node[draw,rounded corners,fill=gray!12,minimum width=26mm,minimum height=11mm,right=of parse] (models) {TF--IDF\\embeddings\\compétences};
     \node[draw,rounded corners,fill=gray!12,minimum width=23mm,minimum height=11mm,right=of models] (fusion) {Fusion\\pondérée};
     \node[draw,rounded corners,fill=gray!12,minimum width=27mm,minimum height=11mm,right=of fusion] (decision) {Décision\\HIRE / CONSIDER / REJECT};
-    \node[draw,rounded corners,fill=gray!6,minimum width=35mm,minimum height=10mm,below=of decision] (llm) {Couche~2 optionnelle : analyse locale et questions};
+    \node[draw,rounded corners,fill=gray!6,minimum width=35mm,minimum height=10mm,below=of decision] (llm) {Couche~2 optionnelle~: analyse locale et questions};
     \draw[->,thick] (cv)--(parse); \draw[->,thick] (parse)--(models);
     \draw[->,thick] (models)--(fusion); \draw[->,thick] (fusion)--(decision);
     \draw[->,dashed] (decision)--(llm);
   \end{tikzpicture}
   }
-  \caption{Pipeline de rapprochement mis en œuvre dans JobTest. La couche~2 est additive et non décisionnelle.}
+  \caption{Pipeline de rapprochement de JobTest}
   \label{fig:chap4-pipeline}
 \end{figure}
 
 \section{Prétraitement et structuration des documents}
 
-L'extraction privilégie \texttt{pdfplumber} pour les PDF et bascule sur \texttt{PyPDF2} en cas d'indisponibilité ; les fichiers DOCX sont lus avec \texttt{python-docx}, avec un repli XML. Le texte est nettoyé des URL, courriels, numéros de téléphone, retours superflus et artefacts de césure. La normalisation disponible applique, lorsque les modèles spaCy sont installés, tokenisation, lemmatisation et filtrage des mots-outils ; un repli par expressions régulières et lemmatisation légère maintient le traitement sinon.
+L'extraction privilégie \texttt{pdfplumber} pour les PDF et bascule sur \texttt{PyPDF2} en cas d'indisponibilité~; les fichiers DOCX sont lus avec \texttt{python-docx}, avec un repli XML. Le texte est nettoyé des URL, courriels, numéros de téléphone, retours superflus et artefacts de césure. La normalisation disponible applique, lorsque les modèles spaCy sont installés, tokenisation, lemmatisation et filtrage des mots-outils~; un repli par expressions régulières et lemmatisation légère maintient le traitement sinon.
 
-Le CV est ensuite segmenté par intitulés français et anglais : profil, expérience, compétences, formation, langues, certifications et projets. Cette structure n'est pas une interprétation humaine du dossier ; elle permet notamment de pondérer l'expérience distinctement des compétences.
+Le CV est ensuite segmenté par intitulés français et anglais~: profil, expérience, compétences, formation, langues, certifications et projets. Cette structure n'est pas une interprétation humaine du dossier~; elle permet notamment de pondérer l'expérience distinctement des compétences.
 
 \section{Similarité lexicale TF--IDF}
 
-Le premier composant vectorise CV et offre avec \texttt{TfidfVectorizer}. La configuration implémentée utilise des $n$-grammes de 1 à 3 termes, au plus 10\,000 caractéristiques et une fréquence de terme sous-linéaire. TF--IDF valorise les termes discriminants ; la similarité cosinus compare les vecteurs issus des deux textes \cite{scikit_tfidf,scikit_cosine} :
+Le premier composant vectorise CV et offre avec \texttt{TfidfVectorizer}. La configuration implémentée utilise des $n$-grammes de 1 à 3 termes, au plus 10\,000 caractéristiques et une fréquence de terme sous-linéaire. TF--IDF valorise les termes discriminants~; la similarité cosinus compare les vecteurs issus des deux textes \cite{scikit_tfidf,scikit_cosine} :
 \[
  \operatorname{tfidf}(t,d)=\operatorname{tf}(t,d)\log\left(\frac{N+1}{\operatorname{df}(t)+1}\right)+1,
  \qquad S_{\mathrm{TFIDF}}=\frac{\vec v_{CV}\cdot\vec v_{offre}}{\lVert\vec v_{CV}\rVert\lVert\vec v_{offre}\rVert}.
@@ -55,7 +55,7 @@ Le deuxième composant encode les textes avec Sentence-Transformers lorsqu'il es
 \end{center}
 \texttt{HashingVectorizer} constitue le repli local en cas de chargement impossible. Les représentations de phrases et leur comparaison cosinus s'appuient sur le principe de Sentence-BERT \cite{reimers2019sbert}.
 
-Les similitudes anglaise et multilingue sont moyennées. Une similitude par sections reçoit les poids expérience 0,40 ; compétences 0,30 ; résumé 0,15 ; formation 0,10 ; langues 0,05. Le composant retourne donc :
+Les similitudes anglaise et multilingue sont moyennées. Une similitude par sections reçoit les poids expérience 0,40~; compétences 0,30~; résumé 0,15~; formation 0,10~; langues 0,05. Le composant retourne donc :
 \[
  S_{\mathrm{emb}}=0{,}7\left(0{,}5s_{en}+0{,}5s_{multi}\right)+0{,}3s_{sections}.
 \]
@@ -69,91 +69,124 @@ Soient $H$ et $S$ les recouvrements techniques et comportementaux. La base répa
 \[
  S_{\mathrm{skill}}=\operatorname{clip}\left(S_{base}+0{,}05I_{domaine}+\min(0{,}10,0{,}03n_{cert})-0{,}20\frac{n_{critiques\ absentes}}{n_{critiques}},0,1\right).
 \]
-Il restitue aussi les compétences trouvées, manquantes et critiques : ces éléments constituent la justification métier principale.
+Il restitue aussi les compétences trouvées, manquantes et critiques~: ces éléments constituent la justification métier principale.
+
+\subsection{Contrôle des preuves avant le calcul}
+
+Un CV peut citer les compétences d'une offre sans démontrer qu'elles ont été pratiquées. Avant le calcul, la version finale applique donc trois contrôles explicables, dont le résultat accompagne chaque évaluation.
+\begin{itemize}
+  \item \textbf{Texte recopié de l'offre.} Toute séquence d'au moins huit mots consécutifs également présente dans l'offre est retirée du CV avant le calcul des trois composantes. Sur les 12\,000 paires du corpus, la plus longue séquence commune légitime compte sept mots~: aucune paire authentique n'est modifiée.
+  \item \textbf{Mentions niées.} Une compétence citée dans une proposition négative (« aucune expérience en Kubernetes », \emph{no experience with Docker}) n'est pas comptée, et la proposition correspondante est retirée du texte utilisé pour TF--IDF et les embeddings.
+  \item \textbf{Compétences déclarées ou démontrées.} Une compétence qui n'apparaît que dans une liste (section « Compétences », « Technologies » ou ligne « Skills~: \ldots ») est dite déclarée~; elle compte pour moitié dans la couverture. Une compétence citée dans l'expérience, les projets, le profil ou une certification est dite démontrée. Lorsque le CV ne comporte aucun intitulé de section reconnaissable, la distinction est impossible et toutes les mentions sont traitées comme démontrées.
+\end{itemize}
+Ces contrôles ne modifient aucun score des 3\,600 paires authentiques de validation et de test~; ils agissent sur les CV qui répètent l'offre ou qui reposent sur des listes déclaratives.
 
 \section{Fusion hybride et décision}
 
-La configuration documentée n'apprend pas les poids de fusion ; elle les fixe ainsi :
+La configuration documentée n'apprend pas les poids de fusion~; elle les fixe ainsi :
 \[
  S_{hybride}=0{,}2S_{\mathrm{TFIDF}}+0{,}4S_{\mathrm{emb}}+0{,}4S_{\mathrm{skill}}.
 \]
-Elle donne le même poids à la proximité sémantique et à la couverture explicite des compétences. Pour l'exemple didactique $(0{,}60,0{,}70,0{,}80)$, le score est $0{,}72$, soit $72{,}0\,\%$.
+Elle donne le même poids à la proximité sémantique et à la couverture explicite des compétences. Le score brut $S_{hybride}$ reste toutefois une combinaison de similarités qui n'ont pas d'échelle commune~: la similarité cosinus de deux documents différents dépasse rarement 0,8, le recouvrement TF--IDF reste en général sous 0,5, et la fusion n'atteint pas 0,75 même lorsque chaque composante est à son maximum observé. Lu directement en pourcentage contre des bornes à 55 et 75, ce score ne produirait presque que des verdicts \texttt{REJECT}.
 
-Le \texttt{DecisionEngine} applique ensuite les règles du Tableau~\ref{tab:chap4-seuils}. Elles sont distinctes des seuils expérimentaux calibrés sur la validation lors du benchmark.
+La version finale interpose donc une calibration versionnée entre le score brut et le score affiché. Il s'agit d'une transformation monotone, linéaire par morceaux, définie par trois points d'ancrage appris sur la partition de validation (Tableau~\ref{tab:chap4-calibration}). Elle préserve l'ordre des scores bruts jusqu'au plafond. Au-delà de 0,6126, en revanche, tous les scores affichés valent 100~: deux scores bruts distincts peuvent donc recevoir le même score affiché, et l'arrondi au dixième produit le même effet à plus petite échelle. Les AUC rapportées dans ce chapitre sont pour cette raison calculées sur les scores bruts, et le classement multi-CV départage les égalités par le score brut. La calibration laisse les sous-scores bruts inchangés dans l'explication. Chaque résultat enregistre le score brut, le score affiché, la version de calibration et les seuils appliqués.
 
 \begin{table}[htbp]
   \centering
-  \caption{Seuils de recommandation de la couche~1}
+  \caption{Ancrages de la calibration}
+  \label{tab:chap4-calibration}
+  \begin{tabular}{|l|r|r|}
+    \hline
+    Point d'ancrage & Score brut $S_{hybride}$ & Score affiché \\
+    \hline
+    Origine & 0 & 0 \\
+    \hline
+    Frontière \texttt{REJECT}/\texttt{CONSIDER} & 0,2633 & 55 \\
+    \hline
+    Frontière \texttt{CONSIDER}/\texttt{HIRE} & 0,3638 & 75 \\
+    \hline
+    Plafond (maximum observé en validation) & 0,6126 & 100 \\
+    \hline
+  \end{tabular}
+\end{table}
+
+Les deux frontières sont choisies sur la validation en maximisant le macro-F1 du verdict à trois classes, comparé aux trois catégories du générateur~: paires sans rapport, profils transférables et adéquations fortes. Pour l'exemple $(S_{\mathrm{TFIDF}},S_{\mathrm{emb}},S_{\mathrm{skill}})=(0{,}10;0{,}55;0{,}20)$, le score brut vaut $0{,}32$ et le score affiché $66{,}3$. Les méthodes isolées, sélectionnables dans l'interface, disposent chacune de leurs propres ancrages.
+
+Le \texttt{DecisionEngine} applique ensuite au score affiché les bandes du Tableau~\ref{tab:chap4-seuils}, réglables par le recruteur. Une règle de prudence complète ces bandes~: lorsque le texte recopie l'offre, ou lorsque moins de la moitié des compétences correspondantes sont démontrées, le verdict \texttt{HIRE} est remplacé par \texttt{CONSIDER}, avec une justification invitant à vérifier l'expérience. Le score affiché n'est pas modifié.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Bandes de décision par défaut}
   \label{tab:chap4-seuils}
   \begin{tabular}{|l|l|l|}
     \hline
-    Intervalle & Recommandation & Interprétation opérationnelle \\
+    Score affiché & Recommandation & Interprétation opérationnelle \\
     \hline
     $[75,100]$ & \texttt{HIRE} & adéquation forte à examiner en priorité \\
-\hline
+    \hline
     $[55,75[$ & \texttt{CONSIDER} & profil à examiner avec réserves explicites \\
-\hline
+    \hline
     $[0,55[$ & \texttt{REJECT} & adéquation insuffisante selon les signaux disponibles \\
     \hline
   \end{tabular}
 \end{table}
 
-La confiance présentée par le moteur est une distance technique à la frontière de seuil la plus proche. Elle n'est pas une probabilité calibrée d'embauche.
+Ces ancrages sont appris sur des étiquettes synthétiques. Ils alignent les bandes affichées sur les classes du banc d'essai~; ils ne constituent pas une politique d'embauche validée. La confiance présentée par le moteur est une distance au seuil le plus proche, et non une probabilité d'embauche.
 
 \section{Explicabilité et couche d'analyse locale}
 
 La couche~1 conserve les sous-scores, poids, décision, compétences trouvées ou absentes, compétences critiques et expérience détectée. L'interface peut donc formuler une justification contrôlable, par exemple l'absence de Docker et Kubernetes parmi les prérequis.
 
-Après ce résultat, l'interface peut demander une analyse approfondie. Le service transmet alors le texte source et ce contexte déterministe à un modèle local configuré par défaut comme \texttt{qwen2.5:1.5b}, exécuté via Ollama. La réponse structurée propose trajectoire, alertes, justification, recommandations et questions d'entretien. Les états \texttt{disabled}, \texttt{unavailable}, \texttt{error} et \texttt{inconsistent} sont contrôlés sans bloquer la couche~1 ; une incohérence générative ne révise donc jamais la recommandation.
+Après ce résultat, l'interface peut demander une analyse approfondie. Le service transmet alors le texte source et ce contexte déterministe à un modèle local configuré par défaut comme \texttt{qwen2.5:1.5b}, exécuté via Ollama. La réponse structurée propose trajectoire, alertes, justification, recommandations et questions d'entretien. Les états \texttt{disabled}, \texttt{unavailable}, \texttt{error} et \texttt{inconsistent} sont contrôlés sans bloquer la couche~1~; une incohérence générative ne révise donc jamais la recommandation.
 
 \subsection{Construction du contexte et format de réponse}
 
-L'appel au modèle local n'est pas une requête libre. Le service assemble un contexte à partir du résultat déjà persistant : pourcentage global, sous-scores des trois composantes, décision retenue et libellé de sa bande, compétences trouvées, compétences absentes et compétences critiques manquantes. Le modèle reçoit donc le verdict comme une donnée d'entrée à commenter, et non comme une question à trancher. Le texte du CV et celui de l'offre accompagnent ce contexte pour que l'analyse puisse s'appuyer sur le contenu réel du dossier.
+L'appel au modèle local n'est pas une requête libre. Le service assemble un contexte à partir du résultat déjà persistant~: score calibré global, sous-scores des trois composantes, décision retenue et libellé de sa bande, compétences trouvées, compétences absentes et compétences critiques manquantes. Le modèle reçoit donc le verdict comme une donnée d'entrée à commenter, et non comme une question à trancher. Le texte du CV et celui de l'offre accompagnent ce contexte pour que l'analyse puisse s'appuyer sur le contenu réel du dossier.
 
-La réponse attendue est un objet structuré comportant cinq parties : une lecture de la trajectoire professionnelle, les points d'attention, une justification du positionnement, des recommandations et des questions d'entretien. Cette contrainte de format sert deux objectifs. Elle rend la réponse exploitable par l'interface sans analyse de texte libre, et elle interdit au modèle de produire un score concurrent : aucun champ ne prévoit de note chiffrée ni de verdict. Une réponse qui ne se conforme pas au schéma attendu est rejetée plutôt que corrigée, et l'état correspondant est remonté à l'interface.
+La réponse attendue est un objet structuré comportant cinq parties~: une lecture de la trajectoire professionnelle, les points d'attention, une justification du positionnement, des recommandations et des questions d'entretien. Cette contrainte de format sert deux objectifs. Elle rend la réponse exploitable par l'interface sans analyse de texte libre, et elle interdit au modèle de produire un score concurrent~: aucun champ ne prévoit de note chiffrée ni de verdict. Une réponse qui ne se conforme pas au schéma attendu est rejetée plutôt que corrigée, et l'état correspondant est remonté à l'interface.
 
 \subsection{Garde-fou de cohérence et tentative d'injection}
 
-La contrainte de format ne suffit pas. Un petit modèle exécuté sur processeur peut respecter la structure demandée tout en énonçant une appréciation qui contredit la décision statistique : décrire comme un excellent profil un dossier que le moteur a classé en \texttt{REJECT} avec des compétences critiques absentes. Une telle réponse n'est pas seulement inexacte, elle est trompeuse, puisqu'elle apparaît à côté du verdict qu'elle dément.
+La contrainte de format ne suffit pas. Un petit modèle exécuté sur processeur peut respecter la structure demandée tout en énonçant une appréciation qui contredit la décision statistique~: décrire comme un excellent profil un dossier que le moteur a classé en \texttt{REJECT} avec des compétences critiques absentes. Une telle réponse n'est pas seulement inexacte, elle est trompeuse, puisqu'elle apparaît à côté du verdict qu'elle dément.
 
-Le service applique donc un contrôle de cohérence sur les cas de faible adéquation. Le texte produit est examiné à la recherche d'affirmations positives incompatibles avec le verdict, en tenant compte des négations pour éviter de sanctionner une formulation telle que « ce n'est pas un profil adapté ». Lorsqu'une contradiction est détectée, le service relance une fois le modèle avec un rappel explicite du verdict à respecter. Si la seconde réponse contredit encore la décision, l'analyse est abandonnée et l'état \texttt{inconsistent} est retourné : le système préfère ne rien afficher plutôt qu'afficher un commentaire qui affaiblirait la recommandation. C'est un comportement de défaillance fermée, cohérent avec le principe selon lequel la couche~2 ne peut jamais réviser la couche~1.
+Le service applique donc un contrôle de cohérence sur les cas de faible adéquation. Le texte produit est examiné à la recherche d'affirmations positives incompatibles avec le verdict, en tenant compte des négations pour éviter de sanctionner une formulation telle que « ce n'est pas un profil adapté ». Lorsqu'une contradiction est détectée, le service relance une fois le modèle avec un rappel explicite du verdict à respecter. Si la seconde réponse contredit encore la décision, l'analyse est abandonnée et l'état \texttt{inconsistent} est retourné~: le système préfère ne rien afficher plutôt qu'afficher un commentaire qui affaiblirait la recommandation. C'est un comportement de défaillance fermée, cohérent avec le principe selon lequel la couche~2 ne peut jamais réviser la couche~1.
 
-Ce garde-fou joue également un rôle de sécurité. Le texte d'un CV est fourni par un tiers et se retrouve intégré au message envoyé au modèle ; un candidat averti pourrait y insérer des instructions destinées à l'influencer, par exemple une consigne affirmant qu'il s'agit d'un profil parfait et qu'aucune réserve ne doit être émise. L'audit de sécurité du projet a retenu ce scénario comme un risque réel. Deux propriétés le contiennent. D'une part, le score et la décision sont calculés par le moteur déterministe avant tout appel au modèle : une injection réussie ne peut pas modifier le verdict, seulement le commentaire qui l'accompagne. D'autre part, c'est précisément sur les dossiers faiblement classés qu'une injection aurait un intérêt, et c'est là que le contrôle de cohérence est actif : un texte trop favorable sur un dossier rejeté conduit au rejet de l'analyse. La protection n'est pas absolue, mais la surface exposée se limite à du texte consultatif, jamais à la recommandation elle-même.
+Ce garde-fou joue également un rôle de sécurité. Le texte d'un CV est fourni par un tiers et se retrouve intégré au message envoyé au modèle~; un candidat averti pourrait y insérer des instructions destinées à l'influencer, par exemple une consigne affirmant qu'il s'agit d'un profil parfait et qu'aucune réserve ne doit être émise. L'audit de sécurité du projet a retenu ce scénario comme un risque réel. Deux propriétés le contiennent. D'une part, le score et la décision sont calculés par le moteur déterministe avant tout appel au modèle~: une injection réussie ne peut pas modifier le verdict, seulement le commentaire qui l'accompagne. D'autre part, c'est précisément sur les dossiers faiblement classés qu'une injection aurait un intérêt, et c'est là que le contrôle de cohérence est actif~: un texte trop favorable sur un dossier rejeté conduit au rejet de l'analyse. La protection n'est pas absolue, mais la surface exposée se limite à du texte consultatif, jamais à la recommandation elle-même.
 
 \section{Jeu de données et protocole expérimental}
 
-L'évaluation utilise \texttt{cv\_job\_dataset.csv}, généré localement avec la graine 42. Il contient 12\,000 paires CV--offre synthétiques, plusieurs domaines et niveaux d'expérience, des textes français et anglais, des abréviations, fautes de frappe, compétences obsolètes et offres contradictoires. Les étiquettes positives regroupent les cas de forte et de transférable adéquation générés ; elles ne sont pas des décisions de recrutement observées.
+L'évaluation utilise \texttt{cv\_job\_dataset.csv}, généré localement avec la graine 42. Il contient 12\,000 paires CV--offre synthétiques, plusieurs domaines et niveaux d'expérience, des textes français et anglais, des abréviations, fautes de frappe, compétences obsolètes et offres contradictoires. Les étiquettes positives regroupent les cas de forte et de transférable adéquation générés~; elles ne sont pas des décisions de recrutement observées.
 
 \subsection{Pourquoi un corpus synthétique}
 
 Le choix d'évaluer le moteur sur des documents générés plutôt que sur de vraies candidatures mérite d'être justifié, car il conditionne la portée de tous les chiffres qui suivent. Cinq raisons l'ont motivé.
 
-La première est l'absence de corpus disponible. Aucun ensemble de CV réels appariés à des offres, en nombre suffisant et en accès autorisé, n'a pu être réuni dans le cadre de ce stage. Les quelques dossiers accessibles se comptaient en dizaines, ce qui n'aurait permis ni un partitionnement en trois sous-ensembles, ni une mesure stable : sur un échantillon aussi réduit, un écart de quelques paires suffit à déplacer un F1 de plusieurs points, et la comparaison entre quatre méthodes n'aurait plus été interprétable.
+La première est l'absence de corpus disponible. Aucun ensemble de CV réels appariés à des offres, en nombre suffisant et en accès autorisé, n'a pu être réuni dans le cadre de ce stage. Les quelques dossiers accessibles se comptaient en dizaines, ce qui n'aurait permis ni un partitionnement en trois sous-ensembles, ni une mesure stable~: sur un échantillon aussi réduit, un écart de quelques paires suffit à déplacer un F1 de plusieurs points, et la comparaison entre quatre méthodes n'aurait plus été interprétable.
 
-La deuxième raison est juridique et éthique. Un CV réel est une donnée à caractère personnel, et son usage dans un travail académique suppose une base légale, une information des personnes et une durée de conservation définie, comme le rappelle la section consacrée à ce sujet au chapitre~\ref{chap:tests-securite}. Construire un corpus de test à partir de candidatures authentiques aurait demandé des démarches que le calendrier du projet ne permettait pas, et aurait introduit dans le dépôt des données qu'il aurait fallu ensuite protéger, anonymiser puis supprimer.
+La deuxième raison est juridique et éthique. Un CV réel est une donnée à caractère personnel, et son usage dans un travail académique suppose une base légale, une information des personnes et une durée de conservation définie, comme le rappelle la section consacrée à ce sujet au chapitre~\ref{chap:tests-securite}. Construire un corpus de test à partir de candidatures authentiques aurait demandé des démarches que le cadre du projet ne permettait pas, et aurait introduit dans le dépôt des données qu'il aurait fallu ensuite protéger, anonymiser puis supprimer.
 
-La troisième tient à la qualité d'extraction. Les CV réels circulent dans des formats hétérogènes, parfois exportés depuis un traitement de texte, parfois scannés, souvent mis en page sur plusieurs colonnes ou dans des tableaux. L'extraction de texte y échoue partiellement : ordre de lecture inversé, colonnes fusionnées, caractères manquants, sections illisibles. Un échec de ce type se répercute sur les trois composantes du score. En travaillant sur des documents dont le contenu textuel est maîtrisé, l'évaluation mesure le rapprochement lui-même et non la qualité variable d'une chaîne d'extraction, dont le comportement est vérifié séparément par les tests de \texttt{parsing}.
+La troisième tient à la qualité d'extraction. Les CV réels circulent dans des formats hétérogènes, parfois exportés depuis un traitement de texte, parfois scannés, souvent mis en page sur plusieurs colonnes ou dans des tableaux. L'extraction de texte y échoue partiellement~: ordre de lecture inversé, colonnes fusionnées, caractères manquants, sections illisibles. Un échec de ce type se répercute sur les trois composantes du score. En travaillant sur des documents dont le contenu textuel est maîtrisé, l'évaluation mesure le rapprochement lui-même et non la qualité variable d'une chaîne d'extraction, dont le comportement est vérifié séparément par les tests de \texttt{parsing}.
 
-La quatrième raison est l'absence de vérité de terrain exploitable. Même avec des CV réels, il aurait fallu disposer, pour chaque paire, d'un jugement fiable indiquant si le profil convient à l'offre. Ce jugement n'existe pas dans un dossier de candidature : une embauche dépend d'entretiens, de disponibilités et d'arbitrages qui ne figurent nulle part dans le document. Il aurait donc fallu faire annoter des milliers de paires par des recruteurs, ce qui dépassait largement le périmètre du stage. Le générateur, lui, connaît par construction la raison pour laquelle une paire est compatible ou non, ce qui fournit une étiquette cohérente avec le critère évalué.
+La quatrième raison est l'absence de vérité de terrain exploitable. Même avec des CV réels, il aurait fallu disposer, pour chaque paire, d'un jugement fiable indiquant si le profil convient à l'offre. Ce jugement n'existe pas dans un dossier de candidature~: une embauche dépend d'entretiens, de disponibilités et d'arbitrages qui ne figurent nulle part dans le document. Il aurait donc fallu faire annoter des milliers de paires par des recruteurs, ce qui dépassait largement le périmètre du stage. Le générateur, lui, connaît par construction la raison pour laquelle une paire est compatible ou non, ce qui fournit une étiquette cohérente avec le critère évalué.
 
-La cinquième est la reproductibilité. Le corpus est produit par un script du dépôt avec une graine fixée à 42 : n'importe quel lecteur peut le régénérer à l'identique, relancer le banc d'essai et retrouver les valeurs du Tableau~\ref{tab:chap4-resultats}. Un jeu de CV réels, même anonymisé, n'aurait pas pu être distribué avec le code.
+La cinquième est la reproductibilité. Le corpus est produit par un script du dépôt avec une graine fixée à 42~: n'importe quel lecteur peut le régénérer à l'identique, relancer le banc d'essai et retrouver les valeurs du Tableau~\ref{tab:chap4-resultats}. Un jeu de CV réels, même anonymisé, n'aurait pas pu être distribué avec le code.
 
-Le générateur a été écrit pour ne pas produire des documents trop faciles. Chaque CV est assemblé à partir du dictionnaire de compétences du projet, avec un domaine et un niveau d'expérience, puis dégradé volontairement : abréviations, fautes de frappe, technologies obsolètes, formulations en français ou en anglais. Des paires contradictoires sont également générées, où le vocabulaire se recoupe alors que le profil ne correspond pas, précisément pour empêcher qu'un simple recouvrement de mots suffise. La figure~\ref{fig:chap4-exemple-cv} montre l'un de ces documents.
+J'ai écrit le générateur pour ne pas produire des documents trop faciles. Chaque CV est assemblé à partir du dictionnaire de compétences du projet, avec un domaine et un niveau d'expérience, puis dégradé volontairement~: abréviations, fautes de frappe, technologies obsolètes, formulations en français ou en anglais. Des paires contradictoires sont également générées, où le vocabulaire se recoupe alors que le profil ne correspond pas, précisément pour empêcher qu'un simple recouvrement de mots suffise. La figure~\ref{fig:chap4-exemple-cv} montre l'un de ces documents.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=.55\textwidth]{img/ai/example_cv.png}
-  \caption{Exemple de CV synthétique produit par le générateur du projet}
+  \caption{Exemple de CV synthétique}
   \label{fig:chap4-exemple-cv}
 \end{figure}
 
-Il faut néanmoins nommer ce que ce choix coûte, et le chapitre y revient dans sa section consacrée aux limites. Un document généré reste plus régulier qu'une candidature authentique : la longueur varie peu, la structure est constante, le vocabulaire provient d'un dictionnaire fini et aucune trajectoire atypique n'y figure. C'est d'ailleurs cette régularité qui explique la plage de scores étroite relevée plus loin, lorsque le même score est lu aux bornes du produit. Les résultats obtenus mesurent donc la capacité du moteur à distinguer des profils sur un matériau contrôlé ; ils ne préjugent pas de son comportement sur des CV réels, dont la validation reste la première étape à mener avant tout usage opérationnel.
+Il faut néanmoins nommer ce que ce choix coûte, et le chapitre y revient dans sa section consacrée aux limites. Un document généré reste plus régulier qu'une candidature authentique~: la longueur varie peu, la structure est constante, le vocabulaire provient d'un dictionnaire fini et aucune trajectoire atypique n'y figure. Les résultats obtenus mesurent donc la capacité du moteur à distinguer des profils sur un matériau contrôlé~; ils ne préjugent pas de son comportement sur des CV réels, dont la validation reste la première étape à mener avant tout usage opérationnel.
 
 \subsection{Partitionnement et métriques}
 
-La séparation est stratifiée par étiquette et domaine, puis vérifiée par groupe de paire CV--offre normalisée : 8\,400 paires pour l'apprentissage, 1\,800 pour la validation et 1\,800 pour le test final. Les seuils de chaque méthode sont sélectionnés sur validation en maximisant le F1, puis les métriques sont calculées sur le test isolé. Cette précaution réduit la fuite de paires identiques, sans remplacer une validation externe réelle.
+La séparation est stratifiée par étiquette et domaine, puis vérifiée par groupe de paire CV--offre normalisée~: 8\,400 paires pour l'apprentissage, 1\,800 pour la validation et 1\,800 pour le test final. Les poids de fusion sont fixés avant l'évaluation, le vocabulaire TF--IDF est appris sur l'apprentissage seul, les seuils binaires de chaque méthode sont sélectionnés sur la validation en maximisant le F1, et les ancrages de calibration le sont en maximisant le macro-F1 à trois classes. Les métriques sont ensuite calculées sur le test isolé. Je n'ai choisi aucun poids, seuil ni ancrage sur le test. J'ai toutefois consulté ce test à plusieurs reprises au cours du projet~: les chiffres finaux n'ont pas été réglés sur lui, mais il n'est plus strictement neuf, ce qui laisse un risque résiduel d'optimisme. Une alerte automatique signale toute méthode qui présenterait une AUC élevée et un F1 quasi nul, symptôme d'un seuil mal placé. Le partitionnement réduit la fuite de paires identiques, sans remplacer une validation externe réelle.
 
-Les métriques sont l'exactitude, la précision, le rappel, le F1, l'AUC-ROC, l'aire précision--rappel, le kappa de Cohen et la matrice de confusion, selon les définitions de scikit-learn \cite{scikit_metrics}. Le F1 équilibre précision et rappel :
+Les métriques sont l'exactitude, la précision, le rappel, le F1, l'AUC-ROC, l'aire précision--rappel, le kappa de Cohen et la matrice de confusion, selon les définitions de scikit-learn \cite{scikit_metrics}. Deux familles sont distinguées~: le F1 binaire, qui oppose les paires positives aux autres à un seuil donné, et le macro-F1 à trois classes, moyenne des F1 de \texttt{REJECT}, \texttt{CONSIDER} et \texttt{HIRE}, qui évalue les verdicts affichés. Ces deux mesures ne sont pas comparables entre elles. Le F1 équilibre précision et rappel :
 \[
  F1=2\frac{\mathrm{precision}\times\mathrm{rappel}}{\mathrm{precision}+\mathrm{rappel}}.
 \]
@@ -165,7 +198,7 @@ Le Tableau~\ref{tab:chap4-resultats} reproduit les résultats enregistrés sur l
 \begin{table}[htbp]
   \centering
   \small
-  \caption{Comparaison sur le jeu de test isolé}
+  \caption{Qualité du score brut (F1 binaire)}
   \label{tab:chap4-resultats}
   \begin{tabular}{|l|r|r|r|r|r|r|}
     \hline
@@ -182,178 +215,148 @@ Le Tableau~\ref{tab:chap4-resultats} reproduit les résultats enregistrés sur l
   \end{tabular}
 \end{table}
 
-La figure~\ref{fig:chap4-comparaison} met ces deux indicateurs en regard pour les quatre méthodes.
+La figure~\ref{fig:chap4-roc} présente les courbes ROC des scores bruts sur les mêmes paires. Elles mesurent la qualité du classement indépendamment de tout seuil~: l'AUC de la fusion (0,964) reste inférieure à celle de TF--IDF (0,979), et les embeddings seuls classent nettement moins bien (0,811). Ces courbes ne disent rien des verdicts affichés, évalués plus loin.
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}[x=1cm,y=1cm,font=\small]
-    \draw[->] (0,0)--(8.8,0) node[right] {score};
-    \draw (0,0)--(0,-.12) node[below,font=\scriptsize] {0};
-    \draw (2,0)--(2,-.12) node[below,font=\scriptsize] {0,25};
-    \draw (4,0)--(4,-.12) node[below,font=\scriptsize] {0,50};
-    \draw (6,0)--(6,-.12) node[below,font=\scriptsize] {0,75};
-    \draw (8,0)--(8,-.12) node[below,font=\scriptsize] {1,00};
-    \foreach \y/\name/\f/\a in {3/TF--IDF/7.60/7.83,2/Embeddings/6.80/6.48,1/Compétences/7.44/7.60,0/Hybride/7.44/7.68} {
-      \node[left] at (0,\y*.55+.22) {\name};
-      \fill[gray!55] (0,\y*.55) rectangle (\f,\y*.55+.18);
-      \fill[gray!20] (0,\y*.55+.23) rectangle (\a,\y*.55+.41);
-    }
-    \node[anchor=west,font=\scriptsize] at (0,2.28) {gris foncé : F1 \qquad gris clair : AUC-ROC};
-  \end{tikzpicture}
-  \caption{F1 et AUC-ROC des quatre méthodes sur le test isolé. Données : \texttt{evaluation\_results.json}.}
-  \label{fig:chap4-comparaison}
+  \includegraphics[width=.72\textwidth]{img/ai/eval_roc_raw.png}
+  \caption{Courbes ROC des scores bruts}
+  \label{fig:chap4-roc}
 \end{figure}
 
-Les visualisations suivantes complètent le tableau et la comparaison synthétique. Elles illustrent les résultats obtenus sur le jeu de données expérimental ; elles ne constituent pas une validation sur des décisions de recrutement réelles.
+La figure~\ref{fig:chap4-brut-classes} relie le score brut de la fusion aux trois classes synthétiques et aux deux ancrages de la calibration, qui deviennent 55 et 75 sur l'échelle affichée. Les paires sans rapport se concentrent sous le premier ancrage et la plupart des adéquations fortes au-dessus du second. Les profils transférables chevauchent les deux autres classes, ce qui annonce la difficulté de la classe intermédiaire.
 
-La figure~\ref{fig:chap4-confusion-matrices} montre comment se répartissent les erreurs de chaque méthode.
-
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
-  \includegraphics[width=.90\textwidth,height=.70\textheight,keepaspectratio]{img/ai/Confusion Matrices.png}
-  \caption{Matrices de confusion des méthodes de rapprochement sur le jeu de test}
-  \label{fig:chap4-confusion-matrices}
+  \includegraphics[width=.9\textwidth]{img/ai/eval_hybrid_raw_by_class.png}
+  \caption{Score brut de la fusion par classe}
+  \label{fig:chap4-brut-classes}
 \end{figure}
 
-La figure~\ref{fig:chap4-domain-heatmap} décompose les scores obtenus selon le domaine métier des paires.
+TF--IDF obtient le meilleur F1 dans ce protocole~: $F1=0{,}95$ (intervalle bootstrap à 95~\%~: 0,941--0,959), contre $F1=0{,}93$ (0,924--0,944) et $AUC=0{,}96$ pour la fusion. Sur les mêmes 1\,800 paires, chacune lue à son propre seuil de validation, TF--IDF classe correctement 108 paires que la fusion manque, et l'inverse se produit pour 73 paires~; le test de McNemar donne $p\approx0{,}011$. Ce protocole ne permet donc pas de revendiquer une supériorité mesurée de l'hybride~: la différence observée va dans le sens inverse. Elle ne démontre pas pour autant une supériorité générale du lexical, car le générateur construit CV et offres à partir d'un vocabulaire contrôlé et partagé, ce qui favorise le recouvrement des termes. La fusion est retenue pour des raisons que ce benchmark ne mesure pas~: la justification par compétences restituée au recruteur et une moindre sensibilité à la reformulation, observée sur l'expérience contrôlée du Tableau~\ref{tab:chap4-bug4}. Le temps moyen mesuré est 55,85~ms par paire pour la fusion, contre 921,60~ms pour les embeddings seuls dans cet environnement.
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=.90\textwidth,height=.70\textheight,keepaspectratio]{img/ai/Domain Score Heatmap.png}
-  \caption{Carte thermique des scores de rapprochement par domaine}
-  \label{fig:chap4-domain-heatmap}
-\end{figure}
+\subsection*{Verdicts affichés par la version finale}
+\addcontentsline{toc}{subsection}{Verdicts affichés par la version finale}
 
-La figure~\ref{fig:chap4-embedding-skill} confronte directement le signal sémantique et le signal issu des compétences.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=.90\textwidth,height=.70\textheight,keepaspectratio]{img/ai/Embedding Vs Skill.png}
-  \caption{Comparaison des signaux sémantique et de compétences}
-  \label{fig:chap4-embedding-skill}
-\end{figure}
-
-La figure~\ref{fig:chap4-f1-scores} reprend enfin les valeurs de F1 sous forme graphique.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=.90\textwidth,height=.70\textheight,keepaspectratio]{img/ai/F1 Scores.png}
-  \caption{Scores F1 des méthodes évaluées}
-  \label{fig:chap4-f1-scores}
-\end{figure}
-
-TF--IDF obtient le meilleur F1 dans ce protocole, tandis que la fusion atteint $F1=0{,}93$ et $AUC=0{,}96$. Cela ne démontre pas une supériorité générale du lexical : le générateur construit CV et offres à partir d'un vocabulaire contrôlé et partagé, ce qui favorise le recouvrement des termes. La fusion est retenue pour associer ce signal à la sémantique et à une justification par compétences. Le temps moyen mesuré est 55,85~ms par paire pour la fusion, contre 921,60~ms pour les embeddings seuls dans cet environnement.
-
-\subsection*{Deux lectures distinctes du même score}
-\addcontentsline{toc}{subsection}{Deux lectures distinctes du même score}
-
-Les chiffres du Tableau~\ref{tab:chap4-resultats} répondent à une question de qualité statistique : le score hybride sépare-t-il correctement les paires étiquetées positives des autres ? Pour y répondre, le seuil est choisi sur la validation de façon à maximiser le F1, ce qui place le point de fonctionnement à 0,2636 pour la fusion. Ce nombre est un instrument de mesure. Il ne décrit pas le comportement de l'application, dont la politique de décision repose sur deux bornes métier fixées indépendamment à 55~\% et 75~\% (Tableau~\ref{tab:chap4-seuils}). Confondre les deux conduirait à attribuer au produit une performance qui n'a pas été mesurée à ses propres bornes ; le Tableau~\ref{tab:chap4-seuils-produit} explicite donc l'écart plutôt que de le laisser implicite.
+Le Tableau~\ref{tab:chap4-resultats} mesure la capacité de discrimination du score brut. Le Tableau~\ref{tab:chap4-verdicts} évalue ce que voit le recruteur, c'est-à-dire les verdicts \texttt{REJECT}, \texttt{CONSIDER} et \texttt{HIRE}, sur les mêmes 1\,800 paires de test. Celles-ci comptent 536 paires sans rapport, 545 profils transférables et 719 adéquations fortes.
 
 \begin{table}[H]
   \centering
-  \small
-  \caption{Le même score hybride lu au point de calibration et aux bornes du produit (1\,800 paires de test)}
-  \label{tab:chap4-seuils-produit}
-  \begin{tabular}{|l|l|r|r|r|r|r|}
+  \footnotesize
+  \caption{Qualité des verdicts affichés}
+  \label{tab:chap4-verdicts}
+  \begin{tabular}{|>{\raggedright\arraybackslash}p{3.7cm}|>{\centering\arraybackslash}p{2.5cm}|>{\centering\arraybackslash}p{1.2cm}|>{\centering\arraybackslash}p{1.7cm}|>{\centering\arraybackslash}p{1.1cm}|>{\centering\arraybackslash}p{2.3cm}|}
     \hline
-    Lecture & Seuil & Exact. & Préc. & Rappel & F1 & Positifs \\
+    Configuration & Macro-F1 3 classes [IC 95~\%] & F1 \texttt{HIRE} & F1 binaire \texttt{CONSIDER} ou mieux & Kappa q. & Verdicts R / C / H \\
     \hline
-    Calibration (qualité du modèle) & 0,2636 & 0,91 & 0,94 & 0,93 & 0,93 & 1\,251 \\
-\hline
-    Politique produit -- \texttt{CONSIDER} & 0,55 & 0,31 & 1,00 & 0,02 & 0,04 & 23 \\
-\hline
-    Politique produit -- \texttt{HIRE} & 0,75 & 0,30 & --- & 0,00 & 0,00 & 0 \\
+    \textbf{Hybride calibré (version finale)} & \textbf{0,740} [0,720--0,760] & 0,782 & 0,934 & 0,799 & 548 / 557 / 695 \\
+    \hline
+    TF--IDF seul, calibré & 0,746 [0,726--0,765] & 0,758 & 0,950 & 0,797 & 471 / 641 / 688 \\
+    \hline
+    Fusion apprise 0,75 / 0,05 / 0,20, calibrée (non retenue) & 0,780 [0,761--0,799] & 0,792 & 0,957 & 0,833 & 552 / 560 / 688 \\
     \hline
   \end{tabular}
 \end{table}
 
-L'explication de cet écart tient à la plage effectivement occupée par le score sur ce corpus. Sur les 1\,800 paires de test, la fusion produit des valeurs comprises entre 0,122 et 0,609, avec une médiane à 0,329 et un quatre-vingt-dixième centile à 0,459. La borne \texttt{CONSIDER} n'est franchie que par 23 paires et la borne \texttt{HIRE} ne l'est jamais. Autrement dit, le corpus ne peuple pas la partie haute de l'échelle : appliquer 55~\% et 75~\% à ces données revient à mesurer la politique métier sur une population qui ne contient presque aucun cas censé la déclencher, et le F1 alors obtenu ne renseigne ni sur le moteur ni sur le produit.
+La figure~\ref{fig:chap4-verdicts-repartition} compare la répartition des verdicts à celle des classes synthétiques. La version finale produit une répartition proche de celle des classes, sans que cette proximité suffise à garantir que chaque paire reçoive le bon verdict.
 
-Cette compression du score n'est pas un défaut du moteur mais une propriété du jeu de données. Le générateur assemble des CV et des offres de longueur homogène à partir d'un vocabulaire contrôlé ; même une paire fortement compatible partage rarement assez de contenu pour que les trois composantes soient simultanément élevées, alors que la fusion exige précisément cette convergence pour dépasser 0,75. La précision de 1,00 relevée à 0,55 va dans le même sens : les rares paires qui atteignent cette zone sont toutes des positifs. Le signal est donc correctement ordonné, mais son amplitude est plus étroite sur des documents synthétiques que sur les CV réels observés pendant la démonstration, où une évaluation a produit un verdict \texttt{CONSIDER}.
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.92\textwidth]{img/ai/eval_verdict_distribution.png}
+  \caption{Répartition des verdicts}
+  \label{fig:chap4-verdicts-repartition}
+\end{figure}
 
-Il faut en tirer deux conséquences honnêtes. D'abord, les bornes 55~\% et 75~\% sont un choix de politique de recrutement, réglable par le recruteur dans l'interface et enregistré avec chaque évaluation ; elles ne sont pas issues du benchmark et ne doivent pas être présentées comme validées par lui. Ensuite, leur calibration ne pourra être menée que sur des candidatures réelles : c'est la distribution des scores sur des dossiers authentiques, et non sur un corpus généré, qui dira si ces bornes placent la frontière au bon endroit. Tant que cette étape n'est pas faite, le Tableau~\ref{tab:chap4-resultats} doit être lu comme une mesure de la capacité de discrimination du moteur, et non comme une prévision du taux de \texttt{HIRE} que produira la plateforme.
+La matrice de confusion de la version finale (figure~\ref{fig:chap4-confusion-verdicts}) montre que les erreurs se concentrent entre classes voisines. Les paires sans rapport sont bien identifiées (459 \texttt{REJECT} sur 536, aucune \texttt{HIRE}), et 553 des 719 adéquations fortes reçoivent \texttt{HIRE}. La classe intermédiaire reste la plus difficile (F1 de 0,59)~: 325 profils transférables sur 545 reçoivent \texttt{CONSIDER}, 142 \texttt{HIRE} et 78 \texttt{REJECT}. Une comparaison appariée par bootstrap sur les mêmes paires ne montre pas de différence entre l'hybride calibré et TF--IDF seul (écart de $-0{,}006$, IC à 95~\% de $-0{,}028$ à $0{,}016$). Les paires multilingues (CV anglais, offre française, 120 paires) sont moins bien traitées que les paires françaises (exactitude de 0,65 contre 0,75).
 
-Sur le déploiement Azure CPU, un essai de couche~2 a produit les cinq sections attendues en 54\,290,6~ms. Cette mesure ponctuelle décrit la démonstration, non une garantie de latence ou une évaluation de qualité générative.
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.7\textwidth]{img/ai/eval_confusion_verdicts.png}
+  \caption{Matrice de confusion des verdicts}
+  \label{fig:chap4-confusion-verdicts}
+\end{figure}
 
-\section{Corrections du moteur et du protocole en cours de projet}
+\subsection*{Choix de la pondération}
+\addcontentsline{toc}{subsection}{Choix de la pondération}
 
-Les résultats présentés ci-dessus ne sont pas le produit d'un premier essai. Deux défauts ont été identifiés puis corrigés pendant le développement, l'un dans la pondération du moteur, l'autre dans la méthode d'évaluation elle-même. Les rapporter sert la reproductibilité : ils expliquent pourquoi les chiffres du dépôt ont changé au cours du projet et pourquoi les valeurs retenues sont celles de ce mémoire.
-
-\subsection{Sensibilité à la formulation et rétablissement des poids documentés}
-
-Le point de départ est une observation gênante faite sur le modèle de production alors en service. Ce dernier ne portait pas les poids documentés mais la combinaison \texttt{tfidf~0,9 / embedding~0,0 / skill~0,1}, héritée d'une recherche sur grille qui maximisait l'AUC sur une partition de validation. Un poids nul sur la composante sémantique signifie, concrètement, que le moteur ne disposait plus d'aucun moyen de reconnaître qu'une même idée est exprimée avec d'autres mots.
-
-Pour mesurer l'effet réel de cette configuration, une expérience contrôlée a été construite : deux CV décrivant le même profil, avec des compétences rigoureusement identiques, ont été confrontés à la même offre. Le premier reprenait la formulation de l'annonce, le second exprimait le même contenu autrement. Les compétences obtenant le score maximal dans les deux cas, toute différence de résultat ne pouvait provenir que du vocabulaire. Le Tableau~\ref{tab:chap4-bug4} donne les valeurs obtenues avant puis après correction.
+Une fusion dont les poids sont appris sur l'apprentissage seul (0,75 / 0,05 / 0,20) obtient le meilleur macro-F1 en validation comme en test, et la règle de sélection fixée avant la lecture du test la désignait. Elle n'est pas retenue pour le produit, pour deux raisons. D'abord, son avantage provient d'un corpus dont les étiquettes sont construites à partir du recouvrement des compétences recopiées dans l'offre, ce qui favorise mécaniquement le signal lexical. Ensuite, une pondération dominée par TF--IDF récompense la simple reprise du vocabulaire de l'annonce. Sur une paire contrôlée de CV de même substance, l'un calqué sur l'offre et l'autre reformulé, une pondération 0,9 / 0,0 / 0,1 donnait un écart de 25,6 points, contre 9,6 points avec la pondération documentée (Tableau~\ref{tab:chap4-bug4}). La version finale conserve donc la pondération documentée 0,2 / 0,4 / 0,4~; la calibration de la fusion apprise est archivée avec le code.
 
 \begin{table}[H]
   \centering
   \small
-  \caption{Effet de la reformulation à compétences identiques, avant et après le rétablissement des poids}
+  \caption{Effet de la reformulation selon la pondération}
   \label{tab:chap4-bug4}
   \begin{tabular}{|l|r|r|r|}
     \hline
     Pondération du moteur & CV calqué sur l'offre & CV reformulé & Écart \\
     \hline
-    0,9 / 0,0 / 0,1 (état initial) & 99,2~\% & 73,6~\% & 25,6 points \\
-\hline
-    0,2 / 0,4 / 0,4 (documentée) & 94,4~\% & 84,8~\% & 9,6 points \\
+    0,9 / 0,0 / 0,1 & 99,2 & 73,6 & 25,6 points \\
+    \hline
+    0,2 / 0,4 / 0,4 (documentée) & 94,4 & 84,8 & 9,6 points \\
     \hline
   \end{tabular}
 \end{table}
 
-Un écart de 25,6 points imputable à la seule rédaction du CV constitue une faille exploitable : il suffisait de recopier les termes de l'annonce pour gagner une vingtaine de points, ce qui est exactement le comportement que la présence d'une composante sémantique doit décourager. Le modèle de production a donc été réexporté avec les poids fixes documentés, sans optimisation, et son point de fonctionnement recalculé sur la validation seule, ce qui l'a fait passer de 0,04 à 0,2636. L'écart résiduel de 9,6 points est cohérent avec ce que l'on attend d'un moteur qui conserve une part lexicale assumée : la formulation compte encore, mais elle ne domine plus la décision.
+\subsection*{Robustesse face aux CV manipulés}
+\addcontentsline{toc}{subsection}{Robustesse face aux CV manipulés}
 
-Cette correction a une conséquence qu'il serait incorrect de passer sous silence. Les évaluations enregistrées avant le 9~septembre 2026 ont été calculées avec l'ancienne pondération ; leurs scores ne sont pas sur la même échelle que ceux produits depuis. Ces enregistrements ont été conservés tels quels plutôt que recalculés, et c'est précisément pour permettre ce genre de lecture que chaque \texttt{MatchResult} conserve la méthode, les poids et les seuils employés au moment du calcul.
+Le Tableau~\ref{tab:chap4-robustesse} mesure l'effet du contrôle des preuves sur des CV de la partition de validation modifiés de façon contrôlée, à raison de 200 paires par scénario. Les cinq premiers scénarios partent de profils sans rapport avec l'offre~; les deux derniers partent d'adéquations fortes. Les deux colonnes utilisent la même calibration~; seule change la présence du contrôle des preuves. Je n'ai ajusté aucun paramètre sur ces scénarios.
 
-\subsection{Intégrité du protocole d'évaluation}
-
-Le second défaut portait sur la mesure et non sur le moteur. La version initiale du banc d'essai appliquait un seuil unique de 0,60 à toutes les méthodes, sans tenir compte du fait que leurs scores n'occupent pas la même plage. TF--IDF et la composante compétences produisent des valeurs concentrées dans le bas de l'intervalle : jugées à 0,60, elles ne classaient presque rien en positif. Il en résultait une contradiction visible, une AUC élevée accompagnée d'un F1 quasi nul, symptôme classique d'un seuil mal placé plutôt que d'un modèle inopérant. Le Tableau~\ref{tab:chap4-protocole} montre l'ampleur de la correction apportée par une calibration propre à chaque méthode.
-
-\begin{table}[H]
+\begin{table}[htbp]
   \centering
-  \small
-  \caption{Effet de la calibration par méthode sur les métriques publiées (exactitude / F1 / AUC-ROC)}
-  \label{tab:chap4-protocole}
-  \begin{tabular}{|l|l|l|}
+  \footnotesize
+  \caption{Effet du contrôle des preuves}
+  \label{tab:chap4-robustesse}
+  \begin{tabular}{|p{7.2cm}|c|c|}
     \hline
-    Méthode & Seuil unique 0,60 & Seuil calibré sur validation \\
+    Scénario & Sans contrôle & Version finale \\
     \hline
-    TF--IDF & 29,8~\% / 0,000 / 0,979 & 92,8~\% / 0,950 / 0,979 \\
-\hline
-    Embeddings & 51,2~\% / 0,479 / 0,801 & 77,7~\% / 0,849 / 0,811 \\
-\hline
-    Compétences & 30,2~\% / 0,011 / 0,947 & 89,4~\% / 0,928 / 0,947 \\
-\hline
-    Hybride & 92,8~\% / 0,950 / 0,983 & 90,8~\% / 0,934 / 0,964 \\
+    Référence~: profils sans rapport non modifiés & \multicolumn{2}{c|}{174 / 25 / 1} \\
+    \hline
+    Profil sans rapport + liste d'exigences de l'offre recopiée & 0 / 0 / 200 & 133 / 67 / 0 \\
+    \hline
+    Profil sans rapport + mêmes compétences, réordonnées, dans une section Compétences & 0 / 0 / 200 & 0 / 200 / 0 \\
+    \hline
+    Profil sans rapport + offre entière collée & 0 / 0 / 200 & 174 / 26 / 0 \\
+    \hline
+    Profil sans rapport + mention niée des compétences & 0 / 0 / 200 & 175 / 24 / 1 \\
+    \hline
+    Profil sans rapport + compétences insérées dans une phrase d'expérience & 0 / 0 / 200 & 0 / 0 / 200 \\
+    \hline
+    Référence~: adéquations fortes non modifiées & \multicolumn{2}{c|}{1 / 33 / 166} \\
+    \hline
+    Adéquation forte privée de la moitié de ses compétences & 15 / 129 / 56 & 15 / 129 / 56 \\
+    \hline
+    Adéquation forte allongée par des expériences sans rapport & 0 / 16 / 184 & 0 / 16 / 184 \\
     \hline
   \end{tabular}
 \end{table}
 
-La stabilité des AUC entre les deux colonnes est instructive : la capacité de classement des méthodes n'avait pas changé, seule la lecture qu'on en faisait était faussée. Le cas de la fusion mérite une remarque inverse : ses chiffres ont légèrement baissé. C'est attendu et souhaitable, car l'ancienne mesure bénéficiait de poids choisis par optimisation sur les mêmes données que celles servant à la juger, alors que la nouvelle fixe les poids avant toute évaluation.
+Le contrôle ramène les listes recopiées, l'offre collée et les mentions niées au niveau de la référence non modifiée~: aucun CV à liste recopiée ou à offre collée n'obtient \texttt{HIRE}, et le seul \texttt{HIRE} restant parmi les mentions niées correspond à un profil déjà mal classé avant modification. Une liste réordonnée placée dans une section Compétences n'est pas reconnue comme copie, mais la règle de prudence ramène le verdict à \texttt{CONSIDER}. Les CV partiels et les CV longs ne sont pas affectés, et aucun verdict des 1\,800 paires authentiques de validation ne change. En revanche, un CV qui affirme une expérience dans une phrase rédigée reste classé \texttt{HIRE}~: l'analyse du texte ne peut pas distinguer une déclaration mensongère d'une expérience réelle. Cette limite justifie la lecture humaine du dossier et les questions d'entretien proposées par la couche~2.
 
-Trois garde-fous ont été ajoutés à cette occasion. Le partitionnement regroupe désormais les paires CV--offre par empreinte du texte normalisé et vérifie par assertion que les trois sous-ensembles n'ont aucun groupe en commun ; l'inspection du corpus a montré que les 12\,000 paires étaient déjà distinctes, mais l'absence de contrôle laissait passer ce risque sans le signaler. Les poids de fusion sont fixés avant l'évaluation et ne sont jamais ajustés sur le jeu de test. Enfin, une alerte automatique se déclenche lorsqu'une méthode présente à la fois une AUC supérieure ou égale à 0,80 et un F1 inférieur ou égal à 0,05, afin que la pathologie corrigée ici ne puisse pas réapparaître silencieusement. Ces contrôles sont couverts par des tests du dépôt, ce qui les rend vérifiables indépendamment de ce mémoire.
+Sur le déploiement Azure CPU, un essai de couche~2 a produit les cinq sections attendues en 54\,290,6~ms. Cette mesure ponctuelle décrit la démonstration, non une garantie de latence ou une évaluation de qualité générative.
 
 \section{Limites, risques et perspectives}
 
-Les résultats sont internes à un corpus synthétique et à des étiquettes générées par règles. Ils ne mesurent ni la qualité d'une embauche, ni les effets sur les candidats, ni l'équité entre groupes protégés. Le dictionnaire peut omettre une technologie ou mal qualifier un intitulé ambigu ; les embeddings peuvent rapprocher des contenus trop généraux ; le modèle local peut produire une justification plausible mais erronée. JobTest doit donc rester une aide à la priorisation, avec révision humaine, traçabilité des critères et possibilité de correction.
+Les résultats quantitatifs sont internes à un corpus synthétique et à des étiquettes générées par règles~; les ancrages de calibration sont appris sur ces étiquettes. Les essais que j'ai menés avec mes propres CV face à des offres réelles, présentés au chapitre~\ref{chap:tests-securite}, sont fonctionnels~: faute de jugements de référence établis par des recruteurs, ils ne permettent de calculer ni précision, ni rappel, ni F1. Les mesures ne couvrent ni la qualité d'une embauche, ni les effets sur les candidats, ni l'équité entre groupes protégés. Un CV qui décrit faussement une expérience n'est pas détecté. Le dictionnaire peut omettre une technologie ou mal qualifier un intitulé ambigu~; les embeddings peuvent rapprocher des contenus trop généraux~; le modèle local peut produire une justification plausible mais erronée. JobTest doit donc rester une aide à la priorisation, avec révision humaine, traçabilité des critères et possibilité de correction.
 
-Les suites nécessaires sont une validation avec des recruteurs sur des données autorisées et minimisées, la mesure de l'accord inter-évaluateurs, des tests de biais et de robustesse par sous-groupes, ainsi qu'une calibration prospective des seuils. L'évaluation du modèle de langage doit être séparée de celle du score : fidélité aux faits, utilité des questions et taux d'incohérences sont des axes distincts.
+Les suites nécessaires sont une validation avec des recruteurs sur des données autorisées et minimisées, la mesure de l'accord inter-évaluateurs, des tests de biais et de robustesse par sous-groupes, ainsi qu'un réapprentissage des ancrages de calibration sur ces données annotées. L'évaluation du modèle de langage doit être séparée de celle du score~: fidélité aux faits, utilité des questions et taux d'incohérences sont des axes distincts.
 
 Le tableau~\ref{tab:chap4-synthese} récapitule le rôle de chaque couche et le garde-fou qui lui est associé.
 
 \begin{table}[H]
   \centering
-  \caption{Synthèse des couches et de leur statut}
+  \caption{Synthèse des couches}
   \label{tab:chap4-synthese}
   \begin{tabular}{|p{3cm}|p{4cm}|p{5cm}|}
     \hline
     Couche & Rôle & Statut et garde-fou \\
     \hline
-    Couche~1 & score hybride, décision et explications & implémentée ; décision déterministe par seuils \\
+    Couche~1 & score hybride calibré, contrôle des preuves, décision et explications & implémentée~; décision déterministe~; \texttt{HIRE} écarté si les preuves sont insuffisantes \\
 \hline
-    Couche~2 & analyse locale et questions d'entretien & optionnelle ; ne change jamais la couche~1 \\
+    Couche~2 & analyse locale et questions d'entretien & optionnelle~; ne change jamais la couche~1 \\
 \hline
-    Évaluation & benchmark train/validation/test synthétique & disponible ; non représentatif d'une embauche réelle \\
+    Évaluation & benchmark train/validation/test synthétique & disponible~; ancrages appris sur étiquettes synthétiques~; non représentatif d'une embauche réelle \\
     \hline
   \end{tabular}
 \end{table}
@@ -361,4 +364,4 @@ Le tableau~\ref{tab:chap4-synthese} récapitule le rôle de chaque couche et le 
 \section*{Conclusion}
 \addcontentsline{toc}{section}{Conclusion}
 
-Le moteur intelligent combine signaux lexicaux, sémantiques et structurés dans une recommandation contrôlable. Son évaluation est encourageante sur le corpus disponible, sans autoriser une généralisation à la sélection réelle. Le chapitre suivant présentera la réalisation de la plateforme et l'intégration de ces services dans l'expérience utilisateur.
+Le moteur combine signaux lexicaux, sémantiques et structurés, contrôle les preuves avant le calcul et calibre son score avant d'appliquer les bandes de décision. Sur le test synthétique, les verdicts affichés atteignent un macro-F1 de 0,740 sur trois classes, sans dépasser TF--IDF seul, et les CV qui recopient l'offre n'obtiennent plus \texttt{HIRE}. La calibration devra être réapprise sur des données réelles annotées avant tout usage opérationnel. Le chapitre suivant présente la réalisation de la plateforme.

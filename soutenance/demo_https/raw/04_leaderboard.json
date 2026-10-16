@@ -1,0 +1,46 @@
+[
+ {
+  "t": 2.64,
+  "label": "loaded"
+ },
+ {
+  "t": 9.17,
+  "label": "shot:leaderboard_form"
+ },
+ {
+  "t": 11.43,
+  "label": "rank_start"
+ },
+ {
+  "t": 13.61,
+  "label": "shot:leaderboard_running"
+ },
+ {
+  "t": 16.46,
+  "label": "rank_done"
+ },
+ {
+  "t": 27.67,
+  "label": "shot:leaderboard_podium"
+ },
+ {
+  "t": 35.75,
+  "label": "shot:leaderboard_2"
+ },
+ {
+  "t": 43.55,
+  "label": "shot:leaderboard_3"
+ },
+ {
+  "t": 46.93,
+  "label": "csv_saved"
+ },
+ {
+  "t": 48.55,
+  "label": "nav"
+ },
+ {
+  "t": 52.3,
+  "label": "OK"
+ }
+]

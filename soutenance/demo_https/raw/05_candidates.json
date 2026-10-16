@@ -1,0 +1,34 @@
+[
+ {
+  "t": 3.62,
+  "label": "loaded"
+ },
+ {
+  "t": 3.82,
+  "label": "shot:candidates"
+ },
+ {
+  "t": 6.72,
+  "label": "modal"
+ },
+ {
+  "t": 10.16,
+  "label": "shot:candidate_edit"
+ },
+ {
+  "t": 14.96,
+  "label": "saved"
+ },
+ {
+  "t": 15.12,
+  "label": "shot:candidates_after"
+ },
+ {
+  "t": 15.12,
+  "label": "nav"
+ },
+ {
+  "t": 19.0,
+  "label": "OK"
+ }
+]

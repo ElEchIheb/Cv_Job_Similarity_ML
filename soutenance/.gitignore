@@ -1,0 +1,9 @@
+# Session navigateur locale (Playwright) : ne jamais versionner
+tools/pw-profile/
+# Fichiers intermediaires volumineux, regenerables
+demo/raw/
+demo/work/
+demo/work_build.log
+deck/out/slides/
+deck/out/slides_jpg/
+__pycache__/

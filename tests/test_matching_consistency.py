@@ -26,6 +26,8 @@ def _hybrid_result(pct: float):
     return {
         "final_score": frac,
         "percentage": pct,
+        "raw_score": round(frac * 0.6, 4),
+        "calibration_version": "test-v1",
         "component_scores": {"tfidf_score": frac, "embedding_score": frac, "skill_score": frac},
         "weights_used": {"tfidf": 0.2, "embedding": 0.4, "skill": 0.4},
         "skill_details": {
@@ -132,9 +134,14 @@ def test_persist_stores_reproducibility_metadata(db):
     db.refresh(job)
 
     match = persist_evaluation(db, _payload(85, cfg), "cv", "Bob", "bob@test.com", job.id, 1)
-    assert match.model_version == "hybrid-checkpoint-v2"
+    from src.matching.service import MODEL_VERSION
+    assert match.model_version == MODEL_VERSION == "hybrid-checkpoint-v4"
     assert match.strong_fit_threshold == 80
     assert match.potential_fit_threshold == 50
     assert match.evaluation_method == "hybrid"
+    assert match.calibration_version == "test-v1"
+    assert match.score_raw == pytest.approx(0.51)
+    assert match.score_hybrid == pytest.approx(0.51)   # raw fusion, not the display score
+    assert match.final_score == pytest.approx(0.85)    # calibrated display score / 100
     assert match.decision_confidence is not None
     assert match.candidate_id is not None and match.job_offer_id is not None

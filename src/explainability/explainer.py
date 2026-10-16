@@ -14,6 +14,7 @@ from typing import Dict, List
 
 from src.nlp.skill_extractor import SkillExtractor
 from src.decisioning import DecisionConfig, DecisionEngine
+from src.nlp.screening import evidence_insufficient
 
 logger = logging.getLogger(__name__)
 
@@ -201,8 +202,9 @@ class MatchingExplainer:
 
         # ── Canonical decision via the central DecisionEngine ──────────────
         cfg = config or DecisionConfig.default()
+        evidence_gap = evidence_insufficient(skill_details)[1] or None
         decision_result = DecisionEngine(cfg).evaluate(
-            global_score, cfg, critical_missing=critical_missing
+            global_score, cfg, critical_missing=critical_missing, evidence_gap=evidence_gap
         )
         verdict = {
             "verdict": _VERDICT_TEXT[decision_result.decision],
@@ -213,6 +215,8 @@ class MatchingExplainer:
             "band_label": decision_result.band_label,
             "justification": decision_result.reason,
             "confidence": decision_result.confidence,          # uncalibrated [0,1]
+            "evidence_gap": evidence_gap,
+            "evidence": skill_details.get("evidence"),
             "confidence_level": decision_result.confidence_level,
         }
 

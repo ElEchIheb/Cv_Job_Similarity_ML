@@ -43,3 +43,14 @@ Thumbs.db
 
 # Archives de rendu du mémoire (volumineuses, régénérables)
 ISI-LaTeX-Template-master/*.zip
+
+# ── Real evaluation data (personal data: never committed) ────────────────
+data/real/
+evaluation/results/real_*.json
+
+# ── Regenerable component-score caches of the calibration study ──────────
+evaluation/cache/*.partial.json
+
+# ── Local database backups (may contain personal data) ─────────────────
+data/backups/
+*.bak

@@ -1,0 +1,34 @@
+[
+ {
+  "t": 2.73,
+  "label": "loaded"
+ },
+ {
+  "t": 9.24,
+  "label": "shot:insights_form"
+ },
+ {
+  "t": 11.42,
+  "label": "compare_start"
+ },
+ {
+  "t": 13.34,
+  "label": "compare_done"
+ },
+ {
+  "t": 21.12,
+  "label": "shot:insights_result"
+ },
+ {
+  "t": 29.15,
+  "label": "shot:insights_table"
+ },
+ {
+  "t": 29.15,
+  "label": "nav"
+ },
+ {
+  "t": 35.18,
+  "label": "OK"
+ }
+]

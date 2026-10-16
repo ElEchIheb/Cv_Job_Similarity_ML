@@ -1,0 +1,147 @@
+{
+  "rule": "max 5-fold CV macro-F1 on validation among candidates whose alias downgrade rate <= documented hybrid + 0.05",
+  "fusion_fit": {
+    "weights": {
+      "tfidf": 0.75,
+      "embedding": 0.05,
+      "skill": 0.2
+    },
+    "train_mean_auc": 0.9472,
+    "train_sample_size": 1500
+  },
+  "candidates": {
+    "hybrid_documented": {
+      "weights": {
+        "tfidf": 0.2,
+        "embedding": 0.4,
+        "skill": 0.4
+      },
+      "cv_macro_f1": 0.7392,
+      "in_sample_macro_f1": 0.7471,
+      "validation_auc": 0.9711,
+      "cuts": [
+        0.2633,
+        0.3638
+      ],
+      "alias_robustness": {
+        "n": 641,
+        "downgrade_rate": 0.0187,
+        "upgrade_rate": 0.0
+      }
+    },
+    "fusion_learned": {
+      "weights": {
+        "tfidf": 0.75,
+        "embedding": 0.05,
+        "skill": 0.2
+      },
+      "cv_macro_f1": 0.7803,
+      "in_sample_macro_f1": 0.7864,
+      "validation_auc": 0.9822,
+      "cuts": [
+        0.0787,
+        0.1655
+      ],
+      "alias_robustness": {
+        "n": 641,
+        "downgrade_rate": 0.039,
+        "upgrade_rate": 0.0047
+      }
+    },
+    "tfidf": {
+      "weights": {
+        "tfidf": 1.0,
+        "embedding": 0.0,
+        "skill": 0.0
+      },
+      "cv_macro_f1": 0.7363,
+      "in_sample_macro_f1": 0.7445,
+      "validation_auc": 0.9768,
+      "cuts": [
+        0.0387,
+        0.1125
+      ],
+      "alias_robustness": {
+        "n": 641,
+        "downgrade_rate": 0.0452,
+        "upgrade_rate": 0.0062
+      }
+    },
+    "embedding": {
+      "weights": {
+        "tfidf": 0.0,
+        "embedding": 1.0,
+        "skill": 0.0
+      },
+      "cv_macro_f1": 0.5342,
+      "in_sample_macro_f1": 0.5401,
+      "validation_auc": 0.8254,
+      "cuts": [
+        0.5542,
+        0.6384
+      ],
+      "alias_robustness": {
+        "n": 641,
+        "downgrade_rate": 0.0312,
+        "upgrade_rate": 0.025
+      }
+    },
+    "skill": {
+      "weights": {
+        "tfidf": 0.0,
+        "embedding": 0.0,
+        "skill": 1.0
+      },
+      "cv_macro_f1": 0.7096,
+      "in_sample_macro_f1": 0.7163,
+      "validation_auc": 0.9518,
+      "cuts": [
+        0.0763,
+        0.2667
+      ],
+      "alias_robustness": {
+        "n": 641,
+        "downgrade_rate": 0.0,
+        "upgrade_rate": 0.0
+      }
+    }
+  },
+  "eligible": [
+    "embedding",
+    "fusion_learned",
+    "hybrid_documented",
+    "skill",
+    "tfidf"
+  ],
+  "chosen": "fusion_learned",
+  "validation_balance": {
+    "n": 1800,
+    "REJECT": {
+      "count": 540,
+      "share": 0.3
+    },
+    "CONSIDER": {
+      "count": 528,
+      "share": 0.2933
+    },
+    "HIRE": {
+      "count": 732,
+      "share": 0.4067
+    }
+  },
+  "train_sample_balance": {
+    "n": 1500,
+    "REJECT": {
+      "count": 448,
+      "share": 0.2987
+    },
+    "CONSIDER": {
+      "count": 446,
+      "share": 0.2973
+    },
+    "HIRE": {
+      "count": 606,
+      "share": 0.404
+    }
+  }
+}

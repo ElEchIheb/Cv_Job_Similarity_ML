@@ -38,7 +38,7 @@ export default function SettingsPage() {
 
   const apply = () => {
     cfg.setConfig(potential, strong);
-    toast("success", `Active decision policy updated: Strong Fit ≥ ${strong}%, Potential Fit ${potential}–${strong - 1}%.`);
+    toast("success", `Active decision policy updated: Strong Fit ≥ ${strong}, Potential Fit ≥ ${potential} (calibrated score /100).`);
   };
 
   return (
@@ -60,22 +60,22 @@ export default function SettingsPage() {
             <CardBody className="flex flex-col gap-5">
               <div className="flex items-start gap-3 rounded-lg bg-accent/8 px-3 py-2.5 text-caption text-ink-secondary ring-1 ring-accent/10">
                 <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent-300" />
-                <span>These thresholds are the single source of truth for the Strong Fit / Potential Fit / Low Fit decision. They affect every <strong>future</strong> evaluation this session. Previously saved evaluations keep the thresholds they were scored with.</span>
+                <span>These thresholds are the single source of truth for the Strong Fit / Potential Fit / Low Fit decision. They apply to the <strong>calibrated</strong> score (0–100), whose reference bounds 55 / 75 were fitted on a synthetic benchmark — not on real hiring outcomes. They affect every <strong>future</strong> evaluation this session. Previously saved evaluations keep the thresholds and score scale they were computed with.</span>
               </div>
               <div>
                 <div className="mb-1.5 flex items-center justify-between text-caption">
-                  <span className="text-ink-secondary">Strong Fit threshold (%)</span><span className="tnum font-semibold text-success-fg">{strong}%</span>
+                  <span className="text-ink-secondary">Strong Fit threshold (/100)</span><span className="tnum font-semibold text-success-fg">{strong}</span>
                 </div>
                 <input type="range" min={50} max={95} value={strong} onChange={(e) => setStrong(Number(e.target.value))} className="w-full accent-[#7c5cff]" />
               </div>
               <div>
                 <div className="mb-1.5 flex items-center justify-between text-caption">
-                  <span className="text-ink-secondary">Potential Fit threshold (%)</span><span className="tnum font-semibold text-warning-fg">{potential}%</span>
+                  <span className="text-ink-secondary">Potential Fit threshold (/100)</span><span className="tnum font-semibold text-warning-fg">{potential}</span>
                 </div>
                 <input type="range" min={10} max={strong - 1} value={potential} onChange={(e) => setPotential(Number(e.target.value))} className="w-full accent-[#7c5cff]" />
               </div>
               <Button onClick={apply}>Apply thresholds</Button>
-              <p className="text-caption text-ink-muted">Currently active — Strong Fit ≥ {cfg.strong}%, Potential Fit ≥ {cfg.potential}%.</p>
+              <p className="text-caption text-ink-muted">Currently active (calibrated score /100) — Strong Fit ≥ {cfg.strong}, Potential Fit ≥ {cfg.potential}.</p>
             </CardBody>
           </Card>
 
@@ -84,9 +84,9 @@ export default function SettingsPage() {
             <CardBody className="flex flex-col gap-4">
               <BandStrip potential={potential} strong={strong} />
               <div className="flex flex-col gap-3">
-                <PreviewRow band="Strong Fit" range={`≥ ${strong}%`} tone="success" tag="Recommended" />
-                <PreviewRow band="Potential Fit" range={`${potential}% – ${strong - 1}%`} tone="warning" tag="Consider" />
-                <PreviewRow band="Low Fit" range={`Below ${potential}%`} tone="danger" tag="Not Recommended" />
+                <PreviewRow band="Strong Fit" range={`≥ ${strong}`} tone="success" tag="Recommended" />
+                <PreviewRow band="Potential Fit" range={`${potential} – < ${strong}`} tone="warning" tag="Consider" />
+                <PreviewRow band="Low Fit" range={`Below ${potential}`} tone="danger" tag="Not Recommended" />
               </div>
             </CardBody>
           </Card>
@@ -118,7 +118,7 @@ export default function SettingsPage() {
             <CardHeader><CardTitle className="flex items-center gap-2 text-h4"><Cpu className="h-4 w-4" /> Environment</CardTitle></CardHeader>
             <CardBody className="flex flex-col gap-3 text-body">
               <Row label="Python" value={system?.python_version ?? "…"} />
-              <Row label="Match threshold" value={system ? String(system.config.match_threshold) : "…"} />
+              <Row label="Score calibration" value={system ? (system.calibration?.calibrated ? system.calibration.version : "uncalibrated (raw × 100)") : "…"} />
               <Row label="Embedding model" value={system?.config.embedding_model ?? "…"} />
               <Row label="Rate limit" value={system ? `${system.config.rate_limit} req/min` : "…"} />
             </CardBody>
@@ -191,9 +191,9 @@ function BandStrip({ potential, strong }: { potential: number; strong: number })
         {seg(100 - strong, "bg-success/80", "Strong")}
       </div>
       <div className="mt-1 flex justify-between text-[10px] tabular-nums text-ink-muted">
-        <span>0%</span>
-        <motion.span animate={{ x: 0 }}>{potential}%</motion.span>
-        <motion.span animate={{ x: 0 }}>{strong}%</motion.span>
+        <span>0</span>
+        <motion.span animate={{ x: 0 }}>{potential}</motion.span>
+        <motion.span animate={{ x: 0 }}>{strong}</motion.span>
         <span>100%</span>
       </div>
     </div>

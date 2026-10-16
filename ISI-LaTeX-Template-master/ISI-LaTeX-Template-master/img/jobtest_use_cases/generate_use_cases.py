@@ -1,133 +1,309 @@
+"""Generate the nine JobTest use-case diagrams (SVG, then PNG at 180 DPI).
+
+Usage:  python generate_use_cases.py          # SVG + PNG next to this script
+        python generate_use_cases.py --svg    # SVG only
+
+UML conventions applied (UML 2.5.1):
+- solid line            : association between an actor and a use case;
+- dashed arrow «include»: behaviour always required by the base use case,
+                          arrow from the base to the included use case;
+- dashed arrow «extend» : optional or conditional behaviour,
+                          arrow from the extending use case to the base;
+- hollow-triangle arrow : generalisation; the child use cases are alternative
+                          specialisations of an abstract parent (shown in
+                          italics), so "Gérer ..." never implies that every
+                          child operation is executed.
+Actors are always drawn outside the system boundary.
+PNG rendering uses Playwright with the system Edge/Chrome browser.
+"""
+from __future__ import annotations
+
+import math
+import sys
 from pathlib import Path
 from xml.sax.saxutils import escape
 
-OUT = Path("output/jobtest_use_cases")
-OUT.mkdir(parents=True, exist_ok=True)
-
-W, H = 1500, 900
-
-
-def lines(text):
-    return text.split("\n")
+OUT = Path(__file__).resolve().parent
+DPI = 180
+SCALE = 1.875  # 1500 px wide SVG -> ~2800 px PNG, as in the original export
 
 
-def text_block(x, y, text, size=25, weight="normal", anchor="middle"):
-    rows = lines(text)
-    start = y - ((len(rows) - 1) * size * 0.58)
-    body = [f'<text x="{x}" y="{start}" text-anchor="{anchor}" class="txt" font-size="{size}" font-weight="{weight}">']
+def text_block(x, y, text, size=26, weight="normal", anchor="middle", italic=False, halo=False):
+    rows = text.split("\n")
+    start = y - ((len(rows) - 1) * size * 0.59) + size * 0.35
+    cls = "txt halo" if halo else "txt"
+    style = ' font-style="italic"' if italic else ""
+    body = [f'<text x="{x}" y="{start:.1f}" text-anchor="{anchor}" class="{cls}" '
+            f'font-size="{size}" font-weight="{weight}"{style}>']
     for i, row in enumerate(rows):
-        body.append(f'<tspan x="{x}" dy="{0 if i == 0 else size * 1.18}">{escape(row)}</tspan>')
-    body.append('</text>')
+        body.append(f'<tspan x="{x}" dy="{0 if i == 0 else size * 1.18:.1f}">{escape(row)}</tspan>')
+    body.append("</text>")
     return "".join(body)
 
 
-def ellipse(x, y, w, h, label):
-    return (
-        f'<ellipse cx="{x}" cy="{y}" rx="{w/2}" ry="{h/2}" class="usecase"/>'
-        + text_block(x, y + 8, label, 23)
-    )
+class Diagram:
+    def __init__(self, width, height, boundary):
+        self.w, self.h = width, height
+        self.bx, self.by, self.bw, self.bh = boundary
+        self.cases: dict[str, tuple] = {}
+        self.actors: dict[str, tuple] = {}
+        self.parts: list[str] = []
 
+    # ── elements ─────────────────────────────────────────────────────────
+    def actor(self, key, x, y, label):
+        self.actors[key] = (x, y)
+        self.parts.append(
+            f'<circle cx="{x}" cy="{y-90}" r="30" class="stroke"/>'
+            f'<line x1="{x}" y1="{y-60}" x2="{x}" y2="{y+35}" class="stroke"/>'
+            f'<line x1="{x-55}" y1="{y-20}" x2="{x+55}" y2="{y-20}" class="stroke"/>'
+            f'<line x1="{x}" y1="{y+35}" x2="{x-45}" y2="{y+105}" class="stroke"/>'
+            f'<line x1="{x}" y1="{y+35}" x2="{x+45}" y2="{y+105}" class="stroke"/>'
+            + text_block(x, y + 150, label, 26, "bold")
+        )
 
-def actor(x, y, label):
-    return (
-        f'<circle cx="{x}" cy="{y-90}" r="30" class="actor"/>'
-        f'<line x1="{x}" y1="{y-60}" x2="{x}" y2="{y+35}" class="actor"/>'
-        f'<line x1="{x-55}" y1="{y-20}" x2="{x+55}" y2="{y-20}" class="actor"/>'
-        f'<line x1="{x}" y1="{y+35}" x2="{x-45}" y2="{y+105}" class="actor"/>'
-        f'<line x1="{x}" y1="{y+35}" x2="{x+45}" y2="{y+105}" class="actor"/>'
-        + text_block(x, y + 150, label, 24, "bold")
-    )
+    def case(self, key, x, y, w, h, label, abstract=False):
+        self.cases[key] = (x, y, w / 2, h / 2)
+        self.parts.append(f'<ellipse cx="{x}" cy="{y}" rx="{w/2}" ry="{h/2}" class="usecase"/>'
+                          + text_block(x, y, label, 26, italic=abstract))
 
+    # ── geometry ─────────────────────────────────────────────────────────
+    def _edge(self, key, tx, ty):
+        """Point on the ellipse `key` in the direction of (tx, ty)."""
+        cx, cy, a, b = self.cases[key]
+        dx, dy = tx - cx, ty - cy
+        t = 1.0 / math.sqrt((dx / a) ** 2 + (dy / b) ** 2)
+        return cx + t * dx, cy + t * dy
 
-def association(x1, y1, x2, y2):
-    return f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" class="assoc"/>'
+    def _actor_anchor(self, key, tx):
+        x, y = self.actors[key]
+        return (x + 60 if tx > x else x - 60), y - 20
 
+    # ── relations ────────────────────────────────────────────────────────
+    def assoc(self, actor, case):
+        cx, cy, a, _ = self.cases[case]
+        ax, ay = self._actor_anchor(actor, cx)
+        # Attach to the horizontal extremity facing the actor so that lines
+        # fanning out of the actor never cut through a neighbouring ellipse.
+        ex, ey = (cx + a if ax > cx else cx - a), cy
+        self.parts.append(f'<line x1="{ax}" y1="{ay}" x2="{ex:.1f}" y2="{ey:.1f}" class="stroke"/>')
 
-def dependency(x1, y1, x2, y2, kind):
-    mx, my = (x1+x2)/2, (y1+y2)/2
-    return (
-        f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" class="dep" marker-end="url(#arrow)"/>'
-        + text_block(mx, my-12, f'«{kind}»', 19, anchor="middle")
-    )
+    def dep(self, source, target, kind, label_dx=0, label_dy=-16):
+        """«include»: source = base. «extend»: source = extending use case."""
+        sx, sy = self._edge(source, *self.cases[target][:2])
+        tx, ty = self._edge(target, *self.cases[source][:2])
+        mx, my = (sx + tx) / 2 + label_dx, (sy + ty) / 2 + label_dy
+        self.parts.append(
+            f'<line x1="{sx:.1f}" y1="{sy:.1f}" x2="{tx:.1f}" y2="{ty:.1f}" class="dep" marker-end="url(#open)"/>'
+            + text_block(mx, my, f"«{kind}»", 22, halo=True))
 
+    def generalisation(self, parent, children, bus_x):
+        """Children joined on a vertical bus, one hollow triangle on the parent."""
+        px, py = self.cases[parent][:2]
+        ys = []
+        for child in children:
+            cx, cy, a, _ = self.cases[child]
+            edge_x = cx - a if bus_x < cx else cx + a
+            self.parts.append(f'<line x1="{edge_x}" y1="{cy}" x2="{bus_x}" y2="{cy}" class="stroke thin"/>')
+            ys.append(cy)
+        ys.append(py)
+        self.parts.append(f'<line x1="{bus_x}" y1="{min(ys)}" x2="{bus_x}" y2="{max(ys)}" class="stroke thin"/>')
+        ex, ey = self._edge(parent, bus_x, py)
+        self.parts.append(f'<line x1="{bus_x}" y1="{py}" x2="{ex:.1f}" y2="{ey:.1f}" '
+                          f'class="stroke thin" marker-end="url(#gen)"/>')
 
-def svg(title, actors, cases, links, filename):
-    chunks = [f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">
+    def note(self, x, y, text):
+        self.parts.append(text_block(x, y, text, 22, italic=True))
+
+    # ── output ───────────────────────────────────────────────────────────
+    def svg(self):
+        head = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" height="{self.h}" viewBox="0 0 {self.w} {self.h}">
 <defs>
-  <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,8 L10,4 z" fill="#263238"/></marker>
+  <marker id="open" markerWidth="18" markerHeight="14" refX="16" refY="7" orient="auto" markerUnits="userSpaceOnUse"><path d="M1,1 L16,7 L1,13" fill="none" stroke="#263238" stroke-width="2.4"/></marker>
+  <marker id="gen" markerWidth="26" markerHeight="24" refX="24" refY="12" orient="auto" markerUnits="userSpaceOnUse"><path d="M1,1 L24,12 L1,23 z" fill="white" stroke="#17202a" stroke-width="2.4"/></marker>
 </defs>
 <style>
   .txt {{ font-family: 'DejaVu Sans', Arial, sans-serif; fill:#17202a; }}
+  .halo {{ paint-order: stroke; stroke: white; stroke-width: 7px; stroke-linejoin: round; }}
   .boundary {{ fill:#fbfcfd; stroke:#34495e; stroke-width:2.5; }}
   .usecase {{ fill:#eef5ff; stroke:#245b9e; stroke-width:2.5; }}
-  .actor,.assoc {{ fill:none; stroke:#17202a; stroke-width:3; }}
-  .dep {{ fill:none; stroke:#263238; stroke-width:2.2; stroke-dasharray:10 8; }}
+  .stroke {{ fill:none; stroke:#17202a; stroke-width:3; }}
+  .thin {{ stroke-width:2.4; }}
+  .dep {{ fill:none; stroke:#263238; stroke-width:2.4; stroke-dasharray:11 8; }}
 </style>
 <rect width="100%" height="100%" fill="white"/>
-{text_block(W/2, 55, title, 32, 'bold')}
-<rect x="260" y="95" width="1180" height="745" rx="8" class="boundary"/>
-{text_block(295, 135, 'Système JobTest', 25, 'bold', 'start')}
-''']
-    for x, y, label in actors:
-        chunks.append(actor(x, y, label))
-    for key, x, y, w, h, label in cases:
-        chunks.append(ellipse(x, y, w, h, label))
-    for link in links:
-        chunks.append(association(*link[1:]) if link[0] == "a" else dependency(*link[1:]))
-    chunks.append('</svg>')
-    (OUT / filename).write_text("".join(chunks), encoding="utf-8")
+<rect x="{self.bx}" y="{self.by}" width="{self.bw}" height="{self.bh}" rx="8" class="boundary"/>
+{text_block(self.bx + 30, self.by + 36, "Système JobTest", 27, "bold", "start")}
+'''
+        return head + "".join(self.parts) + "</svg>"
 
 
-svg("Diagramme global des cas d’utilisation", [(120,430,"Visiteur non\nauthentifié"),(1370,430,"Recruteur\nauthentifié")], [
- ("signup",430,210,300,78,"Créer un compte"),("login",430,330,300,78,"S’authentifier"),
- ("dash",830,175,330,72,"Consulter le tableau de bord"),("offers",830,270,280,72,"Gérer les offres"),
- ("cands",830,365,280,72,"Gérer les candidats"),("eval",830,460,280,72,"Évaluer un CV"),
- ("result",830,555,350,72,"Consulter les résultats"),("deep",830,650,360,72,"Demander une analyse approfondie"),
- ("exploit",830,755,530,78,"Exploiter les résultats\n(rapport, classement et historique)"),
-],[("a",175,410,280,210),("a",175,435,280,330),("a",1315,360,995,175),("a",1315,385,970,270),("a",1315,410,970,365),("a",1315,435,970,460),("a",1315,460,1005,555),("a",1315,485,1010,650),("a",1315,510,1095,755)],"01_global.svg")
+def build() -> dict[str, Diagram]:
+    d: dict[str, Diagram] = {}
 
-svg("UC-01 — Authentification et gestion de session",[(120,400,"Visiteur non\nauthentifié"),(1370,500,"Recruteur\nauthentifié")],[
- ("signup",520,260,330,90,"Créer un compte"),("login",520,470,330,90,"S’authentifier"),
- ("profile",980,360,360,90,"Consulter son profil"),("logout",980,590,320,90,"Se déconnecter"),
-],[("a",175,370,355,260),("a",175,420,355,470),("a",1315,470,1160,360),("a",1315,525,1140,590)],"02_authentification.svg")
+    # 01 — Global view
+    g = Diagram(1600, 1080, (250, 30, 1080, 1020))
+    g.actor("vis", 115, 330, "Visiteur non\nauthentifié")
+    g.actor("rec", 1470, 560, "Recruteur\nauthentifié")
+    g.case("signup", 540, 230, 330, 76, "Créer un compte")
+    g.case("login", 540, 380, 330, 76, "S’authentifier")
+    labels = [
+        ("dash", "Consulter le tableau de bord"), ("offers", "Gérer les offres"),
+        ("cands", "Gérer les candidats"), ("eval", "Évaluer un CV"),
+        ("result", "Consulter un résultat"), ("pdf", "Générer un rapport PDF"),
+        ("rank", "Classer plusieurs CV"), ("hist", "Consulter l’historique"),
+        ("quality", "Comparer les méthodes et\nconsulter le benchmark"),
+        ("settings", "Régler les seuils de décision"),
+    ]
+    for i, (key, label) in enumerate(labels):
+        g.case(key, 1040, 110 + i * 98, 430 if "\n" in label else 400, 84 if "\n" in label else 72, label)
+    g.case("deep", 560, 502, 380, 84, "Demander une analyse\napprofondie")
+    g.assoc("vis", "signup"); g.assoc("vis", "login")
+    for key, _ in labels:
+        g.assoc("rec", key)
+    g.dep("deep", "result", "extend", label_dy=-22)
+    d["01_global"] = g
 
-svg("UC-02 — Gestion des offres d’emploi",[(120,430,"Recruteur\nauthentifié")],[
- ("manage",500,430,330,95,"Gérer les offres\nd’emploi"),("list",1010,185,330,82,"Consulter ses offres"),
- ("create",1010,310,360,90,"Créer une offre\n(code automatique)"),("edit",1010,435,310,82,"Modifier une offre"),
- ("status",1010,560,330,82,"Changer le statut"),("delete",1010,700,390,95,"Supprimer une offre\nsans évaluation liée"),
-],[("a",175,430,335,430),("d",660,400,845,185,"include"),("d",660,415,830,310,"include"),("d",660,430,855,435,"include"),("d",660,445,845,560,"include"),("d",660,460,815,700,"extend")],"03_offres.svg")
+    # 02 — UC-01 authentication
+    a = Diagram(1600, 820, (250, 30, 1080, 760))
+    a.actor("vis", 115, 380, "Visiteur non\nauthentifié")
+    a.actor("rec", 1470, 460, "Recruteur\nauthentifié")
+    a.case("signup", 560, 240, 340, 90, "Créer un compte")
+    a.case("login", 560, 480, 340, 90, "S’authentifier")
+    a.case("profile", 1030, 330, 380, 90, "Consulter son profil")
+    a.case("logout", 1030, 590, 340, 90, "Se déconnecter")
+    a.assoc("vis", "signup"); a.assoc("vis", "login")
+    a.assoc("rec", "profile"); a.assoc("rec", "logout")
+    d["02_authentification"] = a
 
-svg("UC-03 — Gestion des candidats",[(120,430,"Recruteur\nauthentifié")],[
- ("manage",500,430,330,95,"Gérer les candidats"),("list",1010,195,330,82,"Consulter la liste"),
- ("update",1010,335,390,95,"Mettre à jour l’identité\net le statut du pipeline"),("activity",1010,500,380,92,"Consulter l’activité\nd’évaluation"),
- ("delete",1010,680,410,100,"Supprimer un candidat\nsans résultat associé"),
-],[("a",175,430,335,430),("d",660,400,845,195,"include"),("d",660,420,815,335,"include"),("d",660,445,820,500,"include"),("d",660,465,805,680,"extend")],"04_candidats.svg")
+    # 03 — UC-02 job offers (alternatives as specialisations)
+    o = Diagram(1500, 900, (260, 30, 1180, 840))
+    o.actor("rec", 120, 450, "Recruteur\nauthentifié")
+    o.case("manage", 520, 450, 340, 100, "Gérer les offres\nd’emploi", abstract=True)
+    o.case("list", 1110, 130, 380, 82, "Consulter ses offres")
+    o.case("create", 1110, 285, 400, 92, "Créer une offre\n(code automatique)")
+    o.case("edit", 1110, 440, 380, 82, "Modifier une offre")
+    o.case("status", 1110, 590, 400, 92, "Ouvrir ou clôturer\nune offre")
+    o.case("delete", 1110, 755, 420, 100, "Supprimer une offre\n[aucune évaluation liée]")
+    o.assoc("rec", "manage")
+    o.generalisation("manage", ["list", "create", "edit", "status", "delete"], bus_x=820)
+    d["03_offres"] = o
 
-svg("UC-04 — Évaluation d’un CV",[(120,430,"Recruteur\nauthentifié")],[
- ("eval",480,430,310,92,"Évaluer un CV"),("offer",990,175,340,84,"Choisir une offre possédée"),
- ("cv",990,310,390,96,"Saisir le CV ou\ntéléverser un PDF/DOCX"),("method",990,445,360,90,"Choisir la méthode\nd’appariement"),
- ("compute",990,590,390,96,"Calculer et enregistrer\nun résultat explicable"),("view",990,735,370,90,"Consulter le résultat"),
-],[("a",175,430,325,430),("d",635,400,820,175,"include"),("d",635,415,795,310,"include"),("d",635,430,810,445,"include"),("d",635,445,795,590,"include"),("d",635,460,805,735,"include")],"05_evaluation_cv.svg")
+    # 04 — UC-03 candidates
+    c = Diagram(1500, 900, (260, 30, 1180, 840))
+    c.actor("rec", 120, 450, "Recruteur\nauthentifié")
+    c.case("manage", 520, 450, 340, 100, "Gérer les candidats", abstract=True)
+    c.case("list", 1110, 210, 440, 100, "Consulter la liste et\nl’activité d’évaluation")
+    c.case("update", 1110, 450, 440, 100, "Modifier l’identité et\nle statut du pipeline")
+    c.case("delete", 1110, 690, 440, 100, "Supprimer un candidat\n[aucun résultat associé]")
+    c.assoc("rec", "manage")
+    c.generalisation("manage", ["list", "update", "delete"], bus_x=820)
+    d["04_candidats"] = c
 
-svg("UC-05 — Analyse approfondie optionnelle",[(120,430,"Recruteur\nauthentifié")],[
- ("result",520,350,360,92,"Consulter un résultat\nd’évaluation"),("request",1000,350,390,92,"Demander une analyse\napprofondie"),
- ("status",1000,590,420,105,"Consulter l’état et le contenu\nde l’analyse approfondie"),
-],[("a",175,430,340,350),("d",805,350,700,350,"extend"),("d",1000,396,1000,537,"include")],"06_analyse_approfondie.svg")
+    # 05 — UC-04 CV evaluation
+    e = Diagram(1500, 900, (260, 30, 1180, 840))
+    e.actor("rec", 120, 400, "Recruteur\nauthentifié")
+    e.case("eval", 520, 400, 320, 92, "Évaluer un CV")
+    e.case("offer", 1080, 130, 440, 92, "Choisir une offre active\n(ouverte ou en attente)")
+    e.case("cv", 1080, 300, 440, 96, "Saisir le CV ou\ntéléverser un PDF/DOCX")
+    e.case("compute", 1080, 480, 440, 96, "Calculer et enregistrer\nun résultat explicable")
+    e.case("view", 1080, 650, 380, 84, "Consulter le résultat")
+    e.case("method", 520, 720, 420, 96, "Choisir une autre méthode\n(hybride par défaut)")
+    e.assoc("rec", "eval")
+    for key in ("offer", "cv", "compute", "view"):
+        e.dep("eval", key, "include")
+    e.dep("method", "eval", "extend", label_dx=70, label_dy=0)
+    d["05_evaluation_cv"] = e
 
-svg("UC-06 — Génération du rapport PDF",[(120,430,"Recruteur\nauthentifié")],[
- ("generate",500,430,360,92,"Générer un rapport PDF"),("select",1010,280,390,92,"Sélectionner un résultat\ndéjà calculé"),
- ("download",1010,580,360,92,"Télécharger le document"),
-],[("a",175,430,320,430),("d",680,405,815,280,"include"),("d",680,455,830,580,"include")],"07_rapport_pdf.svg")
+    # 06 — UC-05 optional deep analysis
+    p = Diagram(1500, 720, (260, 30, 1180, 660))
+    p.actor("rec", 120, 330, "Recruteur\nauthentifié")
+    p.case("result", 560, 270, 380, 96, "Consulter un résultat\nd’évaluation")
+    p.case("request", 1080, 270, 400, 96, "Demander une analyse\napprofondie")
+    p.case("status", 1080, 540, 440, 110, "Consulter l’état et le contenu\nde l’analyse approfondie")
+    p.assoc("rec", "result")
+    p.dep("request", "result", "extend", label_dy=-20)
+    p.note(815, 345, "[résultat persistant]")
+    p.dep("request", "status", "include", label_dx=70, label_dy=0)
+    d["06_analyse_approfondie"] = p
 
-svg("UC-07 — Classement de plusieurs candidats",[(120,430,"Recruteur\nauthentifié")],[
- ("rank",470,430,350,92,"Classer plusieurs candidats"),("offer",990,190,350,86,"Choisir une offre ouverte"),
- ("upload",990,335,390,96,"Téléverser plusieurs CV\nau format PDF/DOCX"),("display",990,500,420,96,"Afficher le classement\npar score décroissant"),
- ("export",990,680,360,90,"Exporter le classement\nau format CSV"),
-],[("a",175,430,295,430),("d",645,400,815,190,"include"),("d",645,420,795,335,"include"),("d",645,445,780,500,"include"),("d",990,635,990,548,"extend")],"08_classement.svg")
+    # 07 — UC-06 PDF report
+    r = Diagram(1500, 900, (260, 30, 1180, 840))
+    r.actor("rec", 120, 450, "Recruteur\nauthentifié")
+    r.case("generate", 530, 450, 380, 92, "Générer un rapport PDF")
+    r.case("select", 1080, 280, 420, 96, "Sélectionner un résultat\ndéjà calculé")
+    r.case("download", 1080, 620, 380, 92, "Télécharger le document")
+    r.assoc("rec", "generate")
+    r.dep("generate", "select", "include")
+    r.dep("generate", "download", "include")
+    d["07_rapport_pdf"] = r
 
-svg("UC-08 — Historique et consultation des résultats",[(120,430,"Recruteur\nauthentifié")],[
- ("history",480,430,360,92,"Consulter l’historique"),("list",1010,210,370,92,"Lister ses évaluations"),
- ("filter",1010,430,400,100,"Filtrer par code, offre\nou courriel"),("detail",1010,650,390,94,"Consulter le détail\nd’un résultat"),
-],[("a",175,430,300,430),("d",660,400,825,210,"include"),("d",1010,380,1010,256,"extend"),("d",825,650,825,235,"extend")],"09_historique.svg")
+    # 08 — UC-07 ranking
+    k = Diagram(1500, 900, (260, 30, 1180, 840))
+    k.actor("rec", 120, 400, "Recruteur\nauthentifié")
+    k.case("rank", 510, 400, 360, 92, "Classer plusieurs CV")
+    k.case("offer", 1080, 140, 440, 92, "Choisir une offre active\n(ouverte ou en attente)")
+    k.case("upload", 1080, 320, 440, 96, "Téléverser plusieurs CV\nau format PDF/DOCX")
+    k.case("display", 1080, 510, 440, 96, "Afficher le classement\npar score décroissant")
+    k.case("export", 1080, 730, 400, 92, "Exporter le classement\nau format CSV")
+    k.assoc("rec", "rank")
+    for key in ("offer", "upload", "display"):
+        k.dep("rank", key, "include")
+    k.dep("export", "display", "extend", label_dx=70, label_dy=0)
+    d["08_classement"] = k
 
-print(OUT.resolve())
+    # 09 — UC-08 history
+    h = Diagram(1500, 900, (260, 30, 1180, 840))
+    h.actor("rec", 120, 450, "Recruteur\nauthentifié")
+    h.case("history", 510, 450, 360, 92, "Consulter l’historique")
+    h.case("list", 1080, 200, 420, 92, "Lister ses évaluations")
+    h.case("filter", 1080, 450, 440, 100, "Filtrer par code, offre\nou courriel")
+    h.case("detail", 1080, 700, 420, 96, "Consulter le détail\nd’un résultat")
+    h.assoc("rec", "history")
+    h.dep("history", "list", "include")
+    h.dep("filter", "history", "extend")
+    h.dep("detail", "history", "extend", label_dy=-22)
+    d["09_historique"] = h
+    return d
+
+
+def render_png(svg_paths: list[Path]) -> None:
+    from playwright.sync_api import sync_playwright
+    from PIL import Image
+
+    with sync_playwright() as pw:
+        browser = None
+        for channel in ("msedge", "chrome"):
+            try:
+                browser = pw.chromium.launch(channel=channel)
+                break
+            except Exception:
+                continue
+        if browser is None:
+            browser = pw.chromium.launch()
+        for path in svg_paths:
+            text = path.read_text(encoding="utf-8")
+            w = int(text.split('width="', 1)[1].split('"', 1)[0])
+            h = int(text.split('height="', 1)[1].split('"', 1)[0])
+            page = browser.new_page(viewport={"width": w, "height": h}, device_scale_factor=SCALE)
+            page.goto(path.as_uri())
+            png = path.with_suffix(".png")
+            page.screenshot(path=str(png), full_page=False)
+            page.close()
+            with Image.open(png) as im:
+                im.convert("RGB").save(png, dpi=(DPI, DPI))
+        browser.close()
+
+
+def main() -> None:
+    paths = []
+    for name, diagram in build().items():
+        path = OUT / f"{name}.svg"
+        path.write_text(diagram.svg(), encoding="utf-8")
+        paths.append(path)
+    if "--svg" not in sys.argv:
+        render_png(paths)
+    print(OUT)
+
+
+if __name__ == "__main__":
+    main()

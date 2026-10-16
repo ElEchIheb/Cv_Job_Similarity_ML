@@ -15,6 +15,7 @@ try:
     from src.models.skill_matcher import SkillMatcher
     from src.models.tfidf_model import TFIDFMatcher
     from src.explainability.explainer import MatchingExplainer, RecommendationEngine
+    from src.decisioning.calibration import load_calibration
 except ImportError:
     pass
 
@@ -66,6 +67,8 @@ def load_production_models() -> Dict:
         "tfidf":       tfidf,
         "explainer":   MatchingExplainer(),
         "recommender": RecommendationEngine(),
+        # Versioned raw -> displayed score calibration (decisioning/calibration.py)
+        "calibration": load_calibration(),
     }
     
     logger.info("All production AI services ready.")

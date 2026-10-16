@@ -10,7 +10,8 @@ same (score, configuration) always yields the same decision.
 
 Semantics
 ---------
-Given a percentage score in [0, 100] and a configuration with two thresholds:
+Given a percentage score in [0, 100] — the CALIBRATED displayed score, see
+``calibration.py`` — and a configuration with two thresholds:
 
     score >= strong_fit_threshold                       -> HIRE      ("Strong Fit")
     potential_fit_threshold <= score < strong_fit       -> CONSIDER  ("Potential Fit")
@@ -128,10 +129,11 @@ class DecisionEngine:
     # ── Normalisation helpers ────────────────────────────────────────────────
     @staticmethod
     def to_percentage(score: float) -> float:
-        """Accept either a 0-1 fraction or a 0-100 percentage; return 0-100.
+        """Coerce a score that is ALREADY on the 0-100 scale; clamp to [0, 100].
 
-        A value in [0, 1] is treated as a fraction and scaled by 100. Values
-        above 1 are treated as already being percentages. Result is clamped.
+        The engine used to guess the scale ("values in [0, 1] are fractions"),
+        which silently turned a 0.9 % score into 90 % (HIRE). Every caller now
+        passes a percentage; fractions must go through ``from_fraction``.
         """
         try:
             value = float(score)
@@ -139,9 +141,18 @@ class DecisionEngine:
             value = 0.0
         if value != value:  # NaN
             value = 0.0
-        if 0.0 <= value <= 1.0:
-            value *= 100.0
         return max(0.0, min(100.0, value))
+
+    @staticmethod
+    def from_fraction(score: float) -> float:
+        """Explicit 0-1 -> 0-100 conversion for callers holding a fraction."""
+        try:
+            value = float(score)
+        except (TypeError, ValueError):
+            value = 0.0
+        if value != value:  # NaN
+            value = 0.0
+        return max(0.0, min(100.0, value * 100.0))
 
     # ── Core classification ──────────────────────────────────────────────────
     def classify(self, score: float, config: Optional[DecisionConfig] = None) -> str:
@@ -174,14 +185,29 @@ class DecisionEngine:
         return "low"
 
     def evaluate(self, score: float, config: Optional[DecisionConfig] = None,
-                 critical_missing: Optional[List[str]] = None) -> DecisionResult:
-        """Full canonical evaluation of a single score."""
+                 critical_missing: Optional[List[str]] = None,
+                 evidence_gap: Optional[str] = None) -> DecisionResult:
+        """Full canonical evaluation of a single score.
+
+        ``evidence_gap`` (see ``src/nlp/screening.evidence_insufficient``) is a
+        short explanation set when the matched skills rest mostly on declared
+        lists or on text copied from the offer. HIRE is then withheld: the
+        verdict becomes CONSIDER so that a recruiter checks the experience
+        instead of trusting repeated keywords. The displayed score is unchanged.
+        """
         cfg = config or self.config
         pct = round(self.to_percentage(score), 1)
         decision = self.classify(pct, cfg)
+        capped = decision == HIRE and bool(evidence_gap)
+        if capped:
+            decision = CONSIDER
         conf = self.decision_confidence(pct, cfg)
         level = self.confidence_level(conf)
         reason = self._reason(pct, decision, cfg, critical_missing or [])
+        if capped:
+            reason = (f"Calibrated score {pct:.0f}/100 reaches the Strong Fit threshold "
+                      f"({cfg.strong_fit_threshold:.0f}), but {evidence_gap}. "
+                      "Verdict limited to Potential Fit: verify the experience before deciding.")
         return DecisionResult(
             decision=decision,
             band_label=BAND_LABELS[decision],
@@ -199,19 +225,19 @@ class DecisionEngine:
                 critical_missing: List[str]) -> str:
         blockers = ", ".join(critical_missing[:3]) if critical_missing else ""
         if decision == HIRE:
-            base = (f"Overall compatibility of {pct:.0f}% is at or above the Strong Fit "
-                    f"threshold ({cfg.strong_fit_threshold:.0f}%).")
+            base = (f"Calibrated score {pct:.0f}/100 is at or above the Strong Fit "
+                    f"threshold ({cfg.strong_fit_threshold:.0f}).")
             if critical_missing:
                 base += f" Note: some required skills still need validation ({blockers})."
             return base + " Recommended to advance."
         if decision == CONSIDER:
-            base = (f"Overall compatibility of {pct:.0f}% falls in the Potential Fit band "
-                    f"({cfg.potential_fit_threshold:.0f}%–{cfg.strong_fit_threshold:.0f}%).")
+            base = (f"Calibrated score {pct:.0f}/100 falls in the Potential Fit band "
+                    f"({cfg.potential_fit_threshold:.0f}–{cfg.strong_fit_threshold:.0f}).")
             if critical_missing:
                 base += f" Important requirements remain partially satisfied ({blockers})."
             return base + " Review before deciding."
-        base = (f"Overall compatibility of {pct:.0f}% is below the Potential Fit threshold "
-                f"({cfg.potential_fit_threshold:.0f}%).")
+        base = (f"Calibrated score {pct:.0f}/100 is below the Potential Fit threshold "
+                f"({cfg.potential_fit_threshold:.0f}).")
         if critical_missing:
             base += f" Critical requirements are missing ({blockers})."
         return base + " Not recommended without significant re-skilling."

@@ -1,0 +1,94 @@
+[
+ {
+  "t": 3.81,
+  "label": "loaded"
+ },
+ {
+  "t": 19.08,
+  "label": "shot:analysis_form"
+ },
+ {
+  "t": 21.42,
+  "label": "eval_start"
+ },
+ {
+  "t": 23.39,
+  "label": "shot:analysis_running"
+ },
+ {
+  "t": 23.45,
+  "label": "eval_done"
+ },
+ {
+  "t": 30.23,
+  "label": "shot:result_score"
+ },
+ {
+  "t": 39.89,
+  "label": "shot:result_breakdown"
+ },
+ {
+  "t": 48.01,
+  "label": "shot:result_skills_map"
+ },
+ {
+  "t": 52.14,
+  "label": "shot:result_skills_list"
+ },
+ {
+  "t": 56.94,
+  "label": "shot:result_gaps"
+ },
+ {
+  "t": 61.83,
+  "label": "shot:result_actions"
+ },
+ {
+  "t": 67.33,
+  "label": "deep_wait_start"
+ },
+ {
+  "t": 69.11,
+  "label": "shot:deep_loading"
+ },
+ {
+  "t": 69.16,
+  "label": "deep_done"
+ },
+ {
+  "t": 69.18,
+  "label": "deep_status:ok"
+ },
+ {
+  "t": 75.44,
+  "label": "shot:deep_analysis"
+ },
+ {
+  "t": 87.52,
+  "label": "shot:deep_analysis_2"
+ },
+ {
+  "t": 99.91,
+  "label": "shot:deep_analysis_3"
+ },
+ {
+  "t": 99.91,
+  "label": "pdf_click"
+ },
+ {
+  "t": 104.76,
+  "label": "pdf_saved:JobTest_Amira_Khelifi.pdf"
+ },
+ {
+  "t": 107.58,
+  "label": "shot:pdf_exported"
+ },
+ {
+  "t": 107.58,
+  "label": "nav"
+ },
+ {
+  "t": 112.4,
+  "label": "OK"
+ }
+]

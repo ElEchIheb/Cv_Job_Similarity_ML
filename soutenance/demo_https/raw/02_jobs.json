@@ -1,0 +1,30 @@
+[
+ {
+  "t": 3.33,
+  "label": "loaded"
+ },
+ {
+  "t": 6.19,
+  "label": "modal"
+ },
+ {
+  "t": 27.73,
+  "label": "shot:add_job_offer"
+ },
+ {
+  "t": 30.18,
+  "label": "created"
+ },
+ {
+  "t": 33.04,
+  "label": "shot:job_offers"
+ },
+ {
+  "t": 36.15,
+  "label": "nav"
+ },
+ {
+  "t": 39.93,
+  "label": "OK"
+ }
+]

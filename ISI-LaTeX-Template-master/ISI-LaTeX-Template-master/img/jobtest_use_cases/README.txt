@@ -17,8 +17,14 @@ Formats :
 
 Conventions UML :
 - association continue : interaction directe de l'acteur avec le cas d'utilisation ;
-- «include» : comportement systématiquement requis par le cas principal ;
-- «extend» : comportement optionnel ou conditionnel.
+- «include» : comportement systématiquement requis ; flèche du cas de base vers le cas inclus ;
+- «extend» : comportement optionnel ou conditionnel ; flèche du cas qui étend vers le cas de base ;
+- généralisation (triangle creux) : cas abstrait en italique et cas spécialisés alternatifs
+  (créer, consulter, modifier, supprimer ne s'exécutent pas tous à chaque gestion) ;
+- les acteurs sont toujours placés hors de la frontière du système.
+
+Régénération : python generate_use_cases.py (SVG + PNG 180 DPI via Playwright et
+le navigateur Edge/Chrome du système ; --svg pour les seuls SVG).
 
 Les légendes «Figure 2.x» doivent rester dans le code LaTeX du rapport et ne sont
 pas intégrées aux images, afin de préserver la numérotation automatique.

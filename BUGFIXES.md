@@ -130,6 +130,29 @@ controlled skills/substance and JD were unchanged.
 
 ---
 
+## Bug 5 — Score scale vs decision bands; 0-1/0-100 double conversion — RESOLVED (2026-10-11)
+
+The raw fusion was displayed as `raw x 100` and read against 55 / 75, a scale it can
+structurally not reach (test set: 1 777 REJECT / 23 CONSIDER / 0 HIRE). The DecisionEngine
+also re-scaled any percentage in [0, 1] (a 0.9 % TF-IDF score became 90 % -> HIRE).
+Fix: versioned per-method calibration learned on the validation split
+(`src/decisioning/calibration.py`, `models/checkpoints/score_calibration.json`), strict
+percentage API in the engine, scale/version persisted with every result, legacy results
+flagged. Full diagnosis, protocol and before/after results: `evaluation/CALIBRATION.md`.
+
+---
+
+## Bug 6 — Keyword stuffing rated HIRE — RESOLVED (2026-10-11)
+
+Skills were extracted as a bag of words over the whole CV, so pasting the offer's requirement
+list into an unrelated CV produced HIRE in 200/200 validation probes. `src/nlp/screening.py` now
+removes text copied verbatim from the offer, ignores negated skill mentions, weights declared-only
+skills at 0.5 and withholds HIRE when matched skills are mostly undemonstrated (`hybrid-checkpoint-v4`).
+Genuine validation/test pairs are unchanged. Remaining limit: experience claimed in prose is not
+detectable. Details: `evaluation/CALIBRATION.md` §6.
+
+---
+
 ## Impact on historical records
 
 Pre-fix `MatchResult` rows produced for similarly-formatted CVs may have **understated**

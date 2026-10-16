@@ -1,0 +1,267 @@
+=== page 5 L6 PBPZn2pcbXMgRQ60
+rect rvw2m [-275,831 677x588] mMADpuQ19hN8
+rect XZHsn [1403,-294 677x588 r-180] mMADpuQ19hN8
+rect YT26R [676,35 68x98] mMAENv5X5J0c
+rect Nn3mr [-46,163 669x669] MMAGXTR2wTAw
+text HyH1N [-116,65 888x85] "Problématique" fs=70 #ffffff center rg=1
+line prx56 [509,538 682x4 r90] 
+text FsN4h [41,1009 21x57] "5" fs=48 #ffffff center rg=1
+shape jHBTQ [912,352 54x42 r90] #0071c9
+shape ZnLPD [912,492 54x42 r90] #0071c9
+text RFssy [990,353 575x48] "Processus manuels inefficaces" fs=40 #ffffff center rg=1
+text rVn21 [998,489 558x48] "Feuille de route non optimisée" fs=40 #ffffff center rg=1
+shape sDkXs [912,631 54x42 r90] #0071c9
+text pR4Cv [998,625 428x47] "Manque de traçabilités " fs=40 #ffffff center rg=1
+=== page 7 L17 PBr3sZ68pVTNKTck
+shape jgsvY [1052,-156 441x630] MMAEtbobS9M8
+shape DLChg [1743,882 88x88 r90] MMAEtbobS9M8
+shape FMDqX [-543,-215 604x863] MMAEtbobS9M8
+shape qxc4q [1743,126 551x787 r-180] MMAEtbobS9M8
+shape rdK0z [66,202 204x17 r90] #145da0
+rect 8f38g [553,288 773x770] MMAGXUPbxTNQ
+text nG21C [201,93 863x172] "Architecture physique du backend" fs=71 #ffffff start rg=1
+text B5bSz [17,1001 45x57] "16" fs=48 #ffffff center rg=1
+=== page 8 L15 PBMtN6q4869sW8f9
+shape lL6Vz [1052,-156 441x630] MMAEtbobS9M8
+shape ZKNxr [1743,882 88x88 r90] MMAEtbobS9M8
+shape w0jPg [-543,-215 604x863] MMAEtbobS9M8
+shape TGT0w [1743,126 551x787 r-180] MMAEtbobS9M8
+rect 30N2B [1183,312 620x621] MMAGXUHL6Yfc
+shape cPTZf [99,202 204x17 r90] #145da0
+shape gHmLK [245,392 417x103] #145da0
+text gcl17 [245,88 835x202] "Approche architecturale" fs=83 #ffffff start rg=1
+shape k20Mw [245,540 417x103] #145da0
+shape Dy8gk [245,674 417x103] #145da0
+shape DNdd7 [245,823 417x103] #145da0
+text gNKPH [357,957 192x63] "N-Layer" fs=52 #ffffff center rg=1
+text 61Tr3 [1263,957 459x63] "Clean Architecture" fs=52 #ffffff center rg=1
+text WPJtk [393,423 121x41] "Layer 1" fs=34 #ffffff center rg=1
+text 7vz4m [393,564 121x41] "Layer 2" fs=34 #ffffff center rg=1
+text 6sS4s [393,706 121x41] "Layer 3" fs=34 #ffffff center rg=1
+text 1s2Mx [393,847 121x41] "Layer n" fs=34 #ffffff center rg=1
+line khslQ [712,645 413x12 r0] 
+text MdK5R [9,994 45x57] "14" fs=48 #ffffff center rg=1
+=== page 10 L7 PBKdc0jQ14c9PRwY
+rect gThnZ [-275,831 677x588] mMADpuQ19hN8
+rect NmlJr [1403,-294 677x588 r-180] mMADpuQ19hN8
+line ZX7sD [509,538 682x4 r90] 
+rect VQcqg [-23,149 700x700] MMAGXTdeM0Go
+rect b1QJq [794,51 110x83] mMAEHgUmm2i4
+text hZlf2 [4,65 796x85] "Solution proposée" fs=70 #ffffff center rg=1
+text lvDQK [39,997 26x57] "6" fs=48 #ffffff center rg=1
+shape CN6Z2 [907,399 54x42 r90] #0071c9
+text TxRNr [970,393 898x158] "Créer un système qui fournit des données pour le support à l" fs=40 #ffffff justify rg=1
+shape xRgNY [907,596 54x42 r90] #0071c9
+text VvYSZ [970,590 898x103] "Ce système sera accessible via une application web répondant" fs=40 #ffffff justify rg=1
+=== page 13 L11 PB9DnwZDLRypLzv7
+shape K19v2 [1812,217 604x863] MMAEtbobS9M8
+shape 8B2tz [-496,574 604x863 r-180] MMAEtbobS9M8
+group 5Gn0g [226,341 323x429] 
+  rect KKGzN [226,341 323x317] mMAEquSHjajY
+  text XmnXj [279,704 216x66] "Scrum" fs=55 #ffffff start rg=1
+group H2lNy [1232,390 435x380] 
+  rect ybL2g [1232,390 435x281] MMAGYz8s3lP8
+  text Rql9l [1286,713 325x57] "en cascade" fs=47 #ffffff start rg=1
+group 5kb1r [548,338 658x432] 
+  rect 3JKQc [548,338 658x371] MMAGYzzu5lXI
+  text 002wH [702,708 350x61] "modèle en V" fs=51 #ffffff start rg=1
+rect DVGFz [202,648 324x196] mvideo
+text jc7NR [526,86 803x117] "méthodologie" fs=97 #ffffff start rg=1
+text Pfgnj [9,1006 45x57] "10" fs=48 #ffffff center rg=1
+=== page 15 L8 PBhxfQbNWsTVLYHS
+shape 8rRBy [-541,8 1261x1092] MMAFIbMwh7nU
+shape bdbZm [-429,0 1261x1092] MMAEtbobS9M8
+shape ckW9g [-536,2 1261x1092] MMAEtbobS9M8
+shape CghT0 [575,412 257x257] #17e3b2
+rect YLrxb [662,480 83x121] mMAENv5X5J0c
+text Sc6N9 [878,447 765x213] "spécifications des besoins" fs=88 #ffffff start rg=1
+shape jsfnh [1812,217 604x863] MMAEtbobS9M8
+shape 7pjYp [1540,-91 177x253] MMAEtbobS9M8
+shape ybtKT [1724,173 88x88 r90] MMAEtbobS9M8
+shape yGXf5 [680,928 88x88 r90] MMAEtbobS9M8
+shape l4C6F [1518,819 249x356] MMAEtbobS9M8
+shape VQ8t6 [890,261 129x129 r90] MMAEtbobS9M8
+text yjmCl [878,286 153x79] "03" fs=66 #ffffff center rg=1
+text 8b2SC [35,997 25x57] "7" fs=48 #ffffff center rg=1
+=== page 18 L10 PBxW8kSrq0Cv5BKr
+shape rz0Vr [1812,217 604x863] MMAEtbobS9M8
+shape 5chvK [-543,-215 604x863] MMAEtbobS9M8
+shape shvTj [108,108 605x864] MMADGvlVgfn0
+shape Txhy7 [108,108 605x864 r-180] MMAEtbobS9M8
+text MJ62N [108,493 829x49] "Besoins non fonctionnels" fs=41 #ffffff start rg=1
+text t3dwh [1159,345 229x41] "Modularité" fs=34 #ffffff center rg=1
+shape 2lwPh [1204,179 140x140 r90] MMAEtbobS9M8
+shape Xt01l [1204,454 140x140 r90] MMAEtbobS9M8
+shape G8DJs [1204,704 140x140 r90] MMAEtbobS9M8
+shape XJG8H [1498,179 140x140 r90] MMAEtbobS9M8
+shape hBYJP [1498,454 140x140 r90] MMAEtbobS9M8
+shape 4hbdr [1498,695 140x140 r90] MMAEtbobS9M8
+text Ghg7b [1190,207 167x86] "02" fs=72 #ffffff center rg=1
+text tZ6Pk [878,861 229x41] "Scalabilité" fs=34 #ffffff center rg=1
+text 8Z0gf [1159,861 229x41] "Efficacité" fs=34 #ffffff center rg=1
+text tvzWN [1190,481 167x86] "05" fs=72 #ffffff center rg=1
+text mlmpC [1190,731 167x86] "08" fs=72 #ffffff center rg=1
+text qNyk7 [1441,345 229x41] "Fiabilité" fs=34 #ffffff center rg=1
+text 4MqVz [1472,207 167x86] "03" fs=72 #ffffff center rg=1
+text 4GPzV [1472,611 213x41] "Extensibilité" fs=34 #ffffff center rg=1
+text rpVgC [1441,852 229x41] "Sécurité" fs=34 #ffffff center rg=1
+text 7Cj8m [1472,481 167x86] "06" fs=72 #ffffff center rg=1
+text PNYwK [1472,722 167x86] "09" fs=72 #ffffff center rg=1
+text XB680 [878,345 229x41] "Ergonomique" fs=34 #ffffff center rg=1
+shape Qscm7 [922,179 140x140 r90] MMAEtbobS9M8
+shape fQ1wn [922,454 140x140 r90] MMAEtbobS9M8
+shape prNLy [922,704 140x140 r90] MMAEtbobS9M8
+text cvg2B [909,207 167x86] "01" fs=72 #ffffff center rg=1
+text PnfBn [857,611 270x41] "Adaptable" fs=34 #ffffff center rg=1
+text c9cVF [1168,611 273x87] "Maintenabilité et réutilisabilité" fs=34 #ffffff center rg=1
+text 6RjGs [909,481 167x86] "04" fs=72 #ffffff center rg=1
+text R6gJM [909,731 167x86] "07" fs=72 #ffffff center rg=1
+text 1R3nN [34,1006 25x57] "9" fs=48 #ffffff center rg=1
+=== page 20 L18 PB08yW6rJ7srSPY0
+shape T8ryb [-541,8 1261x1092] MMAFIbMwh7nU
+shape qmncG [-429,0 1261x1092] MMAEtbobS9M8
+shape XcBb9 [-536,2 1261x1092] MMAGXUeuhDEM
+shape qTTPd [575,412 257x257] #17e3b2
+rect wSpt8 [662,480 83x121] mMAENv5X5J0c
+shape kB8kn [1812,217 604x863] MMAEtbobS9M8
+shape 7kBPh [1540,-91 177x253] MMAEtbobS9M8
+shape LWbkl [1724,173 88x88 r90] MMAEtbobS9M8
+shape XWSdH [680,928 88x88 r90] MMAEtbobS9M8
+shape j94kv [1518,819 249x356] MMAEtbobS9M8
+shape wYYbS [890,261 129x129 r90] MMAEtbobS9M8
+text VCtP4 [878,447 765x213] "Analyse de conception" fs=88 #ffffff start rg=1
+text GGcJt [878,286 153x79] "05" fs=66 #ffffff center rg=1
+text YW5Xg [21,997 44x57] "17" fs=48 #ffffff center rg=1
+=== page 21 L19 PBys39DCv75C50VD
+shape B0G0Z [-242,12 604x1090] MMAEtbobS9M8
+rect QrNB0 [709,-153 897x1447 r90] MMAGdf0OuNLU
+text Dk6Q4 [28,409 390x297] "Diagramme 
+de cas
+ d'utilisation 
+global" fs=55 #ffffff start rg=1
+text HSl1v [28,991 45x57] "18" fs=48 #ffffff center rg=1
+=== page 22 L20 PBGRsgG4zKVsZ1Lt
+shape NFYG1 [-242,12 604x1090] MMAEtbobS9M8
+text J4Pg3 [28,390 390x373] "Diagramme 
+de cas
+ d'utilisation 
+gestion des clients" fs=55 #ffffff start rg=1
+rect W0sTs [363,110 1513x934] MMAGXlUw4hAU
+rect l214m [1634,162 206x156] MMAGdgcRGFoY
+text 6Fzt2 [26,987 44x57] "19" fs=48 #ffffff center rg=1
+=== page 23 L21 PBwDRkmZdrzXjGgZ
+shape D2jG6 [-242,12 604x1090] MMAEtbobS9M8
+rect H3d4b [363,302 1537x663] MMAGXonBnWno
+rect D4VJY [1649,328 213x162] MMAGdgQwfP3Y
+text 25KzQ [28,409 390x450] "Diagramme 
+de cas
+ d'utilisation 
+gestion des feuilles de ro" fs=55 #ffffff start rg=1
+text PNChW [28,1009 50x57] "20" fs=48 #ffffff center rg=1
+=== page 24 L25 PByV0yrzLr9bBWMW
+shape LvTMM [-242,12 604x1090] MMAEtbobS9M8
+rect TsB6l [626,30 1251x1021] MMAGZ0mMvrIM
+text hFGtB [28,409 398x240] "Diagramme 
+de classe global" fs=60 #ffffff start rg=1
+text PhR4X [28,1003 49x57] "24" fs=48 #ffffff center rg=1
+=== page 25 L22 PBVgkvc11Pfq3PpX
+shape 9Fp2l [-242,12 604x1090] MMAEtbobS9M8
+rect DKF0C [363,246 1529x726] MMAGXoI5mvfU
+rect Tg5KY [1647,288 211x160] MMAGdgeSWvok
+text 80y4J [28,409 390x373] "Diagramme 
+de cas
+ d'utilisation 
+compte-rendus" fs=55 #ffffff start rg=1
+text X33gT [32,997 43x57] "21" fs=48 #ffffff center rg=1
+=== page 26 L23 PBMQrTTZrVDq6ydW
+shape VSpQM [-242,12 604x1090] MMAEtbobS9M8
+rect ZrxtZ [382,282 1500x546] MMAGdh7g9o6I
+text Y3Ttw [28,364 390x373] "Diagramme 
+de cas
+ d'utilisation 
+gestion des pré-facture" fs=55 #ffffff start rg=1
+text cBw5m [37,993 47x57] "22" fs=48 #ffffff center rg=1
+=== page 36 L26 PBf68dzrRcGjGLBH
+shape jjjQC [-541,8 1261x1092] MMAFIbMwh7nU
+shape yfjPG [-429,0 1261x1092] MMAEtbobS9M8
+shape Kmpbq [-536,2 1261x1092] MMAGY1njBvXU
+shape Zwpt9 [575,412 257x257] #17e3b2
+rect P3mS8 [662,480 83x121] mMAENv5X5J0c
+shape jWcJw [1812,217 604x863] MMAEtbobS9M8
+shape yWM01 [1540,-91 177x253] MMAEtbobS9M8
+shape YpHdn [1724,173 88x88 r90] MMAEtbobS9M8
+shape rx7QK [680,928 88x88 r90] MMAEtbobS9M8
+shape D8Glp [1518,819 249x356] MMAEtbobS9M8
+shape FnnnK [890,261 129x129 r90] MMAEtbobS9M8
+text 5rvSQ [878,447 765x107] "Réalisation" fs=88 #ffffff start rg=1
+text ghH5f [878,286 153x79] "06" fs=66 #ffffff center rg=1
+text MRrfK [20,997 45x57] "25" fs=48 #ffffff center rg=1
+=== page 39 L27 PBv7wQcPMCxrWyzn
+text ZmYKX [58,439 563x80] "Réalisation" fs=67 #ffffff center rg=1
+text YcWqn [58,540 563x127] "Application
+Recordé" fs=49 #ffffff center rg=3
+line T588d [166,535 772x4 r-90] 
+rect MbLLn [620,186 1259x708] Mvideo
+=== page 45 L28 PBWS1XnM39WskD5t
+shape n9ph1 [-541,8 1261x1092] MMAFIbMwh7nU
+shape LWSVD [-429,0 1261x1092] MMAEtbobS9M8
+shape 0Qgwq [-536,2 1261x1092] MMAGXUSvF09M
+shape X6lfB [575,412 257x257] #17e3b2
+rect kT7N6 [662,480 83x121] mMAENv5X5J0c
+shape xSsBl [1812,217 604x863] MMAEtbobS9M8
+shape QpQvk [1540,-91 177x253] MMAEtbobS9M8
+shape 2xtXh [1724,173 88x88 r90] MMAEtbobS9M8
+shape 1KSDb [680,928 88x88 r90] MMAEtbobS9M8
+shape Tw900 [1518,819 249x356] MMAEtbobS9M8
+shape kxDSz [890,261 129x129 r90] MMAEtbobS9M8
+text vSMgt [878,447 765x426] "Conclusion 
+ et perspectives
+" fs=88 #ffffff start rg=4
+text 3D2hK [878,286 153x79] "06" fs=66 #ffffff center rg=1
+text HNGb9 [18,997 48x57] "27" fs=48 #ffffff center rg=1
+=== page 46 L29 PBmP8zYXwGShXTNq
+rect vJNGH [-275,831 677x588] mMADpuQ19hN8
+rect dBJSn [1403,-294 677x588 r-180] mMADpuQ19hN8
+line jVW13 [509,538 682x4 r90] 
+shape JLn81 [912,374 54x42 r90] #0071c9
+shape 8p0yv [912,604 54x42 r90] #0071c9
+rect gc7z6 [575,18 95x115] mMAFw6mTjDdI
+shape Q9P7H [-60,207 770x551] mMAEqJSafN9w,MMAGY1s0_Oug
+text 8WBjk [13,48 550x85] "Conclusion " fs=70 #ffffff center rg=1
+text 0rJ9s [27,1009 50x57] "28" fs=48 #ffffff center rg=1
+text wL9pz [983,368 972x158] "La plateforme apporte des solutions innovantes pour relever " fs=40 #ffffff start rg=1
+text mW1X6 [977,600 978x158] "Ce projet démontre l’importance des technologies numériques " fs=40 #ffffff start rg=1
+=== page 47 L30 PBMwl5xJMw7SxqLR
+rect Svc5k [-275,831 677x588] mMADpuQ19hN8
+rect 3CF6S [1403,-294 677x588 r-180] mMADpuQ19hN8
+line fTMJW [509,538 682x4 r90] 
+shape vxqs2 [868,377 54x42 r90] #0071c9
+shape NSmQr [868,625 54x42 r90] #0071c9
+rect yZfwm [563,32 93x101] mMAF95gz1RNw
+shape 5DgNb [-60,237 770x551] mMAEqJSafN9w,MMAGY1WLdLng
+text 7BKVH [13,48 550x85] "perspectives" fs=70 #ffffff center rg=1
+text hpr5L [27,1009 49x57] "29" fs=48 #ffffff center rg=1
+text qdGdP [939,371 969x158] "Intégration de fonctionnalités avancées, comme les mises à j" fs=40 #ffffff justify rg=1
+text vhrR1 [939,622 1050x103] "Extension des fonctionnalités pour répondre à des besoins sp" fs=40 #ffffff start rg=1
+=== page 48 L31 PBHshZ3LVy0cqJBh
+group GZCmz [1607,-0 313x313 r90] 
+  shape wGFgS [1764,0 156x156 r90] #0071c9
+  shape M0FFW [1607,0 156x156 r90] #145da0
+  shape G4h02 [1764,156 156x156 r90] #145da0
+group KtY27 [0,885 195x195 r-90] 
+  shape 80FQK [0,982 98x98 r-90] #0071c9
+  shape HXTBf [98,982 98x98 r-90] #145da0
+  shape CcLSv [0,885 98x98 r-90] #145da0
+shape fWCMN [1171,293 553x493] 
+rect 5pHbd [1100,192 696x696] MMAGPNZGtxm8
+text 6Jr7f [372,416 494x201] "ERCI" fs=167 #ffffff start rg=1
+text TQqf1 [89,293 293x403] "M" fs=336 #ffffff start rg=1
+text JYdSQ [279,709 780x215] "POUR VOTRE ATTENTION" fs=97 #ffffff start rg=1
+group vd6rz [-33,-19 313x313] 
+  shape gRpNC [-33,-19 156x156] #0071c9
+  shape 7w2hl [-33,137 156x156] #145da0
+  shape qRHlj [123,-19 156x156] #145da0
+group 6HTT0 [1725,888 195x195 r-180] 
+  shape 0BTH9 [1822,985 98x98 r-180] #0071c9
+  shape kxHq5 [1822,888 98x98 r-180] #145da0
+  shape XD1t3 [1725,985 98x98 r-180] #145da0

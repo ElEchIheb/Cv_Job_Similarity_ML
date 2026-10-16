@@ -24,10 +24,14 @@ from sqlalchemy import func
 
 from src import models_db
 from src.decisioning import DecisionConfig, DecisionEngine, DEFAULT_STRONG_FIT, DEFAULT_POTENTIAL_FIT
+from src.decisioning.calibration import UNCALIBRATED_VERSION, load_calibration
+from src.nlp.screening import evidence_insufficient, similarity_text
 
 logger = logging.getLogger("jobtest.matching")
 
-MODEL_VERSION = "hybrid-checkpoint-v2"
+# v3: decisions are taken on the calibrated score (see decisioning/calibration.py).
+# v4: evidence screening (copied offer text, negations, declared vs demonstrated skills).
+MODEL_VERSION = "hybrid-checkpoint-v4"
 
 _GENERIC_CANDIDATE = {"", "anonymous candidate", "anonymous", "unknown", "unknown candidate"}
 _GENERIC_JOB = {"", "unnamed job offer", "untitled", "n/a"}
@@ -36,6 +40,43 @@ _GENERIC_JOB = {"", "unnamed job offer", "untitled", "n/a"}
 # ─────────────────────────────────────────────────────────────────────────────
 # EVALUATION (pure — no DB)
 # ─────────────────────────────────────────────────────────────────────────────
+
+def score_pair(models: Dict, cv_text: str, job_text: str, model_key: str = "hybrid") -> Dict:
+    """Raw model score -> calibrated displayed score, for any selectable method.
+
+    ``raw_score`` is the method's native 0-1 similarity (the fusion for
+    ``hybrid``); ``percentage`` / ``final_score`` are the calibrated display
+    scale on which the recruiter thresholds apply. Component scores stay raw.
+    """
+    calibration = models.get("calibration") or load_calibration()
+    if model_key == "hybrid":
+        base = models["hybrid"].predict(cv_text, job_text)
+        raw = float(base["final_score"])
+        components = dict(base.get("component_scores", {}))
+        weights = dict(base.get("weights_used", {}))
+        skill_details = base.get("skill_details", {})
+    else:
+        scored_cv = (cv_text if model_key == "skill"
+                     else similarity_text(cv_text, job_text, models["skill"].extractor))
+        raw = float(models[model_key].predict(scored_cv, job_text))
+        components = {f"{model_key}_score": round(raw, 4)}
+        weights = {model_key: 1.0}
+        skill_details = models["skill"].predict_detailed(cv_text, job_text)
+
+    pct = calibration.to_display(model_key, raw)
+    version = calibration.version_for(model_key)
+    return {
+        "raw_score": round(raw, 4),
+        "final_score": round(pct / 100.0, 4),
+        "percentage": pct,
+        "score_scale": "calibrated" if version != UNCALIBRATED_VERSION else "uncalibrated",
+        "calibration_version": version,
+        "confidence": None,  # the decision confidence comes from the DecisionEngine
+        "component_scores": components,
+        "weights_used": weights,
+        "skill_details": skill_details,
+    }
+
 
 def run_evaluation(models: Dict, cv_text: str, job_text: str,
                    model_key: str = "hybrid",
@@ -49,19 +90,7 @@ def run_evaluation(models: Dict, cv_text: str, job_text: str,
     config = config or DecisionConfig.default()
     engine = DecisionEngine(config)
 
-    if model_key == "hybrid":
-        result = models["hybrid"].predict(cv_text, job_text)
-    else:
-        raw = float(models[model_key].predict(cv_text, job_text))
-        result = {
-            "final_score": round(raw, 4),
-            "percentage": round(raw * 100.0, 1),
-            "confidence": None,
-            "component_scores": {f"{model_key}_score": round(raw, 4)},
-            "weights_used": {model_key: 1.0},
-            "skill_details": models["skill"].predict_detailed(cv_text, job_text),
-        }
-
+    result = score_pair(models, cv_text, job_text, model_key)
     pct = float(result.get("percentage", 0.0))
     skill_details = result.get("skill_details", {})
     critical_missing = list(skill_details.get("critical_missing", []))
@@ -70,7 +99,8 @@ def run_evaluation(models: Dict, cv_text: str, job_text: str,
     # Both the DecisionResult used for persistence and the explanation's
     # hiring_recommendation are produced by the SAME DecisionEngine + config,
     # so they can never disagree.
-    decision = engine.evaluate(pct, config, critical_missing=critical_missing)
+    evidence_gap = evidence_insufficient(skill_details)[1] or None
+    decision = engine.evaluate(pct, config, critical_missing=critical_missing, evidence_gap=evidence_gap)
     explanation = models["explainer"].explain(cv_text, job_text, result, config=config)
 
     return {
@@ -163,8 +193,10 @@ def persist_evaluation(db, payload: Dict, cv_text: str,
         candidate_id=candidate.id,
         cv_id=cv_row.id,
         job_offer_id=job.id,
-        final_score=result.get("final_score"),
-        score_hybrid=result.get("final_score") if model_key == "hybrid" else None,
+        final_score=result.get("final_score"),            # calibrated display score / 100
+        score_raw=result.get("raw_score"),                # method's native 0-1 score
+        calibration_version=result.get("calibration_version"),
+        score_hybrid=result.get("raw_score") if model_key == "hybrid" else None,
         score_semantic=comp.get("embedding_score"),
         score_keyword=comp.get("tfidf_score"),
         score_skill=comp.get("skill_score"),

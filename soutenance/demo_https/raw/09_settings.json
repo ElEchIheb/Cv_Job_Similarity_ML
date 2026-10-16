@@ -1,0 +1,46 @@
+[
+ {
+  "t": 3.05,
+  "label": "loaded"
+ },
+ {
+  "t": 3.24,
+  "label": "shot:settings"
+ },
+ {
+  "t": 12.65,
+  "label": "shot:settings_models"
+ },
+ {
+  "t": 16.8,
+  "label": "shot:settings_system"
+ },
+ {
+  "t": 21.0,
+  "label": "shot:settings_about"
+ },
+ {
+  "t": 24.08,
+  "label": "theme"
+ },
+ {
+  "t": 28.48,
+  "label": "shot:theme_switched"
+ },
+ {
+  "t": 32.01,
+  "label": "search"
+ },
+ {
+  "t": 37.68,
+  "label": "shot:search"
+ },
+ {
+  "t": 38.89,
+  "label": "end"
+ },
+ {
+  "t": 38.89,
+  "label": "OK"
+ }
+]

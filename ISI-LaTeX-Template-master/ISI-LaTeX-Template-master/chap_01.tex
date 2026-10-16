@@ -6,7 +6,7 @@ Le présent chapitre fixe le cadre organisationnel, fonctionnel et méthodologiq
 \section{Présentation de l'organisme d'accueil}
 
 \subsection{Présentation de CyberCloud Solutions}
-CyberCloud Solutions est une entreprise de services et de conseil en informatique fondée en 2017. Sa page publique la situe dans le Grand Tunis, indique un effectif de deux à dix personnes et présente une organisation tournée vers l'accompagnement technique, le conseil et la transformation numérique \cite{cybercloud_linkedin}. Dans ce contexte, l'entreprise peut réunir des besoins variés autour des environnements numériques sans que cela implique une spécialisation unique sur le recrutement.
+CyberCloud Solutions est une entreprise de services et de conseil en informatique. Sa page publique la situe dans le Grand Tunis, indique un effectif de deux à dix personnes et présente une organisation tournée vers l'accompagnement technique, le conseil et la transformation numérique \cite{cybercloud_linkedin}. Dans ce contexte, l'entreprise peut réunir des besoins variés autour des environnements numériques sans que cela implique une spécialisation unique sur le recrutement.
 
 Son positionnement associe prestation de services, assistance et conseil. La flexibilité du travail à distance ou hybride est cohérente avec le cadre du stage décrit dans ce mémoire : elle permet de structurer un travail individuel autour de livrables partagés et vérifiables, sans présumer d'une organisation interne, d'un rythme de réunion ou d'une répartition de services qui ne sont pas documentés publiquement.
 
@@ -15,7 +15,7 @@ La figure \ref{fig:cybercloud-logo} reproduit le logo employé par l'entreprise 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.26\textwidth]{Logo_CyberCloud}
-  \caption{Logo de CyberCloud Solutions (source : page officielle de l'entreprise \cite{cybercloud_linkedin})}
+  \caption[Logo de CyberCloud Solutions]{Logo de CyberCloud Solutions \cite{cybercloud_linkedin}}
   \label{fig:cybercloud-logo}
 \end{figure}
 
@@ -25,9 +25,9 @@ Les activités publiées par CyberCloud Solutions peuvent être regroupées sans
 Les spécialités affichées complètent ce panorama : cybersécurité, XDR, réseaux, serveurs, cloud, DevOps, logiciels et intelligence. Elles montrent un environnement technique pluridisciplinaire ; elles ne signifient pas que chacun de ces domaines a été directement mobilisé pour la plateforme. JobTest relève plus précisément de l'ingénierie d'une application d'aide au recrutement, à l'intersection du traitement de texte, du développement web, de la persistance des données et de l'évaluation de modèles.
 
 \subsection{Cadre du stage}
-Ce projet est réalisé par Iheb El Ech dans le cadre du Mastère Professionnel en Applications Web Intelligentes de l'Institut Supérieur d'Informatique du Kef, relevant de l'Université de Jendouba, pour l'année universitaire 2025--2026. Le stage de PFE s'étend de mars à août 2026. Le sujet, proposé par CyberCloud Solutions, est : \emph{conception et développement d'une plateforme intelligente d'aide au recrutement et de mise en correspondance entre CV et offres d'emploi}.
+J'ai réalisé ce projet dans le cadre du Mastère Professionnel en Applications Web Intelligentes de l'Institut Supérieur d'Informatique du Kef, relevant de l'Université de Jendouba. Le sujet, proposé par CyberCloud Solutions, est : \emph{conception et développement d'une plateforme intelligente d'aide au recrutement et de mise en correspondance entre CV et offres d'emploi}.
 
-L'étudiant intervient individuellement en qualité de stagiaire PFE, dans un mode principalement distant ou hybride. L'encadrement professionnel est assuré par Dr. Trabelsi Emna. Ce cadre précise l'origine professionnelle du besoin tout en conservant le caractère académique du travail : les choix techniques, les résultats et leurs limites doivent pouvoir être explicités et contrôlés.
+Mon intervention est individuelle, en qualité de stagiaire PFE, dans un mode principalement distant ou hybride. L'encadrement professionnel est assuré par Dr. Trabelsi Emna. Ce cadre précise l'origine professionnelle du besoin tout en conservant le caractère académique du travail : les choix techniques, les résultats et leurs limites doivent pouvoir être explicités et contrôlés.
 
 \section{Contexte du projet}
 Une candidature condense des informations de natures différentes : expériences, formations, compétences déclarées, réalisations, certifications et éléments libres. Les offres d'emploi présentent elles aussi des exigences hétérogènes, parfois sous forme de listes, parfois dans des descriptions rédigées. La généralisation des candidatures en ligne a accru le volume à examiner et rend la présélection plus difficile à organiser manuellement \cite{ilo_hrm_2026}.
@@ -49,14 +49,14 @@ Les systèmes de suivi de candidatures (\textit{Applicant Tracking Systems}, ou 
 L'analyse textuelle par termes demeure ainsi un signal, non une preuve complète d'adéquation. Les revues sur le recrutement assisté indiquent que les outils de sélection vont aujourd'hui de la recherche de mots à des traitements cherchant des correspondances plus contextuelles ; elles invitent également à distinguer le filtrage technique de la validité d'une décision de sélection \cite{koechling2020fairness}. La comparaison sémantique et l'analyse explicite des compétences constituent donc des compléments pertinents, à condition que leurs résultats restent contrôlables.
 
 \subsection{Solutions numériques étudiées}
-Trois solutions ont été retenues pour une comparaison ciblée, à partir de leur documentation officielle consultée le 13 septembre 2026. LinkedIn Recruiter propose une recherche assistée par IA à partir d'une demande en langage naturel ; selon l'offre et la langue, elle peut produire des recommandations et une synthèse expliquant l'adéquation affichée sur la carte d'un candidat \cite{linkedin_recruiter_search,linkedin_recruiter_ai}. La documentation étudiée ne permet pas de conclure à la présence d'une analyse détaillée des lacunes de compétences ni d'un export de rapport de correspondance CV/offre.
+J'ai retenu trois solutions pour une comparaison ciblée, à partir de leur documentation officielle. LinkedIn Recruiter propose une recherche assistée par IA à partir d'une demande en langage naturel ; selon l'offre et la langue, elle peut produire des recommandations et une synthèse expliquant l'adéquation affichée sur la carte d'un candidat \cite{linkedin_recruiter_search,linkedin_recruiter_ai}. La documentation étudiée ne permet pas de conclure à la présence d'une analyse détaillée des lacunes de compétences ni d'un export de rapport de correspondance CV/offre.
 
 Workable centralise les profils, les CV et le pipeline. Sa vue de candidature permet notamment une recherche par mots-clés ou recherche avancée, l'affichage des compétences et le tri par meilleure évaluation ou meilleur appariement fondé sur les évaluations IA \cite{workable_pipeline}. Sa documentation de sécurité mentionne des dispositifs de protection des données, dont le chiffrement en transit, des mécanismes liés aux droits des candidats et des contrôles de conformité \cite{workable_security}. Ces informations décrivent la plateforme Workable, pas le niveau de protection d'une installation particulière.
 
 Greenhouse Recruiting documente une fonction \emph{Talent Matching} qui compare les CV à une calibration définie et pondérée pour le poste. Il propose aussi des \textit{scorecards} pour évaluer les candidats selon des critères préparés, ainsi que des rapports candidats exportables au format tableur \cite{greenhouse_ai,greenhouse_scorecards,greenhouse_reports}. Les sources consultées ne documentent pas un diagnostic autonome de lacunes de compétences comparable à celui visé par JobTest.
 
 \subsection{Synthèse comparative}
-Le tableau \ref{tab:comparatif-existant} met en regard des capacités directement documentées. Il ne mesure ni la qualité réelle de chaque solution, ni leur couverture complète : la mention \emph{non documenté} signifie seulement qu'aucune preuve explicite n'a été trouvée dans les pages officielles consultées. Les informations sur JobTest proviennent du code, des rapports techniques du dépôt et du déploiement vérifié du projet.
+Le tableau \ref{tab:comparatif-existant} met en regard des capacités directement documentées. Il ne mesure ni la qualité réelle de chaque solution, ni leur couverture complète : la mention \emph{non documenté} signifie seulement que je n'ai trouvé aucune preuve explicite dans les pages officielles consultées. Les informations sur JobTest proviennent du code, des rapports techniques du dépôt et du déploiement vérifié du projet.
 
 \begin{table}[htbp]
 \centering
@@ -78,7 +78,7 @@ Classement et export & Résultats de recherche ; export de rapport d'appariement
 Contrôle et données & Modèle de déploiement/confidentialité non documenté dans les sources consultées & Documentation sécurité et confidentialité disponible & Modèle de déploiement/confidentialité non documenté dans les sources consultées & Persistance limitée au recruteur ; déploiement PFE sur VM Azure\\
 \hline
 \end{tabularx}
-\caption{Comparaison fonctionnelle fondée sur les documentations officielles consultées \cite{linkedin_recruiter_ai,workable_pipeline,workable_security,greenhouse_ai,greenhouse_scorecards,greenhouse_reports}}
+\caption[Comparaison fonctionnelle des solutions existantes]{Comparaison fonctionnelle des solutions existantes \cite{linkedin_recruiter_ai,workable_pipeline,workable_security,greenhouse_ai,greenhouse_scorecards,greenhouse_reports}}
 \label{tab:comparatif-existant}
 \end{table}
 
@@ -87,7 +87,7 @@ Les plateformes étudiées couvrent des besoins opérationnels importants : rech
 
 JobTest adresse ce besoin par une chaîne unique : une analyse hybride associe un signal lexical, un signal sémantique et une analyse des compétences ; un moteur de décision central applique la même politique à toutes les interfaces ; les composantes, les compétences manquantes et des recommandations sont restituées avec le résultat. Les évaluations enregistrent également des métadonnées de reproductibilité, notamment la configuration de décision et les poids utilisés. Une analyse qualitative facultative, exécutée localement via Ollama, intervient après le score statistique et ne peut ni le modifier ni annuler la recommandation.
 
-Cette proposition comporte des limites qu'il faut exposer dès maintenant. L'évaluation hors ligne repose sur des données synthétiques ; elle ne constitue donc pas une preuve de performance sur des décisions d'embauche réelles. L'inférence sémantique et la petite couche LLM locale sont exécutées sur CPU, ce qui introduit une latence perceptible pour l'analyse approfondie. Le déploiement Azure vérifié est adapté à une démonstration de PFE : il s'agit d'une instance unique, publiée en HTTP, sans dispositif de haute disponibilité. Enfin, le petit modèle local peut produire une analyse superficielle ou inexacte ; son résultat est strictement consultatif. Ces limites renforcent la nécessité d'un recruteur décisionnaire.
+Cette proposition comporte des limites qu'il faut exposer dès maintenant. L'évaluation quantitative repose sur un corpus synthétique ; les essais que j'ai menés avec mes propres CV face à des offres réelles sont fonctionnels et ne disposent pas de jugements de référence. Ni l'une ni les autres ne constituent une preuve de performance sur des décisions d'embauche réelles. L'inférence sémantique et la petite couche LLM locale sont exécutées sur CPU, ce qui introduit une latence perceptible pour l'analyse approfondie. Le déploiement Azure vérifié est adapté à une démonstration de PFE : il s'agit d'une instance unique, servie en HTTPS, sans dispositif de haute disponibilité. Enfin, le petit modèle local peut produire une analyse superficielle ou inexacte ; son résultat est strictement consultatif. Ces limites renforcent la nécessité d'un recruteur décisionnaire.
 
 \section{Problématique}
 La problématique du projet peut être formulée ainsi :
@@ -139,13 +139,13 @@ La figure \ref{fig:waterfall-jobtest} présente la déclinaison de cette démarc
 \begin{figure}[htbp]
   \centering
   \input{img/jobtest_waterfall}
-  \caption{Déroulement en cascade adapté au projet JobTest}
+  \caption{Cycle en cascade adapté à JobTest}
   \label{fig:waterfall-jobtest}
 \end{figure}
 
 Le recueil et la formalisation des besoins ont permis de préciser le rôle du recruteur, les entrées CV/offre et les attentes d'explication. L'analyse a ensuite structuré les cas d'usage, les données manipulées et les contraintes de confidentialité. La conception a défini la séparation entre interface web, API, moteur d'appariement, décision, persistance et analyse qualitative optionnelle.
 
-L'implémentation a produit l'application web, les services de traitement des CV, la gestion des offres et des candidats, l'export PDF et les écrans d'évaluation. La validation a porté sur les parcours fonctionnels, le classement, les rapports, les résultats d'évaluation et les corrections du moteur. Enfin, le déploiement a rassemblé Next.js, FastAPI, PostgreSQL, Ollama et Nginx dans une configuration Docker Compose sur une machine virtuelle Azure. Cette dernière étape reste une livraison de démonstration, avec les limites d'exploitation déjà indiquées.
+L'implémentation a produit l'application web, les services de traitement des CV, la gestion des offres et des candidats, l'export PDF et les écrans d'évaluation. La validation a porté sur les parcours fonctionnels, le classement, les rapports, les résultats d'évaluation et les corrections du moteur. Enfin, le déploiement a rassemblé Next.js, FastAPI, PostgreSQL, Ollama et un proxy inverse HTTPS dans une configuration Docker Compose sur une machine virtuelle Azure. Cette dernière étape reste une livraison de démonstration, avec les limites d'exploitation déjà indiquées.
 
 \section*{Conclusion}
 Ce chapitre a présenté CyberCloud Solutions, le cadre individuel du stage et les contraintes du problème de présélection. L'étude de l'existant a montré l'intérêt des ATS et de l'assistance par IA, tout en mettant en évidence l'importance de l'explicabilité, de la supervision humaine et de la prudence face aux résultats automatisés. JobTest répond à ce besoin par une analyse hybride, une décision cohérente et une restitution orientée recruteur, tout en assumant les limites de ses données, de ses modèles et de son déploiement. Le chapitre suivant, \emph{Analyse et spécification des besoins}, détaillera les acteurs, les besoins fonctionnels et non fonctionnels ainsi que la spécification du système.

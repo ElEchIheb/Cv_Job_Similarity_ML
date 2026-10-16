@@ -54,6 +54,8 @@ _REQUIRED_COLUMNS: Dict[str, Dict[str, str]] = {
         "evaluation_method": "VARCHAR",
         "weights_json": "TEXT",
         "llm_analysis_json": "TEXT",
+        "score_raw": "FLOAT",
+        "calibration_version": "VARCHAR",
     },
 }
 
@@ -117,7 +119,8 @@ def backfill_legacy(engine) -> Dict[str, int]:
         for row in rows:
             mid, score, _old = row[0], row[1], row[2]
             score = 0.0 if score is None else float(score)
-            result = engine_dec.evaluate(score)
+            # Legacy rows store a 0-1 fraction; convert explicitly.
+            result = engine_dec.evaluate(engine_dec.from_fraction(score))
             conn.execute(
                 text(
                     "UPDATE match_results SET decision=:d, confidence=:c, "
